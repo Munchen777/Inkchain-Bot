@@ -47,3 +47,5 @@ def get_accounts_data():
             logger.error(f"Error when reading a string {row}: {e}")
 
     return accounts
+
+sdg
