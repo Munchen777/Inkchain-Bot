@@ -1,0 +1,3 @@
+
+class SoftwareException(Exception):
+    pass

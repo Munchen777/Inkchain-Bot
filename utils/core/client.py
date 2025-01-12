@@ -5,8 +5,8 @@ from web3.contract import AsyncContract
 from web3.exceptions import TransactionNotFound, TimeExhausted
 from web3 import AsyncHTTPProvider, AsyncWeb3
 
-from .network import Network
-from .logger import logger
+from utils.networks import Network
+from modules import Logger
 from data.config import ERC20_ABI, NETWORK_TOKEN_CONTRACTS
 
 
@@ -15,6 +15,9 @@ class BlockchainException(Exception):
 
 class SoftwareException(Exception):
     pass
+
+
+logger = Logger().get_logger()
 
 
 class Client:
