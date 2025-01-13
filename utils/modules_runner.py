@@ -8,7 +8,7 @@ from random import shuffle
 from typing import Any, Dict, List
 from web3 import AsyncWeb3, AsyncHTTPProvider
 
-from config import ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, CHAIN_NAMES
+from data.config import ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, CHAIN_NAMES
 from generall_settings import (WALLETS_TO_WORK, SHUFFLE_WALLETS, SOFTWARE_MODE, USE_PROXY,
                                ACCOUNTS_IN_STREAM, GLOBAL_NETWORK, SAVE_PROGRESS, TELEGRAM_NOTIFICATIONS, BREAK_ROUTE,
                                SLEEP_MODE, SLEEP_TIME_ACCOUNTS, SLEEP_TIME_MODULES, TG_ID, TG_TOKEN)
