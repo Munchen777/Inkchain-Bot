@@ -8,6 +8,7 @@ from web3 import AsyncHTTPProvider, AsyncWeb3
 from utils.networks import Network
 from modules import Logger
 from data.config import ERC20_ABI, NETWORK_TOKEN_CONTRACTS
+from generall_settings import RANDOM_RANGE, ROUNDING_LEVELS
 
 
 class BlockchainException(Exception):
@@ -20,8 +21,9 @@ class SoftwareException(Exception):
 logger = Logger().get_logger()
 
 
-class Client:
+class Client(Logger):
     def __init__(self, network: Network, private_key: str, name: str, proxy: str = None):
+        super().__init__()
         self.name = name
         self.network: Network = network
         self.proxy_init = proxy
@@ -30,6 +32,84 @@ class Client:
         self.w3 = AsyncWeb3(AsyncHTTPProvider(self.rpc, request_kwargs=self.request_kwargs))
         self.private_key = private_key
         self.address = AsyncWeb3.to_checksum_address(self.w3.eth.account.from_key(private_key).address)
+    
+    async def get_value_and_normalized_value(
+        self, normalized_fee: float, normalized_min_available_balance: float = 0.0025,
+        normalized_min_amount_out: float = 0.002, normalized_min_amount_residue: float = 0.005
+    ) -> tuple[int, float] | None:
+        """
+        Метод для автоматического расчёта value для мостов Л2.
+        """
+        balance = await self.get_token_balance(check_native=True)
+
+        if not self._has_sufficient_balance(
+            balance, normalized_min_available_balance, "ETH", True
+        ):
+            return None
+
+        return self._calculate_value(
+            balance, normalized_min_amount_out, normalized_min_amount_residue,
+            "ETH", True, normalized_fee
+        )
+
+    def _has_sufficient_balance(
+        self, balance: int, normalized_min_available_balance: float,
+        token_name: str, check_native: bool
+    ) -> bool:
+        """
+        Проверяет, достаточно ли баланса.
+        """
+        if balance is None:
+            logger.warning(
+                f"{self.name} | Balance not found for address: {self.address}. "
+                f"Most likely, the balance is completely empty."
+            )
+            return False
+
+        decimals = self.get_decimals(token_name, check_native)
+        min_balance = normalized_min_available_balance / decimals
+
+        if balance < min_balance:
+            logger.warning(
+                f"{self.name} | Insufficient {self.network.token} balance for transaction "
+                f"on network {self.network.name}. Address: {self.address}. "
+                f"Minimum required: {normalized_min_available_balance} {self.network.token}."
+            )
+            return False
+
+        return True
+
+    def _calculate_value(
+        self, balance: int, normalized_min_amount_out: float, normalized_min_amount_residue: float,
+        token_name: str, check_native: bool, normalized_fee: float,
+        random_range: tuple[float, float] = RANDOM_RANGE, 
+        rounding_levels: tuple[int, int] = ROUNDING_LEVELS
+    ) -> tuple[int, float]:
+        """
+        Расчёт значений для моста.
+        """
+        decimals = self.get_decimals(token_name, check_native)
+        min_out = (normalized_min_amount_out + normalized_fee) / decimals
+        min_residue = normalized_min_amount_residue / decimals
+        free_amount = balance - min_residue
+
+        if free_amount < min_out:
+            logger.warning(
+                f"{self.name} | Insufficient {self.network.token} for the bridge "
+                f"on network {self.network.name}. Address: {self.address}. "
+                f"Free tokens: {free_amount * decimals:.6f} ETH, "
+                f"required: {normalized_min_amount_out:.6f} ETH."
+            )
+            return 0, 0.0
+
+        random_percent = random.uniform(*random_range)
+        normalized_value = round(
+            free_amount * random_percent + normalized_min_amount_out,
+            random.randint(*rounding_levels)
+        )
+        value = int(normalized_value * decimals)
+
+        return value, normalized_value
     
     @staticmethod
     def get_normalize_error(error: Exception) -> Exception | str:
@@ -107,51 +187,6 @@ class Client:
             return tx_params
         except Exception as error:
             raise BlockchainException(f'{self.get_normalize_error(error)}')
-
-    async def make_call(self, contract_address: str, function_name: str, *args, abi: dict = None, 
-                       retry_count: int = 3, retry_delay: int = 1) -> any:
-        """
-        Выполняет call-вызов к смарт-контракту с автоматическими повторами при ошибке
-        
-        :param contract_address: Адрес контракта
-        :param function_name: Имя вызываемой функции
-        :param args: Аргументы функции
-        :param abi: ABI контракта (если не указан, используется ERC20_ABI)
-        :param retry_count: Количество попыток при ошибке
-        :param retry_delay: Задержка между попытками в секундах
-        :return: Результат вызова функции
-        """
-        if abi is None:
-            abi = ERC20_ABI
-
-        contract = await self.get_contract(contract_address, abi)
-        
-        for attempt in range(retry_count):
-            try:
-                contract_function = getattr(contract.functions, function_name)
-                result = await contract_function(*args).call({'from': self.address})
-                return result
-            
-            except Exception as error:
-                if attempt == retry_count - 1:  # Если это последняя попытка
-                    raise BlockchainException(f'Call failed after {retry_count} attempts: {self.get_normalize_error(error)}')
-                
-                logger.warning(f'Call attempt {attempt + 1} failed: {self.get_normalize_error(error)} | {self.address}')
-                await asyncio.sleep(retry_delay)
-        """# Пример вызова balanceOf
-        balance = await client.make_call(
-            contract_address="0x...",
-            function_name="balanceOf",
-            wallet_address
-        )
-
-        # Пример вызова с кастомным ABI
-        result = await client.make_call(
-            contract_address="0x...",
-            function_name="customFunction",
-            param1, param2,
-            abi=CUSTOM_ABI
-        )"""
         
     async def send_transaction(self, transaction, need_hash: bool = False, without_gas: bool = False,
                                poll_latency: int = 10, timeout: int = 360):
