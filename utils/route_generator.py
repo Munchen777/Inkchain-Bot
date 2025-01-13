@@ -3,7 +3,7 @@ import json
 
 from typing import Dict, List, Tuple, Set
 
-from config import ACCOUNT_NAMES
+from data.config import ACCOUNT_NAMES
 from generall_settings import GLOBAL_NETWORK, SHUFFLE_ROUTE
 from functions import bridge_native
 from modules import Logger

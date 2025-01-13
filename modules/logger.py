@@ -85,7 +85,7 @@ class Logger(ABC):
             self.logger.addHandler(file_handler)
     
     def logger_msg(self, account_name, address, msg, type_msg: Literal["info", "error", "success", "warning"] = 'info'):
-        from config import CHAIN_NAMES
+        from data.config import CHAIN_NAMES
 
         software_chain: str = CHAIN_NAMES[GLOBAL_NETWORK]
 
