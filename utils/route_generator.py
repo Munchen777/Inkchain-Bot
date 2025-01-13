@@ -7,8 +7,8 @@ from data.config import ACCOUNT_NAMES
 from generall_settings import GLOBAL_NETWORK, SHUFFLE_ROUTE
 from functions import*
 from modules import Logger
-from modules.interfaces import SoftwareException
 from settings import CLASSIC_ROUTES_MODULES_USING, CLASSIC_WITHDRAW_DEPENDENCIES
+from utils.client import SoftwareException
 from utils.tools import clean_progress_file
 
 
