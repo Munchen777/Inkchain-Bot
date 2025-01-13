@@ -20,7 +20,7 @@ class BridGGWorker(Logger):
             normalized_min_amount_residue=0.01
         )
 
-        self.logger_msg(
+        self.logger.info(
             f'{self.client.name} Sending {balance} ETH via the official bridge from the Ethereum network to Ink'
         )
 
@@ -42,6 +42,6 @@ class BridGGWorker(Logger):
             ).build_transaction(tx_params)
             await self.client.send_transaction(tx_params, need_hash=True)
         except Exception as error:
-            logger.error(
+            self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ethereum network to Ink'
             )
