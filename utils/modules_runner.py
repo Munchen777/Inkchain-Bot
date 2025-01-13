@@ -15,7 +15,7 @@ from generall_settings import (WALLETS_TO_WORK, SHUFFLE_WALLETS, SOFTWARE_MODE, 
 from modules import Logger
 from utils.tools import clean_progress_file
 from utils.route_generator import AVAILABLE_MODULES_INFO, get_func_by_name
-from utils.core.client import SoftwareException
+from utils.client import SoftwareException
 from utils.networks import Ethereum
 
 
