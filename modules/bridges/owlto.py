@@ -1,13 +1,20 @@
-from . import*
+from web3 import AsyncWeb3
+from web3.contract import AsyncContract
+from web3.contract.async_contract import AsyncContract
+from web3.eth.async_eth import ChecksumAddress
 
-class BridgeOwltoWorker:
+from modules import*
+from utils.client import Client
+from data.config import BRIDGE_OWLTO_ABI
+
+class BridgeOwltoWorker(Logger):
     def __init__(self, client: Client):
         self.client = client
 
     async def bridge_from_op_to_ink(self):
         value, balance = await self.client.get_value_and_normalized_value(normalized_fee=0.0005)
 
-        logger.info(
+        self.logger.info(
             f'{self.client.name} Sending {balance} ETH via the official bridge from the Optimism network to Ink'
         )
 
@@ -32,14 +39,14 @@ class BridgeOwltoWorker:
             ).build_transaction(tx_params)
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
-            logger.error(
+            self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Optimism network to Ink'
             )
 
     async def bridge_from_base_to_ink(self):
         value, balance = await self.client.get_value_and_normalized_value(normalized_fee=0.0005)
 
-        logger.info(
+        self.logger.info(
             f'{self.client.name} Sending {balance} ETH via the official bridge from the Base network to Ink'
         )
 
@@ -64,14 +71,14 @@ class BridgeOwltoWorker:
             ).build_transaction(tx_params)
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
-            logger.error(
+            self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink'
             )
 
     async def bridge_from_ink_to_op(self):
         value, balance = await self.client.get_value_and_normalized_value(normalized_fee=0.0005)
 
-        logger.info(
+        self.logger.info(
             f'{self.client.name} Sending {balance} ETH via the official bridge from the Ink network to OP'
         )
 
@@ -89,14 +96,14 @@ class BridgeOwltoWorker:
             transaction = await contract.functions.deposit(            ).build_transaction(tx_params)
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
-            logger.error(
+            self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP'
             )
 
     async def bridge_from_ink_to_op(self):
         value, balance = await self.client.get_value_and_normalized_value(normalized_fee=0.0005)
 
-        logger.info(
+        self.logger.info(
             f'{self.client.name} Sending {balance} ETH via the official bridge from the Ink network to Base'
         )
 
@@ -114,6 +121,6 @@ class BridgeOwltoWorker:
             transaction = await contract.functions.deposit(            ).build_transaction(tx_params)
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
-            logger.error(
+            self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to Base'
             )
