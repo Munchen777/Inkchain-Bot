@@ -58,7 +58,7 @@ class Client(Logger):
         Проверяет, достаточно ли баланса.
         """
         if balance is None:
-            logger.warning(
+            self.logger.warning(
                 f"{self.name} | Balance not found for address: {self.address}. "
                 f"Most likely, the balance is completely empty."
             )
@@ -68,7 +68,7 @@ class Client(Logger):
         min_balance = normalized_min_available_balance / decimals
 
         if balance < min_balance:
-            logger.warning(
+            self.logger.warning(
                 f"{self.name} | Insufficient {self.network.token} balance for transaction "
                 f"on network {self.network.name}. Address: {self.address}. "
                 f"Minimum required: {normalized_min_available_balance} {self.network.token}."
@@ -92,7 +92,7 @@ class Client(Logger):
         free_amount = balance - min_residue
 
         if free_amount < min_out:
-            logger.warning(
+            self.logger.warning(
                 f"{self.name} | Insufficient {self.network.token} for the bridge "
                 f"on network {self.network.name}. Address: {self.address}. "
                 f"Free tokens: {free_amount * decimals:.6f} ETH, "
@@ -199,7 +199,7 @@ class Client(Logger):
             tx_hash = await self.w3.eth.send_raw_transaction(singed_tx.raw_transaction)
         except Exception as error:
             if self.get_normalize_error(error) == 'already known':
-                logger.warning(f'RPC получил ошибку, но tx был отправлен | {self.address}')
+                self.logger.warning(f'RPC получил ошибку, но tx был отправлен | {self.address}')
                 return True
             else:
                 raise BlockchainException(f'{self.get_normalize_error(error)}')
@@ -213,7 +213,7 @@ class Client(Logger):
                     receipts = await self.w3.eth.get_transaction_receipt(tx_hash) 
                     status = receipts.get("status")
                     if status == 1:
-                        logger.success(f'Транзакция прошла успешно: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
+                        self.logger.success(f'Транзакция прошла успешно: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
                         if need_hash:
                             return tx_hash
                         return True
@@ -228,7 +228,7 @@ class Client(Logger):
                     await asyncio.sleep(poll_latency)
 
                 except Exception as error:
-                    logger.error(f'RPC получил автоматический ответ. Ошибка: {error} | {self.address}')
+                    self.logger.error(f'RPC получил автоматический ответ. Ошибка: {error} | {self.address}')
                     total_time += poll_latency
                     await asyncio.sleep(poll_latency)
         except Exception as error:
