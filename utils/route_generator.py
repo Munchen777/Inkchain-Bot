@@ -5,7 +5,7 @@ from typing import Dict, List, Tuple, Set
 
 from data.config import ACCOUNT_NAMES
 from generall_settings import GLOBAL_NETWORK, SHUFFLE_ROUTE
-from functions import bridge_native
+from functions import*
 from modules import Logger
 from modules.interfaces import SoftwareException
 from settings import CLASSIC_ROUTES_MODULES_USING, CLASSIC_WITHDRAW_DEPENDENCIES
@@ -14,7 +14,8 @@ from utils.tools import clean_progress_file
 
 AVAILABLE_MODULES_INFO: Dict = {
     # module name: function, priority, tg module name, supported network
-    bridge_native: (bridge_native, 1, "Bridge Native", [2]),
+    # bridge_native: (bridge_native, 1, "Bridge Native", [2]),
+    bridge_gg_worker: (bridge_gg_worker, 1, "Bridge GG", [2]),
 
 }
 
