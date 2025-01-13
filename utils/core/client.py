@@ -18,8 +18,6 @@ class SoftwareException(Exception):
     pass
 
 
-logger = Logger().get_logger()
-
 
 class Client(Logger):
     def __init__(self, network: Network, private_key: str, name: str, proxy: str = None):
