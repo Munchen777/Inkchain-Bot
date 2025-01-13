@@ -1,7 +1,38 @@
+from decimal import Decimal
 from typing import Dict
 
+from modules.interfaces import BridgeModuleInfo
 from utils.networks import Ethereum, Ink
 from utils.tools import get_accounts_data
+
+
+"""
+Available modules:
+    - bridge_native
+    - bridge_gg
+
+"""
+
+MODULES_INFO: Dict[str, BridgeModuleInfo] = {
+    "bridge_native": BridgeModuleInfo(
+        name="bridge_native",
+        display_name="Bridge Native Token",
+        source_network=Ethereum.name,
+        destination_network=Ink.name,
+        min_amount=Decimal(0.01),
+        max_amount=Decimal(0.02),
+        priority=1,
+    ),
+    "bridge_gg": BridgeModuleInfo(
+        name="bridge_gg",
+        display_name="Bridge GG",
+        source_network=Ethereum.name,
+        destination_network=Ink.name,
+        min_amount=Decimal(0.01),
+        max_amount=Decimal(0.02),
+        priority=1,
+    ),
+}
 
 
 CHAIN_NAMES: Dict[int, str] = {
