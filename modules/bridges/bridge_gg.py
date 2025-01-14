@@ -1,5 +1,3 @@
-import random
-
 from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
@@ -40,7 +38,7 @@ class BridGGWorker(Logger):
                 2000,
                 b'6272696467670a'
             ).build_transaction(tx_params)
-            await self.client.send_transaction(tx_params, need_hash=True)
+            await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ethereum network to Ink'
