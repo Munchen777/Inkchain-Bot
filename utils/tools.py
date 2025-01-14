@@ -9,7 +9,7 @@ from modules import Logger
 from openpyxl.utils.exceptions import InvalidFileException
 
 
-logger = Logger().get_logger()
+logger: Logger = Logger().get_logger()
 
 
 def get_accounts_data():
