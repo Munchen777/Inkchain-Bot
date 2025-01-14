@@ -37,6 +37,9 @@ def get_accounts_data():
             private_key = row[1].value
             proxy = row[2].value
 
+            if not all([account_name, private_key, proxy]):
+                continue
+
             account_names.append(str(account_name) if isinstance(account_name, (str, int)) else None)
             private_keys.append(private_key if private_key else None)
             proxies.append(
