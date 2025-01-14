@@ -21,8 +21,11 @@ class BaseModuleInfo(BaseModel):
 
 class BridgeModuleInfo(BaseModuleInfo):
     """ Bridge module info class for all bridge modules """
-    min_amount: float = 0.01
-    max_amount: float = 0.02
+    fee: float = 0.0005
+    min_available_balance: float = 0.008
+    min_amount_residue: float = 0.005
+    min_amount_out: float = 0.002
+    max_amount_out: float = 0.003
     source_network: Optional[str] = None
     destination_network: Optional[str] = None
     module_type: str = "bridge"
@@ -37,3 +40,13 @@ class BridgeNativeModule(BridgeModuleInfo):
     module_priority: int = 1
     module_name: str = "bridge_native"
     module_display_name: str = "Bridge Native"
+
+class BridgeOwltoModule(BridgeModuleInfo):
+    """ Bridge Owlto module from Ethereum to Ink  """
+    source_network: str = Ethereum.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ethereum.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 1
+    module_name: str = "bridge_owlto"
+    module_display_name: str = "Bridge Owlto"
