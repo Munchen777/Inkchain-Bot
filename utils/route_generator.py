@@ -1,76 +1,72 @@
 import random
 import json
 
-from typing import Dict, List, Tuple, Set
+from typing import Any, Dict, List, Set
 
-from data.config import ACCOUNT_NAMES
+from data.config import ACCOUNT_NAMES, MODULES_INFO, MODULES_CLASSES_NAMES
 from generall_settings import GLOBAL_NETWORK, SHUFFLE_ROUTE
 from functions import*
 from modules import Logger
+from modules.interfaces import BaseModuleInfo
 from settings import CLASSIC_ROUTES_MODULES_USING, CLASSIC_WITHDRAW_DEPENDENCIES
 from utils.client import SoftwareException
 from utils.tools import clean_progress_file
 
 
-AVAILABLE_MODULES_INFO: Dict = {
-    # module name: function, priority, tg module name, supported network
-    # bridge_native: (bridge_native, 1, "Bridge Native", [2]),
-    bridge_gg_worker: (bridge_gg_worker, 1, "Bridge GG", [2]),
-
-}
-
-
-def get_func_by_name(module_name, help_message: bool = False):
+def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo:
     """Ищет в словаре AVAILABLE_MODULES_INFO по имени модуля и возвращает либо module_name,
     либо tg info, в зависимости от значения аргумента help_message"""
-    for k, v in AVAILABLE_MODULES_INFO.items():
-        if k.__name__ == module_name:
+    for _module_name, module_obj in MODULES_INFO.items():
+        if _module_name == module_name:
             if help_message:
-                return v[2]
-            return v[0]
+                return module_obj.display_name
+            return module_obj
 
 
 class RouteGenerator(Logger):
     def __init__(self):
         super().__init__()
 
-        self.modules_names_const: list = [
-            module.__name__ for module in list(AVAILABLE_MODULES_INFO.keys())
-        ]
-
     @staticmethod
-    def classic_generate_route() -> List[str]:
+    def classic_generate_route() -> List[BaseModuleInfo]:
         """
-        Generate list of module_names based on module priority
+        Generate list of BaseNoduleInfo
 
         """
-        route = []
-        rpc = GLOBAL_NETWORK
-        """ 
-        CLASSIC_ROUTES_MODULES_USING = [
-            ["bridge_native: 1"],
-        ] 
-          
-        """
+        route: List[BaseModuleInfo] = []
+
         for i in CLASSIC_ROUTES_MODULES_USING:
             module_name: str = random.choice(i)
 
-            if module_name is None:
+            if module_name is None or module_name not in MODULES_INFO:
                 continue
 
-            if ":" in module_name:
-                module_name, rpc = module_name.split(":")
+            module_obj: BaseModuleInfo = get_func_by_name(module_name)
 
-            module = get_func_by_name(module_name)
-
-            if module:
-                route.append(f"{module.__name__} {rpc}")
+            if module_obj:
+                route.append(module_obj)
                 continue
 
             raise SoftwareException(f"There is no module with the name {module_name} in the software!")
 
         return route
     
+    @classmethod
+    def create_route_from_dict(cls, route_dict: Dict[str, Any]) -> BaseModuleInfo:
+        module_name, module_display_name = (
+            route_dict.get("module_name"),
+            route_dict.get("module_display_name")
+        )
+        module_class = MODULES_CLASSES_NAMES.get(module_name) or \
+                        MODULES_CLASSES_NAMES.get(module_display_name)
+
+        # validated_module = module_class.model_validate(route_dict)
+
+        if not module_class:
+            raise ValueError(f"Unknown module name: {module_name} or {module_display_name}")
+
+        return module_class(**route_dict)
+
     def sort_classic_route(self, route: list[str], landing_mode: bool) -> List[str]:
         """
         Create classic route
@@ -139,15 +135,15 @@ class RouteGenerator(Logger):
                 if isinstance(account_name, (str, int)):
                     classic_route = self.classic_generate_route()
 
-                    if SHUFFLE_ROUTE:
-                        classic_route = self.sort_classic_route(route=classic_route)
+                    # if SHUFFLE_ROUTE:
+                    #     classic_route = self.sort_classic_route(route=classic_route)
 
-                    if CLASSIC_WITHDRAW_DEPENDENCIES:
-                        classic_route = self.sort_classic_route(route=classic_route, landing_mode=True)
+                    # if CLASSIC_WITHDRAW_DEPENDENCIES:
+                    #     classic_route = self.sort_classic_route(route=classic_route, landing_mode=True)
 
                     account_data = {
                         "current_step": 0,
-                        "route": classic_route,
+                        "route": [module_obj.model_dump() for module_obj in classic_route],
                     }
                     accounts_data[str(account_name)] = account_data
 

@@ -7,7 +7,8 @@ from web3 import AsyncHTTPProvider, AsyncWeb3
 
 from utils.networks import Network
 from modules import Logger
-from data.config import ERC20_ABI, NETWORK_TOKEN_CONTRACTS
+from data.abi import ERC20_ABI
+from settings import NETWORK_TOKEN_CONTRACTS
 from generall_settings import RANDOM_RANGE, ROUNDING_LEVELS
 
 

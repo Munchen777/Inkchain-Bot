@@ -1,22 +1,39 @@
-from dataclasses import dataclass
-from decimal import Decimal
+from pydantic import BaseModel
+from typing import Any, Dict, Optional, Literal
 
-from modules import Logger
-
-
-@dataclass
-class BaseModuleInfo:
-    name: str
-    display_name: str
-    priority: int = 0
-    module_type: str = "base"
+from utils.networks import Ethereum, Ink
 
 
-@dataclass
-class BridgeModuleInfo(BaseModuleInfo, Logger):
-   # сделать некоторые поля необязательными
-    source_network: str | None
-    destination_network: str | None
-    min_amount: Decimal | 0.01
-    max_amount: Decimal | 0.02
-    module_type: str = "bridge" | None
+MODULE_TYPES = Literal[
+    "swap",
+    "bridge",
+    "add_liquidity",
+    "remove_liquidity"
+]
+
+class BaseModuleInfo(BaseModel):
+    """ Base module info class for all modules"""
+    module_name: str = "BaseModule"
+    module_display_name: str = "BaseModule"
+    module_priority: int = 0
+    module_type: MODULE_TYPES = "base"
+
+
+class BridgeModuleInfo(BaseModuleInfo):
+    """ Bridge module info class for all bridge modules """
+    min_amount: float = 0.01
+    max_amount: float = 0.02
+    source_network: Optional[str] = None
+    destination_network: Optional[str] = None
+    module_type: str = "bridge"
+
+
+class BridgeNativeModule(BridgeModuleInfo):
+    """ Bridge native module info class for bridge native tokens from Ethereum to Ink """
+    source_network: str = Ethereum.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ethereum.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 1
+    module_name: str = "bridge_native"
+    module_display_name: str = "Bridge Native"

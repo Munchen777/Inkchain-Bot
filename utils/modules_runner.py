@@ -5,16 +5,17 @@ import re
 import telebot
 
 from random import shuffle
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List
 from web3 import AsyncWeb3, AsyncHTTPProvider
 
-from data.config import ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, CHAIN_NAMES
+from data.config import (ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, CHAIN_NAMES, MODULE_RUNNERS)
 from generall_settings import (WALLETS_TO_WORK, SHUFFLE_WALLETS, SOFTWARE_MODE, USE_PROXY,
                                ACCOUNTS_IN_STREAM, GLOBAL_NETWORK, SAVE_PROGRESS, TELEGRAM_NOTIFICATIONS, BREAK_ROUTE,
                                SLEEP_MODE, SLEEP_TIME_ACCOUNTS, SLEEP_TIME_MODULES, TG_ID, TG_TOKEN)
 from modules import Logger
+from modules.interfaces import BaseModuleInfo
 from utils.tools import clean_progress_file
-from utils.route_generator import AVAILABLE_MODULES_INFO, get_func_by_name
+from utils.route_generator import get_func_by_name, RouteGenerator
 from utils.client import SoftwareException
 from utils.networks import Ethereum
 
@@ -164,22 +165,22 @@ class Runner(Logger):
         message_list, result_list, route_paths, break_flag, module_counter = [], [], [], False, 0
 
         try:
-            route_data = self.load_routes().get(str(account_name), {}).get("route", [])
+            route_data = self.load_routes()
 
             if not route_data:
                 raise SoftwareException("Route isn't available")
 
-            route_modules = [[*i.split()] for i in route_data]
+            route_modules: List[BaseModuleInfo | None] = [
+                RouteGenerator.create_route_from_dict(module_data)
+                for module_data in route_data.get(str(account_name), {}).get("route", [])
+            ]
 
             current_step = 0
             if SAVE_PROGRESS:
-                current_step = self.load_routes()[str(account_name)]["current_step"]
-
-            module_info = AVAILABLE_MODULES_INFO
-            info = CHAIN_NAMES[1]
+                current_step = route_data.get(str(account_name), {}).get("current_step", 0)
 
             message_list.append(
-                f'⚔️ {info} | Account name: "{account_name}"\n \n{len(route_modules)} module(s) in route\n')
+                f'⚔️| Account name: "{account_name}"\n \n{len(route_modules)} module(s) in route\n')
 
             if current_step >= len(route_modules):
                 self.logger_msg(
@@ -188,23 +189,29 @@ class Runner(Logger):
 
             while current_step < len(route_modules):
                 module_counter += 1
-                module_name = route_modules[current_step][0]
-                module_func = get_func_by_name(module_name)
+                current_module = route_modules[current_step]
+                module_name: str = current_module.module_name
+                module_func: Callable | None = MODULE_RUNNERS.get(module_name)
 
-                module_name_tg = AVAILABLE_MODULES_INFO[module_func][2]
+                if not module_func:
+                    raise SoftwareException(f"Module function not found: {module_name}")
+
+                module_display_name: str = current_module.module_display_name
 
                 if parallel_mode and module_counter == 1:
                     await self.smart_sleep(account_name, index, accounts_delay=True)
 
-                self.logger_msg(account_name, None, f"🚀 Launch module: {module_info[module_func][2]}")
+                self.logger_msg(account_name, None, f"🚀 Launch module: {module_display_name}")
 
-                module_input_data = [account_name, private_key, proxy]
+                module_input_data: List[str, str, str, BaseModuleInfo] = [
+                    account_name, private_key, proxy, current_module
+                ]
 
                 try:
                     result = await module_func(*module_input_data)
 
                 except Exception as error:
-                    info = f"Module name: {module_info[module_func][2]} | Error {error}"
+                    info = f"Module name: {module_display_name} | Error {error}"
                     self.logger_msg(
                         account_name, None, f"Error while working: {info}", type_msg='error')
                     result = False
@@ -220,14 +227,14 @@ class Runner(Logger):
                     result = False
 
                     if BREAK_ROUTE:
-                        message_list.extend([f'❌   {module_name_tg}\n', f'💀 The route was broken!\n'])
-                        account_progress = (False, module_name, account_name)
+                        message_list.extend([f'❌   {module_display_name}\n', f'💀 The route was broken!\n'])
+                        account_progress = (False, current_module.module_name, account_name)
                         result_list.append(account_progress)
                         break
 
                 current_step += 1
-                message_list.append(f'{"✅" if result else "❌"}   {module_name_tg}\n')
-                account_progress = (result, module_name, account_name)
+                message_list.append(f'{"✅" if result else "❌"}   {module_display_name}\n')
+                account_progress = (result, current_module.module_name, account_name)
                 result_list.append(account_progress)
     
             success_count = len([1 for i in result_list if i[0]])

@@ -7,7 +7,7 @@ from web3.eth.async_eth import ChecksumAddress
 
 from modules import*
 from utils.client import Client
-from data.config import BRIDGE_GG_ABI
+from data.abi import BRIDGE_GG_ABI
 
 class BridGGWorker(Logger):
     def __init__(self, client: Client):
