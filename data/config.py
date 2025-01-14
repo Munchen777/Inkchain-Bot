@@ -1,7 +1,7 @@
 from typing import Callable, Dict
 
-from functions import bridge_native
-from modules.interfaces import BridgeNativeModule, BaseModuleInfo
+from functions import bridge_native_worker, bridge_owlto_worker, bridge_gg_worker
+from modules.interfaces import BridgeNativeModule, BaseModuleInfo, BridgeOwltoModule, BridgeGGModule
 from utils.networks import Ethereum, Ink
 from utils.tools import get_accounts_data
 
@@ -13,13 +13,11 @@ Available modules:
 
 """
 
-MODULES_INFO: Dict[str, BaseModuleInfo] = {
-    "bridge_native": BridgeNativeModule(),
-}
-
 # Mapping of module names to module classes
-MODULES_CLASSES_NAMES: Dict[str, BaseModuleInfo] = {
+MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_native": BridgeNativeModule,
+    "bridge_gg": BridgeGGModule,
+    "bridge_owlto": BridgeOwltoModule,
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -29,7 +27,9 @@ CHAIN_NAMES: Dict[int, str] = {
 
 # Mapping of module names to module functions
 MODULE_RUNNERS: Dict[str, Callable] = {
-    "bridge_native": bridge_native,
+    "bridge_native": bridge_native_worker,
+    "bridge_gg": bridge_gg_worker,
+    "bridge_owlto": bridge_owlto_worker,
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()
