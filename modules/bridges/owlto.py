@@ -22,7 +22,7 @@ class BridgeOwltoWorker(Logger):
         self.module_name: str | None = module_info.module_name
         self.module_display_name: str | None = module_info.module_display_name
 
-    async def bridge_from_op_to_ink(self):
+    async def run(self):
         value, balance = await self.client.get_value_and_normalized_value(normalized_fee=0.0005)
 
         self.logger.info(
@@ -34,9 +34,10 @@ class BridgeOwltoWorker(Logger):
         )
 
         contract: AsyncContract = self.client.w3.eth.contract(
-            proxy_address_contract,
-            BRIDGE_OWLTO_ABI
+            address=proxy_address_contract,
+            abi=BRIDGE_OWLTO_ABI
         )
+
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)

@@ -2,9 +2,8 @@ from utils.client import Client
 from modules.bridges import *
 from modules.interfaces import (BridgeModuleInfo, BridgeOwltoModule, BridgeGGModule)
 
-
-def get_client(account_name, private_key, proxy) -> Client:
-    return Client(account_name, private_key, proxy)
+def get_client(account_name, private_key, proxy, source_network) -> Client:
+    return Client(account_name, private_key, proxy, source_network)
 
 
 async def bridge_native_worker(account_name: str, private_key: str, proxy: str | None, module_info: BridgeModuleInfo):
@@ -27,3 +26,4 @@ async def bridge_owlto_worker(account_name: str, private_key: str, proxy: str | 
         module_info=module_info
     )
     return await worker.run()
+

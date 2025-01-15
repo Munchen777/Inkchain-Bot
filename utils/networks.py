@@ -35,7 +35,7 @@ Ethereum = Network(
     chain_id=1,
     eip1559_support=True,
     token='ETH',
-    explorer='https://explorer-sepolia.inkonchain.com',
+    explorer='https://etherscan.io/',
 )
 
 Ink = Network(
@@ -47,5 +47,35 @@ Ink = Network(
     chain_id=57073,
     eip1559_support=True,
     token='ETH',
-    explorer='ttps://explorer.inkonchain.com/',
+    explorer='https://explorer.inkonchain.com/',
+)
+
+Base = Network(
+    name='Base Mainnet',
+    rpc=[
+        'https://base.llamarpc.com',
+        'wss://base.callstaticrpc.com',
+        'https://base-mainnet.public.blastapi.io',
+        'wss://base.gateway.tenderly.co',
+        'https://base.blockpi.network/v1/rpc/public'
+    ],
+    chain_id=8453,
+    eip1559_support=True,
+    token='ETH',
+    explorer='https://basescan.org/',
+)
+
+OP = Network(
+    name='OP Mainnet',
+    rpc=[
+        'https://optimism.llamarpc.com',
+        'wss://optimism.drpc.org',
+        'wss://optimism-rpc.publicnode.com',
+        'https://optimism-mainnet.public.blastapi.io',
+        'https://rpc.ankr.com/optimism'
+    ],
+    chain_id=10,
+    eip1559_support=True,
+    token='ETH',
+    explorer='https://optimistic.etherscan.io/',
 )

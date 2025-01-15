@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Any, Dict, Optional, Literal
 
-from utils.networks import Ethereum, Ink
+from utils.networks import*
 
 
 MODULE_TYPES = Literal[
