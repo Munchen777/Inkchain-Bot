@@ -5,13 +5,13 @@ from web3.eth.async_eth import ChecksumAddress
 
 from modules import*
 from utils.client import Client
-from data.config import BRIDGE_OWLTO_ABI
+from data.abi import BRIDGE_OWLTO_ABI
 
-class BridgeOwltoWorker(Logger):
+class BridgeOwltoOPtoInkWorker(Logger):
     def __init__(self, client: Client):
         self.client = client
 
-    async def bridge_from_op_to_ink(self):
+    async def run(self):
         value, balance = await self.client.get_value_and_normalized_value(normalized_fee=0.0005)
 
         self.logger.info(

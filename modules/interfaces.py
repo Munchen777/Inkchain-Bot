@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Any, Dict, Optional, Literal
 
-from utils.networks import Ethereum, Ink
+from utils.networks import*
 
 
 MODULE_TYPES = Literal[
@@ -37,3 +37,13 @@ class BridgeNativeModule(BridgeModuleInfo):
     module_priority: int = 1
     module_name: str = "bridge_native"
     module_display_name: str = "Bridge Native"
+
+class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
+    """ Bridge native Owlto module for bridging native tokens from OP to Ink """
+    source_network: str = OP.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = OP.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 1
+    module_name: str = "bridge_owlto_op_to_ink"
+    module_display_name: str = "Bridge Owlto OP to Ink"
