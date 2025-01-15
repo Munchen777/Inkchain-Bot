@@ -8,15 +8,15 @@ from utils.tools import get_accounts_data
 
 """
 Available modules:
-    - bridge_native
     - bridge_owlto_op_to_ink
-
 """
 
 # Mapping of module names to module classes
 MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
-    "bridge_native": BridgeNativeModule,
     "bridge_owlto_op_to_ink": BridgeOwltoOPtoInkModule,
+    "bridge_owlto_base_to_ink": BridgeOwltoBasetoInkModule,
+    "bridge_owlto_ink_to_op": BridgeOwltoInktoOPModule,
+    "bridge_owlto_ink_to_base": BridgeOwltoInktoBaseModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -26,8 +26,10 @@ CHAIN_NAMES: Dict[int, str] = {
 
 # Mapping of module names to module functions
 MODULE_RUNNERS: Dict[str, Callable] = {
-    "bridge_native": bridge_native,
-    "bridge_owlto_op_to_ink": bridge_owlto_op_to_ink
+    "bridge_owlto_op_to_ink": bridge_owlto_op_to_ink,
+    "bridge_owlto_base_to_ink": bridge_owlto_base_to_ink,
+    "bridge_owlto_ink_to_op": bridge_owlto_ink_to_op,
+    "bridge_owlto_ink_to_base": bridge_owlto_ink_to_base
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()

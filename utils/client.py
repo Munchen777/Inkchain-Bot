@@ -113,11 +113,12 @@ class Client(Logger):
         if free_amount < min_out:
             self.logger.warning(
                 f"{self.name} | Insufficient {self.network.token} for the bridge "
+                f"Balance: {balance / (10 ** decimals)} {self.network.token} "
                 f"on network {self.network.name}. Address: {self.address}. "
-                f"Free tokens: {free_amount:.6f} ETH, "
-                f"required: {normalized_min_amount_out:.6f} ETH."
+                f"Free tokens: {free_amount:.6f} {self.network.token}, "
+                f"is required for a transaction: {normalized_min_amount_out:.6f} {self.network.token}"
             )
-            return 0, 0.0
+            return None
 
         # Генерируем случайное значение в пределах заданного диапазона
         random_percent = random.uniform(*random_range)

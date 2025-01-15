@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import Any, Dict, Optional, Literal
 
-from utils.networks import*
+from utils.networks import *
 
 
 MODULE_TYPES = Literal[
@@ -52,33 +52,44 @@ class BridgeModuleInfo(BaseModuleInfo):
     destination_network: str = None
     module_type: str = "bridge"
 
-
-class BridgeNativeModule(BridgeModuleInfo):
-    """ Bridge native module info class for bridge native tokens from Ethereum to Ink """
-    source_network: str = Ethereum.name
+class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
+    """ Bridge Owlto module from OP to Ink  """
+    source_network: str = OP.name
     destination_network: str = Ink.name
-    source_network_chain_id: int = Ethereum.chain_id
-    destination_network_chain_id: int = Ink.chain_id
-    module_priority: int = 1
-    module_name: str = "bridge_native"
-    module_display_name: str = "Bridge Native"
-
-class BridgeOwltoModule(BridgeModuleInfo):
-    """ Bridge Owlto module from Ethereum to Ink  """
-    source_network: str = Ethereum.name
-    destination_network: str = Ink.name
-    source_network_chain_id: int = Ethereum.chain_id
+    source_network_chain_id: int = OP.chain_id
     destination_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "bridge_owlto"
-    module_display_name: str = "Bridge Owlto"
+    module_name: str = "bridge_owlto_op_to_ink"
+    module_display_name: str = "Bridge Owlto OP to Ink"
 
-class BridgeGGModule(BridgeModuleInfo):
-    """ Bridge GG module from Ethereum to Ink """
-    source_network: str = Ethereum.name
+class BridgeOwltoBasetoInkModule(BridgeModuleInfo):
+    """ Bridge Owlto module from Base to Ink  """
+    source_network: str = Base.name
     destination_network: str = Ink.name
-    source_network_chain_id: int = Ethereum.chain_id
+    source_network_chain_id: int = Base.chain_id
     destination_network_chain_id: int = Ink.chain_id
-    module_priority: int = 3
-    module_name: str = "bridge_gg"
-    module_display_name: str = "Bridge GG"
+    module_priority: int = 2
+    module_name: str = "bridge_owlto_base_to_ink"
+    module_display_name: str = "Bridge Owlto Base to Ink"
+
+class BridgeOwltoInktoOPModule(BridgeModuleInfo):
+    """ Bridge Owlto module from Ink to OP """
+    fee: float = 0.00065
+    source_network: str = Ink.name
+    destination_network: str = OP.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = OP.chain_id
+    module_priority: int = 2
+    module_name: str = "bridge_owlto_ink_to_op"
+    module_display_name: str = "Bridge Owlto Ink to OP"
+
+class BridgeOwltoInktoBaseModule(BridgeModuleInfo):
+    """ Bridge Owlto module from Ink to Base """
+    fee: float = 0.00065
+    source_network: str = Ink.name
+    destination_network: str = Base.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Base.chain_id
+    module_priority: int = 2
+    module_name: str = "bridge_owlto_ink_to_base"
+    module_display_name: str = "Bridge Owlto Ink to Base"
