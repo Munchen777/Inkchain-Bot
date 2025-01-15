@@ -25,9 +25,10 @@ class BridgeOwltoOPtoInkWorker(Logger):
         )
 
         contract: AsyncContract = self.client.w3.eth.contract(
-            proxy_address_contract,
-            BRIDGE_OWLTO_ABI
+            address=proxy_address_contract,
+            abi=BRIDGE_OWLTO_ABI
         )
+
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)

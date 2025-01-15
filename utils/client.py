@@ -133,7 +133,7 @@ class Client(Logger):
 
         return value, normalized_value
 
-    
+        
     @staticmethod
     def get_normalize_error(error: Exception) -> Exception | str:
         try:
