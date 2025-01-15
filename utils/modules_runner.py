@@ -201,7 +201,7 @@ class Runner(Logger):
                 if parallel_mode and module_counter == 1:
                     await self.smart_sleep(account_name, index, accounts_delay=True)
 
-                self.logger_msg(account_name, None, f"🚀 Launch module: {module_display_name}")
+                self.logger_msg(account_name, None, f"Launch module: {module_display_name}")
 
                 module_input_data: List[str, str, str, BaseModuleInfo] = [
                     account_name, private_key, proxy, current_module
@@ -259,7 +259,7 @@ class Runner(Logger):
         
         except Exception as error:
             self.logger_msg(
-                account_name, None, "Error while running", "error"
+                account_name, None, f"Error while running: {error}", "error"
             )
 
     async def run_parallel(self, smart_route: bool):

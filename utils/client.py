@@ -5,7 +5,7 @@ from web3.contract import AsyncContract
 from web3.exceptions import TransactionNotFound, TimeExhausted
 from web3 import AsyncHTTPProvider, AsyncWeb3
 
-from utils.networks import Network
+from utils.networks import*
 from modules import Logger
 from data.abi import ERC20_ABI
 from settings import NETWORK_TOKEN_CONTRACTS
@@ -21,16 +21,30 @@ class SoftwareException(Exception):
 
 
 class Client(Logger):
-    def __init__(self, network: Network, private_key: str, name: str, proxy: str = None):
+    def __init__(self, account_name: str, private_key: str, proxy: str = None, source_network: str = None):
         super().__init__()
-        self.name = name
-        self.network: Network = network
+        self.name = account_name
+        self.private_key = private_key
         self.proxy_init = proxy
+        self.network: Network = self.get_network(source_network)
         self.rpc = random.choice(self.network.rpc)
         self.request_kwargs = {"proxy": f'{proxy}', "verify_ssl": False} if proxy else {"verify_ssl": False}
         self.w3 = AsyncWeb3(AsyncHTTPProvider(self.rpc, request_kwargs=self.request_kwargs))
-        self.private_key = private_key
         self.address = AsyncWeb3.to_checksum_address(self.w3.eth.account.from_key(private_key).address)
+
+    def get_network(self, network_name: str) -> str:
+        networks = {
+            "Ethereum Mainnet": Ethereum,
+            "Ink Mainnet": Ink,
+            "Base Mainnet": Base,
+            "OP Mainnet": OP,
+        }
+
+        network = networks.get(network_name)
+        if not network:
+            raise ValueError(f"The network named '{network_name}' was not found")
+
+        return network
     
     async def get_value_and_normalized_value(
         self, normalized_fee: float,    # Комисия моста в читаемом виде
@@ -43,17 +57,17 @@ class Client(Logger):
         """
         balance = await self.get_token_balance(check_native=True)
 
-        if not self._has_sufficient_balance(
+        if not await self._has_sufficient_balance(
             balance, normalized_min_available_balance, "ETH", True
         ):
             return None
 
-        return self._calculate_value(
+        return await self._calculate_value(
             balance, normalized_min_amount_out, normalized_min_amount_residue,
             "ETH", True, normalized_fee
         )
 
-    def _has_sufficient_balance(
+    async def _has_sufficient_balance(
         self, balance: int, normalized_min_available_balance: float,
         token_name: str, check_native: bool
     ) -> bool:
@@ -67,7 +81,7 @@ class Client(Logger):
             )
             return False
 
-        decimals = self.get_decimals(token_name, check_native)
+        decimals = await self.get_decimals(token_name, check_native)
         min_balance = normalized_min_available_balance / decimals
 
         if balance < min_balance:
@@ -80,7 +94,7 @@ class Client(Logger):
 
         return True
 
-    def _calculate_value(
+    async def _calculate_value(
         self, balance: int, normalized_min_amount_out: float, normalized_min_amount_residue: float,
         token_name: str, check_native: bool, normalized_fee: float,
         random_range: tuple[float, float] = RANDOM_RANGE, 
@@ -89,28 +103,36 @@ class Client(Logger):
         """
         Расчёт значений для моста.
         """
-        decimals = self.get_decimals(token_name, check_native)
-        min_out = (normalized_min_amount_out + normalized_fee) / decimals
-        min_residue = normalized_min_amount_residue / decimals
-        free_amount = balance - min_residue
+        decimals = await self.get_decimals(token_name, check_native)
+        
+        # Нормализуем минимальные значения для отправки и остатка
+        min_out = normalized_min_amount_out + normalized_fee
+        min_residue = normalized_min_amount_residue
+
+        # Нормализуем баланс (переводим в читаемое значение)
+        free_amount = balance / (10 ** decimals) - min_residue  # Преобразуем balance в читаемое значение
 
         if free_amount < min_out:
             self.logger.warning(
                 f"{self.name} | Insufficient {self.network.token} for the bridge "
                 f"on network {self.network.name}. Address: {self.address}. "
-                f"Free tokens: {free_amount * decimals:.6f} ETH, "
+                f"Free tokens: {free_amount:.6f} ETH, "
                 f"required: {normalized_min_amount_out:.6f} ETH."
             )
             return 0, 0.0
 
+        # Генерируем случайное значение в пределах заданного диапазона
         random_percent = random.uniform(*random_range)
         normalized_value = round(
             free_amount * random_percent + normalized_min_amount_out,
             random.randint(*rounding_levels)
         )
-        value = int(normalized_value * decimals)
+        
+        # Переводим обратно в минимальные единицы (например, wei для ETH)
+        value = int(normalized_value * (10 ** decimals))
 
         return value, normalized_value
+
     
     @staticmethod
     def get_normalize_error(error: Exception) -> Exception | str:
@@ -134,7 +156,9 @@ class Client(Logger):
             abi=abi
         )
         
-    async def get_decimals(self, token_name: str = None) -> int:
+    async def get_decimals(self, token_name: str = None, check_native: bool = False) -> int:
+        if check_native:
+            return 18
         contract = await self.get_contract(NETWORK_TOKEN_CONTRACTS[token_name])
         return await contract.functions.decimals().call()
     
@@ -216,7 +240,7 @@ class Client(Logger):
                     receipts = await self.w3.eth.get_transaction_receipt(tx_hash) 
                     status = receipts.get("status")
                     if status == 1:
-                        self.logger.success(f'Транзакция прошла успешно: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
+                        self.logger.info(f'Транзакция прошла успешно: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
                         if need_hash:
                             return tx_hash
                         return True

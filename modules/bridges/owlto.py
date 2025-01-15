@@ -8,8 +8,10 @@ from utils.client import Client
 from data.abi import BRIDGE_OWLTO_ABI
 
 class BridgeOwltoOPtoInkWorker(Logger):
-    def __init__(self, client: Client):
+    def __init__(self, client: Client, module_info):
+        super().__init__()
         self.client = client
+        self.module_info = module_info
 
     async def run(self):
         value, balance = await self.client.get_value_and_normalized_value(normalized_fee=0.0005)
