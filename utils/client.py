@@ -47,11 +47,9 @@ class Client(Logger):
         return network
     
     async def get_value_and_normalized_value(
-        self, normalized_fee: float,    # Комисия моста в читаемом виде
-        normalized_min_available_balance: float = 0.0025,    # Минимальный баланс перед бриджом в читаемом виде
-        normalized_min_amount_out: float = 0.002,    # минимальный отправляемый баланс в читаемом виде
-        normalized_min_amount_residue: float = 0.005    # минимальный остаточны баланс в читаемом виде
-    ) -> tuple[int, float] | None:
+        self, normalized_fee: float, normalized_min_available_balance: float, 
+        normalized_min_amount_out: float, normalized_min_amount_residue: float
+        ) -> tuple[int, float] | None:
         """
         Метод для автоматического расчёта value для мостов Л2.
         """
