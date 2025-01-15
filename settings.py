@@ -12,7 +12,8 @@ CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to wit
 
 CLASSIC_ROUTES_MODULES_USING = [
     ["bridge_native"],
-    ["bridge_owlto_op_to_ink"],    
+    ["bridge_owlto"],
+    ["bridge_gg"],
 ]
 
 NETWORK_TOKEN_CONTRACTS = {

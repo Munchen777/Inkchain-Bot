@@ -3,7 +3,7 @@ import json
 
 from typing import Any, Dict, List, Set
 
-from data.config import ACCOUNT_NAMES, MODULES_INFO, MODULES_CLASSES_NAMES
+from data.config import ACCOUNT_NAMES, MODULES_CLASSES
 from generall_settings import GLOBAL_NETWORK, SHUFFLE_ROUTE
 from functions import*
 from modules import Logger
@@ -13,14 +13,18 @@ from utils.client import SoftwareException
 from utils.tools import clean_progress_file
 
 
-def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo:
+def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo | None:
     """Ищет в словаре AVAILABLE_MODULES_INFO по имени модуля и возвращает либо module_name,
     либо tg info, в зависимости от значения аргумента help_message"""
-    for _module_name, module_obj in MODULES_INFO.items():
-        if _module_name == module_name:
-            if help_message:
-                return module_obj.display_name
-            return module_obj
+    module_class = MODULES_CLASSES.get(module_name)
+
+    try:
+        if help_message:
+            return module_class().module_display_name
+        return module_class()
+
+    except Exception as error:
+        return None
 
 
 class RouteGenerator(Logger):
@@ -30,7 +34,8 @@ class RouteGenerator(Logger):
     @staticmethod
     def classic_generate_route() -> List[BaseModuleInfo]:
         """
-        Generate list of BaseNoduleInfo
+        Generate and sort list of BaseNoduleInfo by module_priority
+        The lower priority is the first in the route list
 
         """
         route: List[BaseModuleInfo] = []
@@ -38,16 +43,18 @@ class RouteGenerator(Logger):
         for i in CLASSIC_ROUTES_MODULES_USING:
             module_name: str = random.choice(i)
 
-            if module_name is None or module_name not in MODULES_INFO:
+            if module_name is None or module_name not in MODULES_CLASSES:
                 continue
 
-            module_obj: BaseModuleInfo = get_func_by_name(module_name)
+            module_obj: BaseModuleInfo | None = get_func_by_name(module_name)
 
             if module_obj:
                 route.append(module_obj)
                 continue
 
             raise SoftwareException(f"There is no module with the name {module_name} in the software!")
+
+        route.sort(key=lambda x: x.module_priority)
 
         return route
     
@@ -57,8 +64,8 @@ class RouteGenerator(Logger):
             route_dict.get("module_name"),
             route_dict.get("module_display_name")
         )
-        module_class = MODULES_CLASSES_NAMES.get(module_name) or \
-                        MODULES_CLASSES_NAMES.get(module_display_name)
+        module_class: BaseModuleInfo | None = MODULES_CLASSES.get(module_name) or \
+                                                MODULES_CLASSES.get(module_display_name)
 
         # validated_module = module_class.model_validate(route_dict)
 
@@ -128,12 +135,12 @@ class RouteGenerator(Logger):
     def classic_routes_json_save(self):
         clean_progress_file()
 
-        accounts_data = {}
+        accounts_data: Dict[str, Any] = {}
 
         with open(file="./data/service/wallets_progress.json", mode="w") as file:
             for account_name in ACCOUNT_NAMES:
                 if isinstance(account_name, (str, int)):
-                    classic_route = self.classic_generate_route()
+                    classic_route: List[BaseModuleInfo] = self.classic_generate_route()
 
                     # if SHUFFLE_ROUTE:
                     #     classic_route = self.sort_classic_route(route=classic_route)

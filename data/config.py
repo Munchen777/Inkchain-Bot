@@ -13,13 +13,8 @@ Available modules:
 
 """
 
-MODULES_INFO: Dict[str, BaseModuleInfo] = {
-    "bridge_native": BridgeNativeModule(),
-    "bridge_owlto_op_to_ink": BridgeOwltoOPtoInkModule(),
-}
-
 # Mapping of module names to module classes
-MODULES_CLASSES_NAMES: Dict[str, BaseModuleInfo] = {
+MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_native": BridgeNativeModule,
     "bridge_owlto_op_to_ink": BridgeOwltoOPtoInkModule,
 }
@@ -32,7 +27,7 @@ CHAIN_NAMES: Dict[int, str] = {
 # Mapping of module names to module functions
 MODULE_RUNNERS: Dict[str, Callable] = {
     "bridge_native": bridge_native,
-    "bridge_owlto_op_to_ink": bridge_owlto_op_to_ink,
+    "bridge_owlto_op_to_ink": bridge_owlto_op_to_ink
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()
