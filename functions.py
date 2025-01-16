@@ -2,7 +2,7 @@ from utils.client import Client
 from modules.bridges import *
 from modules.interfaces import *
 
-def get_client(account_name, private_key, proxy, source_network) -> Client:
+def get_client(account_name, private_key, proxy, source_network: str) -> Client:
     return Client(account_name, private_key, proxy, source_network)
 
 async def bridge_owlto_op_to_ink(account_name: str, private_key: str, proxy: str | None, module_info: BridgeOwltoOPtoInkModule):

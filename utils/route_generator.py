@@ -8,7 +8,9 @@ from generall_settings import GLOBAL_NETWORK, SHUFFLE_ROUTE
 from functions import*
 from modules import Logger
 from modules.interfaces import BaseModuleInfo
+from utils.networks import Network
 from settings import CLASSIC_ROUTES_MODULES_USING, CLASSIC_WITHDRAW_DEPENDENCIES
+from utils.networks import NETWORKS
 from utils.client import SoftwareException
 from utils.tools import clean_progress_file
 
@@ -131,6 +133,27 @@ class RouteGenerator(Logger):
             new_route_with_dep = route_with_priority
 
         return new_route_with_dep
+
+    async def smart_generate_route(self, account_name: str, private_key: str, proxy: str | None):
+        route: List[BaseModuleInfo] = []
+        """
+        - доступный перед бриджем,
+        а второй это баланс который должен остаться с вычетом бриджа
+        
+        - Мин и макс это значение отправляемых токенов
+        В этом диапазоне выбирается рандомное число
+        
+        - 
+        
+        """
+        # словарь с модулями (название модуля - класс модуля)
+        all_available_modules: Dict[str, BaseModuleInfo] = MODULES_CLASSES
+        all_available_networks: Dict[str, Network] = NETWORKS
+        # словарь с балансами токенов (название сети: словарь с названием токена и балансом)
+        all_available_wallet_balances: Dict[str, Dict[str, int]] = await Client.get_wallet_balance(
+            account_name=account_name, private_key=private_key, proxy=proxy
+        )
+
 
     def classic_routes_json_save(self):
         clean_progress_file()
