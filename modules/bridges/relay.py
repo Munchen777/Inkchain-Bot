@@ -51,6 +51,7 @@ async def get_data(client: Client, value: int,  module_info):
         )
         return None
 
+
 class BridgeRelayOPtoInkWorker(Logger):
     def __init__(self, client: Client, module_info: BridgeRelayOPtoInkModule):
         super().__init__()
@@ -98,6 +99,7 @@ class BridgeRelayOPtoInkWorker(Logger):
                 f'{self.client.name} Failed to send {balance} ETH from the OP network to Ink. Error: {error} '
             )
 
+
 class BridgeRelayBasetoInkWorker(Logger):
     def __init__(self, client: Client, module_info: BridgeRelayBasetoInkModule):
         super().__init__()
@@ -143,4 +145,52 @@ class BridgeRelayBasetoInkWorker(Logger):
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink. Error: {error} '
+            )
+
+
+class BridgeRelayInktoOPWorker(Logger):
+    def __init__(self, client: Client, module_info: BridgeRelayInktoOPModule):
+        super().__init__()
+
+        self.client: Client = client
+        self.module_info: BridgeRelayInktoOPModule = module_info
+        self.destination_network: str | None = module_info.destination_network
+        self.source_network: str | None = module_info.source_network
+        self.source_network_chain_id: int | None = module_info.source_network_chain_id
+        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
+        self.module_priority: int | None = module_info.module_priority
+        self.module_name: str | None = module_info.module_name
+        self.module_display_name: str | None = module_info.module_display_name
+
+    async def run(self):
+        result = await self.client.get_value_and_normalized_value(
+            normalized_fee=self.module_info.fee,
+            normalized_min_available_balance=0.0001,
+            normalized_min_amount_out=0.0001,
+            normalized_min_amount_residue=0.0001
+        )
+
+        if result is None:
+            return
+
+        value, balance = result
+
+        self.logger.info(
+            f'{self.client.name} Sending {balance} ETH via the official bridge from the Ink network to OP'
+        )
+
+        tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
+
+        if tx_data is None: return
+
+        try:
+            tx_params = await self.client.prepare_transaction(value=value)
+            tx_params.update({
+                'to': AsyncWeb3.to_checksum_address(tx_data["steps"][0]['items'][0]['data']['to']),
+                'data': tx_data["steps"][0]['items'][0]['data']['data']
+            })
+            await self.client.send_transaction(tx_params, need_hash=True)
+        except Exception as error:
+            self.logger.error(
+                f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP. Error: {error} '
             )
