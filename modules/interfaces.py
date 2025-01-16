@@ -20,12 +20,22 @@ class BaseModuleInfo(BaseModel):
         module_display_name: str - отображаемое имя модуля (для вывода в консоль и Telegram)
         module_priority: int - приоритет модуля
         module_type: MODULE_TYPES - тип модуля
+        min_operation_amount: float - минимальная сумма для операции
+        max_operation_amount: float - максимальная сумма для операции
+        min_balance_save: float - минимальный остаток на счете после операции
+        max_balance_save: float - максимальный остаток на счете после операции
+        count_of_operations: int - количество успешных действий в модуле
     
     """
     module_name: str = "BaseModule"
     module_display_name: str = "BaseModule"
     module_priority: int = 0
     module_type: MODULE_TYPES = "base"
+    min_operation_amount: float = 0.0035
+    max_operation_amount: float = 0.01
+    min_balance_save: float = 0.0
+    max_balance_save: float = 0.15
+    count_of_operations: int = 0
 
 
 class BridgeModuleInfo(BaseModuleInfo):
