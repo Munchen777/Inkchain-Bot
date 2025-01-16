@@ -47,11 +47,9 @@ class Client(Logger):
         return network
     
     async def get_value_and_normalized_value(
-        self, normalized_fee: float,    # Комисия моста в читаемом виде
-        normalized_min_available_balance: float = 0.0025,    # Минимальный баланс перед бриджом в читаемом виде
-        normalized_min_amount_out: float = 0.002,    # минимальный отправляемый баланс в читаемом виде
-        normalized_min_amount_residue: float = 0.005    # минимальный остаточны баланс в читаемом виде
-    ) -> tuple[int, float] | None:
+        self, normalized_fee: float, normalized_min_available_balance: float, 
+        normalized_min_amount_out: float, normalized_min_amount_residue: float
+        ) -> tuple[int, float] | None:
         """
         Метод для автоматического расчёта value для мостов Л2.
         """
@@ -115,11 +113,12 @@ class Client(Logger):
         if free_amount < min_out:
             self.logger.warning(
                 f"{self.name} | Insufficient {self.network.token} for the bridge "
+                f"Balance: {balance / (10 ** decimals)} {self.network.token} "
                 f"on network {self.network.name}. Address: {self.address}. "
-                f"Free tokens: {free_amount:.6f} ETH, "
-                f"required: {normalized_min_amount_out:.6f} ETH."
+                f"Free tokens: {free_amount:.6f} {self.network.token}, "
+                f"is required for a transaction: {normalized_min_amount_out:.6f} {self.network.token}"
             )
-            return 0, 0.0
+            return None
 
         # Генерируем случайное значение в пределах заданного диапазона
         random_percent = random.uniform(*random_range)
@@ -214,49 +213,58 @@ class Client(Logger):
             raise BlockchainException(f'{self.get_normalize_error(error)}')
         
     async def send_transaction(self, transaction, need_hash: bool = False, without_gas: bool = False,
-                               poll_latency: int = 10, timeout: int = 360):
-        try:
-            if not without_gas:
-                transaction['gas'] = int(await self.w3.eth.estimate_gas(transaction))
-        except Exception as error:
-            raise BlockchainException(f'{self.get_normalize_error(error)}')
-
-        try:
-            singed_tx = self.w3.eth.account.sign_transaction(transaction, self.private_key)
-            tx_hash = await self.w3.eth.send_raw_transaction(singed_tx.raw_transaction)
-        except Exception as error:
-            if self.get_normalize_error(error) == 'already known':
-                self.logger.warning(f'RPC получил ошибку, но tx был отправлен | {self.address}')
+                            poll_latency: int = 10, timeout: int = 360, test_mode: bool = False):
+        if test_mode:
+            try:
+                result = await self.w3.eth.call(transaction)
+                self.logger.info(f"Симуляция транзакции прошла успешно: {result}")
                 return True
-            else:
+            except Exception as error:
+                self.logger.error(f"Симуляция транзакции не удалась: {self.get_normalize_error(error)}")
+                raise BlockchainException(f"Ошибка симуляции: {self.get_normalize_error(error)}")
+        else:
+            try:
+                if not without_gas:
+                    transaction['gas'] = int(await self.w3.eth.estimate_gas(transaction))
+            except Exception as error:
                 raise BlockchainException(f'{self.get_normalize_error(error)}')
 
-        try:
-            total_time = 0
-            timeout = 1200
+            try:
+                singed_tx = self.w3.eth.account.sign_transaction(transaction, self.private_key)
+                tx_hash = await self.w3.eth.send_raw_transaction(singed_tx.raw_transaction)
+            except Exception as error:
+                if self.get_normalize_error(error) == 'already known':
+                    self.logger.warning(f'RPC получил ошибку, но tx был отправлен | {self.address}')
+                    return True
+                else:
+                    raise BlockchainException(f'{self.get_normalize_error(error)}')
 
-            while True:
-                try:
-                    receipts = await self.w3.eth.get_transaction_receipt(tx_hash) 
-                    status = receipts.get("status")
-                    if status == 1:
-                        self.logger.info(f'Транзакция прошла успешно: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
-                        if need_hash:
-                            return tx_hash
-                        return True
-                    elif status is None:
+            try:
+                total_time = 0
+                timeout = 1200
+
+                while True:
+                    try:
+                        receipts = await self.w3.eth.get_transaction_receipt(tx_hash) 
+                        status = receipts.get("status")
+                        if status == 1:
+                            self.logger.info(f'Транзакция прошла успешно: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
+                            if need_hash:
+                                return tx_hash
+                            return True
+                        elif status is None:
+                            await asyncio.sleep(poll_latency)
+                        else:
+                            return SoftwareException(f'Транзакция не выполнилась: {self.network.explorer}/tx/0x{tx_hash.hex()}')
+                    except TransactionNotFound:
+                        if total_time > timeout:
+                            raise TimeExhausted(f"Транзакция отсутствует в цепочке после {timeout} секунд")
+                        total_time += poll_latency
                         await asyncio.sleep(poll_latency)
-                    else:
-                        return SoftwareException(f'Транзакция не выполнилась: {self.network.explorer}/tx/0x{tx_hash.hex()}')
-                except TransactionNotFound:
-                    if total_time > timeout:
-                        raise TimeExhausted(f"Транзакция отсутствует в цепочке после {timeout} секунд")
-                    total_time += poll_latency
-                    await asyncio.sleep(poll_latency)
 
-                except Exception as error:
-                    self.logger.error(f'RPC получил автоматический ответ. Ошибка: {error} | {self.address}')
-                    total_time += poll_latency
-                    await asyncio.sleep(poll_latency)
-        except Exception as error:
-            raise BlockchainException(f'{self.get_normalize_error(error)}')
+                    except Exception as error:
+                        self.logger.error(f'RPC получил автоматический ответ. Ошибка: {error} | {self.address}')
+                        total_time += poll_latency
+                        await asyncio.sleep(poll_latency)
+            except Exception as error:
+                raise BlockchainException(f'{self.get_normalize_error(error)}')

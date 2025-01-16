@@ -3,7 +3,7 @@ Handle installation of classic route.
 You can specify modules that will be used in the classic route.
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["bridge_native"],
+    ["bridge_owlto_op_to_ink"],
 ]
 
 """
@@ -11,9 +11,10 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["bridge_native"],
-    ["bridge_owlto"],
-    ["bridge_gg"],
+    ["bridge_owlto_op_to_ink"],
+    ["bridge_owlto_base_to_ink"],
+    ["bridge_owlto_ink_to_op"],
+    ["bridge_owlto_ink_to_base"]
 ]
 
 NETWORK_TOKEN_CONTRACTS = {
