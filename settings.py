@@ -1,3 +1,5 @@
+from typing import Dict
+
 """
 Handle installation of classic route.
 You can specify modules that will be used in the classic route.
@@ -17,6 +19,11 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["bridge_owlto_ink_to_base"]
 ]
 
-NETWORK_TOKEN_CONTRACTS = {
-    "": ""
+NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
+    "Base Mainnet": {
+        "ETH": "0x4200000000000000000000000000000000000006",
+    },
+    "OP Mainnet": {
+        "ETH": "0x4200000000000000000000000000000000000006",
+    },
 }
