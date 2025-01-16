@@ -1,3 +1,4 @@
+
 # from web3 import AsyncWeb3
 # from web3.contract import AsyncContract
 # from web3.contract.async_contract import AsyncContract
@@ -40,6 +41,7 @@
 #             proxy_address_contract,
 #             BRIDGE_GG_ABI
 #         )
+
         
 #         try:
 #             tx_params = await self.client.prepare_transaction(value=value)

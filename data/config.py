@@ -16,7 +16,11 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_owlto_op_to_ink": BridgeOwltoOPtoInkModule,
     "bridge_owlto_base_to_ink": BridgeOwltoBasetoInkModule,
     "bridge_owlto_ink_to_op": BridgeOwltoInktoOPModule,
-    "bridge_owlto_ink_to_base": BridgeOwltoInktoBaseModule
+    "bridge_owlto_ink_to_base": BridgeOwltoInktoBaseModule,
+    "bridge_relay_op_to_ink": BridgeRelayOPtoInkModule,
+    "bridge_base_op_to_ink": BridgeRelayBasetoInkModule,
+
+
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -29,7 +33,11 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "bridge_owlto_op_to_ink": bridge_owlto_op_to_ink,
     "bridge_owlto_base_to_ink": bridge_owlto_base_to_ink,
     "bridge_owlto_ink_to_op": bridge_owlto_ink_to_op,
-    "bridge_owlto_ink_to_base": bridge_owlto_ink_to_base
+    "bridge_owlto_ink_to_base": bridge_owlto_ink_to_base,
+    "bridge_relay_op_to_ink": bridge_relay_op_to_ink,
+    "bridge_base_op_to_ink": bridge_base_op_to_ink,
+
+
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()
