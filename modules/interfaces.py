@@ -93,3 +93,25 @@ class BridgeOwltoInktoBaseModule(BridgeModuleInfo):
     module_priority: int = 2
     module_name: str = "bridge_owlto_ink_to_base"
     module_display_name: str = "Bridge Owlto Ink to Base"
+
+class BridgeRelayOPtoInkModule(BridgeModuleInfo):
+    """ Bridge Relay module from OP to Ink  """
+    fee: float = 0.0
+    source_network: str = OP.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = OP.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "bridge_relay_op_to_ink"
+    module_display_name: str = "Bridge Relay OP to Ink"
+
+class BridgeRelayBasetoInkModule(BridgeModuleInfo):
+    """ Bridge Relay module from Base to Ink  """
+    fee: float = 0.0
+    source_network: str = Base.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Base.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "bridge_base_op_to_ink"
+    module_display_name: str = "Bridge Relay Base to Ink"

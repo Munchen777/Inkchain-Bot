@@ -6,11 +6,11 @@ from web3.eth.async_eth import ChecksumAddress
 from modules import*
 from utils.client import Client
 from data.abi import BRIDGE_GG_ABI
-from modules.interfaces import BridgeGGModule
+from modules.interfaces import BridgeModuleInfo
 
 
 class BridGGWorker(Logger):
-    def __init__(self, client: Client, module_info: BridgeGGModule):
+    def __init__(self, client: Client, module_info: BridgeModuleInfo):
         super().__init__()
 
         self.client: Client = client
