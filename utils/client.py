@@ -1,10 +1,12 @@
 import asyncio
 import random
 
+from typing import Dict, Set
 from web3.contract import AsyncContract
 from web3.exceptions import TransactionNotFound, TimeExhausted
 from web3 import AsyncHTTPProvider, AsyncWeb3
 
+from .networks import NETWORKS
 from utils.networks import*
 from modules import Logger
 from data.abi import ERC20_ABI
@@ -19,33 +21,37 @@ class SoftwareException(Exception):
     pass
 
 
-
 class Client(Logger):
     def __init__(self, account_name: str, private_key: str, proxy: str = None, source_network: str = None):
         super().__init__()
-        self.name = account_name
-        self.private_key = private_key
-        self.proxy_init = proxy
-        self.network: Network = self.get_network(source_network)
-        self.rpc = random.choice(self.network.rpc)
+        self.name: str = account_name
+        self.private_key: str = private_key
+        self.proxy_init: str = proxy
         self.request_kwargs = {"proxy": f'{proxy}', "verify_ssl": False} if proxy else {"verify_ssl": False}
-        self.w3 = AsyncWeb3(AsyncHTTPProvider(self.rpc, request_kwargs=self.request_kwargs))
+        self.w3 = AsyncWeb3(AsyncHTTPProvider(None, request_kwargs=self.request_kwargs))
         self.address = AsyncWeb3.to_checksum_address(self.w3.eth.account.from_key(private_key).address)
 
-    def get_network(self, network_name: str) -> str:
-        networks = {
-            "Ethereum Mainnet": Ethereum,
-            "Ink Mainnet": Ink,
-            "Base Mainnet": Base,
-            "OP Mainnet": OP,
-        }
+        if source_network:
+            self.setup_network(source_network)
 
-        network = networks.get(network_name)
+    def get_network(self, network_name: str) -> Network | None:
+        network: Network | None = NETWORKS.get(network_name)
+        return NETWORKS.get(network_name) or None
+
+    def setup_network(self, network_name: str):
+        network: Network | None = self.get_network(network_name)
         if not network:
-            raise ValueError(f"The network named '{network_name}' was not found")
+            self.logger_msg(self.name, self.address, f"The network named '{network_name}' was not found", "error")
+            raise ValueError
 
-        return network
-    
+        self.network: Network = network
+        self.rpc: str = random.choice(self.network.rpc)
+        self.request_kwargs: Dict[str, str] | None = {
+            "proxy": f'{self.proxy_init}',
+            "verify_ssl": False
+            } if self.proxy_init else {"verify_ssl": False}
+        self.w3 = AsyncWeb3(AsyncHTTPProvider(self.rpc, request_kwargs=self.request_kwargs))
+
     async def get_value_and_normalized_value(
         self, normalized_fee: float, normalized_min_available_balance: float, 
         normalized_min_amount_out: float, normalized_min_amount_residue: float
@@ -164,15 +170,21 @@ class Client(Logger):
     async def get_normalize_amount(self, token_name: str, amount_in_wei: int) -> float:
         decimals = await self.get_decimals(token_name)
         return float(amount_in_wei / 10 ** decimals)
-    
+
     async def get_token_balance(self, token: str = None, check_native: bool = False) -> int | None:
-        if check_native:
-            token_balance = await self.w3.eth.get_balance(self.address)
+        try:
+            if check_native:
+                token_balance = await self.w3.eth.get_balance(self.address)
+                return token_balance or None
+
+            contract: AsyncContract = await self.get_contract(NETWORK_TOKEN_CONTRACTS.get(self.network.name, {}).get(token, ""))
+            token_balance = await contract.functions.balanceOf(self.address).call()
             return token_balance or None
-        contract = await self.get_contract(NETWORK_TOKEN_CONTRACTS[token])
-        token_balance = await contract.functions.balanceOf(self.address).call()
-        return token_balance or None
-    
+
+        except Exception as error:
+            self.logger_msg(self.name, self.address, f"Error while receiving token balance.\nError: {error}", "error")
+            return None
+
     async def get_allowance(self, token_address: str, spender_address: str) -> int:
         contract = self.get_contract(token_address)
         return await contract.functions.allowance(
@@ -268,3 +280,62 @@ class Client(Logger):
                         await asyncio.sleep(poll_latency)
             except Exception as error:
                 raise BlockchainException(f'{self.get_normalize_error(error)}')
+
+    @classmethod
+    async def get_wallet_balance(cls, account_name: str, private_key: str, proxy: str | None) -> Dict[str, Dict[str, int]]:
+        client: Client = Client(account_name, private_key, proxy)
+
+        if NETWORKS:
+            wallet_balances: Dict[str, Dict[str, float]] = {}
+            native_tokens_names: Set[str] = set(network.token for network in NETWORKS.values())
+
+            for network_name in NETWORKS:
+                try:
+                    try:
+                        client.setup_network(network_name)
+                    except Exception as error:
+                        client.logger_msg(account_name, client.address,
+                                          f"Error while setting up network.\nError: {error}", "error")
+                        continue
+
+                    network_token_contracts: Dict[str, str] = NETWORK_TOKEN_CONTRACTS.get(network_name)
+                    
+                    if not network_token_contracts:
+                        token_name: str = "ETH"
+                        native_token_balance: int | None = await client.get_token_balance(token_name, check_native=True)
+
+                        if not native_token_balance:
+                            client.logger_msg(account_name, client.address,
+                                              f"Native token balance not found for network: {network_name}", "error")
+                            continue
+
+                        wallet_balances.setdefault(network_name, {})[token_name] = native_token_balance
+
+                    else:
+                        for token_name in network_token_contracts:
+                            token_contract_address: str | None = network_token_contracts.get(token_name)
+                            if not token_contract_address:
+                                client.logger_msg(account_name, client.address,
+                                                f"Token contract address not found for token: {token_name} in network {network_name}", "error")
+                                continue
+                            
+                            if token_name in native_tokens_names:
+                                token_balance: int | None = await client.get_token_balance(token_name, check_native=True)
+                            else:
+                                token_balance: int | None = await client.get_token_balance(token_name)
+
+                            if not token_balance:
+                                client.logger_msg(account_name, client.address,
+                                                f"Token balance not found for token: {token_name}", "error")
+                                continue
+
+                            wallet_balances.setdefault(network_name, {})[token_name] = token_balance
+
+                except Exception as error:
+                    client.logger_msg(account_name, client.address,
+                                      f"Error while receiving wallet balances in networks.\nError: {error}", "error")
+                    raise error
+
+            return wallet_balances
+
+        raise SoftwareException("Networks not found! Please, add networks to the networks module.")

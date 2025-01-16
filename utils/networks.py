@@ -1,3 +1,6 @@
+from typing import Dict
+
+
 class Network:
     def __init__(
             self,
@@ -79,3 +82,11 @@ OP = Network(
     token='ETH',
     explorer='https://optimistic.etherscan.io/',
 )
+
+# Mapping of network names to network classes
+NETWORKS: Dict[str, Network] = {
+    "Ethereum Mainnet": Ethereum,
+    "Ink Mainnet": Ink,
+    "Base Mainnet": Base,
+    "OP Mainnet": OP,
+}
