@@ -5,7 +5,7 @@ import re
 import telebot
 
 from random import shuffle
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Tuple
 from web3 import AsyncWeb3, AsyncHTTPProvider
 
 from data.config import (ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, CHAIN_NAMES, MODULE_RUNNERS)
@@ -34,7 +34,7 @@ class Runner(Logger):
             await asyncio.sleep(duration)
 
     @staticmethod
-    def get_wallets():
+    def get_wallets() -> List[Tuple[str, str]]:
         accounts_data = []
 
         if WALLETS_TO_WORK == 0:
@@ -101,7 +101,7 @@ class Runner(Logger):
         with open("./data/service/bad_wallets.json", "w") as file:
             json.dump(data, file, indent=4)
 
-    def get_proxy_for_account(self, account_name: str):
+    def get_proxy_for_account(self, account_name: str) -> str | None:
         if USE_PROXY:
             try:
                 account_number = ACCOUNT_NAMES.index(account_name)
@@ -154,9 +154,20 @@ class Runner(Logger):
         with open("./data/service/wallets_progress.json", "r") as file:
             return json.load(file)
 
-    def update_step(self, account_name: str, current_step: int):
+    def update_step(self, account_name: str, current_step: int, module_name: str):
         wallets = self.load_routes()
         wallets[str(account_name)]["current_step"] = current_step
+        route_modules: List[Dict[str, Any]] = wallets[str(account_name)]["route"]
+
+        for module_dict in route_modules:
+            if module_dict.get("module_name") == module_name:
+                try:
+                    module_dict["count_of_operations"] += 1
+                    break
+
+                except (KeyError, Exception) as error:
+                    self.logger_msg(account_name, None,
+                                    f"Error while updating counter of successful transactions: {error}", "error")
 
         with open("./data/service/wallets_progress.json", "w") as file:
             json.dump(wallets, file, indent=4)
@@ -165,7 +176,7 @@ class Runner(Logger):
         message_list, result_list, route_paths, break_flag, module_counter = [], [], [], False, 0
 
         try:
-            route_data = self.load_routes()
+            route_data: Dict[str, Any] = self.load_routes()
 
             if not route_data:
                 raise SoftwareException("Route isn't available")
@@ -189,7 +200,7 @@ class Runner(Logger):
 
             while current_step < len(route_modules):
                 module_counter += 1
-                current_module = route_modules[current_step]
+                current_module: BaseModuleInfo = route_modules[current_step]
                 module_name: str = current_module.module_name
                 module_func: Callable | None = MODULE_RUNNERS.get(module_name)
 
@@ -217,7 +228,7 @@ class Runner(Logger):
                     result = False
 
                 if result:
-                    self.update_step(account_name, current_step + 1)
+                    self.update_step(account_name, current_step + 1, current_module.module_name)
 
                     if not (current_step + 2) > (len(route_modules)):
                         await self.smart_sleep(account_name, account_number=1)
@@ -300,21 +311,30 @@ class Runner(Logger):
 
         self.logger_msg(None, None, f"All wallets completed their tasks in parallel mode", "success")
 
-    async def run_consistently(self, smart_route: bool):
-        accounts_data = self.get_wallets()
+    async def run_consistently(self, smart_route: bool, route_generator: RouteGenerator | None):
+        accounts_data: List[Tuple[str, str]] = self.get_wallets()
 
         for index, (account_name, private_key) in enumerate(accounts_data):
+            proxy: str | None = self.get_proxy_for_account(account_name)
+            if smart_route:
+                await route_generator.smart_generate_route(account_name, private_key, proxy)
+
             result = await self.run_account_modules(
-                account_name, private_key, self.get_proxy_for_account(account_name),
+                account_name, private_key, proxy,
                 smart_route, index
             )
 
     async def run(self, smart_route: bool):
+        route_generator: RouteGenerator | None = None
+
+        if smart_route:
+            route_generator = RouteGenerator()
+
         try:
             if SOFTWARE_MODE:
-                await self.run_parallel(smart_route)
+                await self.run_parallel(smart_route, route_generator)
             else:
-                await self.run_consistently(smart_route)
+                await self.run_consistently(smart_route, route_generator)
 
         except SoftwareException as error:
             self.logger.error(
