@@ -1,5 +1,4 @@
 from web3 import AsyncWeb3
-from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 
@@ -28,7 +27,7 @@ class BridgeOwltoOPtoInkWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=0.0
+            normalized_min_amount_residue=self.module_info.fee
         )
 
         if result is None:
@@ -62,7 +61,7 @@ class BridgeOwltoOPtoInkWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed to send {balance} ETH from the Optimism network to Ink'
+                f'{self.client.name} Failed to send {balance} ETH from the OP network to Ink. Error: {error} '
             )
 
 
@@ -85,7 +84,7 @@ class BridgeOwltoBasetoInkWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=0.0
+            normalized_min_amount_residue=self.module_info.fee
         )
 
         if result is None:
@@ -119,7 +118,7 @@ class BridgeOwltoBasetoInkWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink'
+                f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink. Error: {error} '
             )
 
 
@@ -142,7 +141,7 @@ class BridgeOwltoInktoOPWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=0.0
+            normalized_min_amount_residue=self.module_info.fee
         )
 
         if result is None:
@@ -176,7 +175,7 @@ class BridgeOwltoInktoOPWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP'
+                f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP. Error: {error} '
             )
 
 
@@ -199,7 +198,7 @@ class BridgeOwltoInktoBaseWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=0.0
+            normalized_min_amount_residue=self.module_info.fee
         )
 
         if result is None:
@@ -233,5 +232,5 @@ class BridgeOwltoInktoBaseWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed to send {balance} ETH from the Ink network to Base'
+                f'{self.client.name} Failed to send {balance} ETH from the Ink network to Base. Error: {error} '
             )
