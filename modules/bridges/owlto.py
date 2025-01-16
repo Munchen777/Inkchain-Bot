@@ -27,7 +27,7 @@ class BridgeOwltoOPtoInkWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=self.module_info.fee
+            normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
         if result is None:
@@ -84,7 +84,7 @@ class BridgeOwltoBasetoInkWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=self.module_info.fee
+            normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
         if result is None:
@@ -141,7 +141,7 @@ class BridgeOwltoInktoOPWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=self.module_info.fee
+            normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
         if result is None:
@@ -198,7 +198,7 @@ class BridgeOwltoInktoBaseWorker(Logger):
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
-            normalized_min_amount_residue=self.module_info.fee
+            normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
         if result is None:
