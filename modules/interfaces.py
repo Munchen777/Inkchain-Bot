@@ -53,7 +53,7 @@ class BridgeModuleInfo(BaseModuleInfo):
         module_type: str = "bridge" - тип модуля (дефолтное значение)
     
     """
-    fee: float = 0.0005
+    fee: float = 0.0
     min_available_balance: float = 0.008
     min_amount_residue: float = 0.005
     min_amount_out: float = 0.002
@@ -64,6 +64,7 @@ class BridgeModuleInfo(BaseModuleInfo):
 
 class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
     """ Bridge Owlto module from OP to Ink  """
+    fee: float = 0.0005
     source_network: str = OP.name
     destination_network: str = Ink.name
     source_network_chain_id: int = OP.chain_id
@@ -74,6 +75,7 @@ class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
 
 class BridgeOwltoBasetoInkModule(BridgeModuleInfo):
     """ Bridge Owlto module from Base to Ink  """
+    fee: float = 0.0005
     source_network: str = Base.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Base.chain_id
@@ -106,7 +108,6 @@ class BridgeOwltoInktoBaseModule(BridgeModuleInfo):
 
 class BridgeRelayOPtoInkModule(BridgeModuleInfo):
     """ Bridge Relay module from OP to Ink  """
-    fee: float = 0.0
     source_network: str = OP.name
     destination_network: str = Ink.name
     source_network_chain_id: int = OP.chain_id
@@ -117,7 +118,6 @@ class BridgeRelayOPtoInkModule(BridgeModuleInfo):
 
 class BridgeRelayBasetoInkModule(BridgeModuleInfo):
     """ Bridge Relay module from Base to Ink  """
-    fee: float = 0.0
     source_network: str = Base.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Base.chain_id
@@ -128,7 +128,6 @@ class BridgeRelayBasetoInkModule(BridgeModuleInfo):
 
 class BridgeRelayInktoOPModule(BridgeModuleInfo):
     """ Bridge Relay module from Ink to OP  """
-    fee: float = 0.0
     source_network: str = Ink.name
     destination_network: str = OP.name
     source_network_chain_id: int = Ink.chain_id
@@ -139,7 +138,6 @@ class BridgeRelayInktoOPModule(BridgeModuleInfo):
 
 class BridgeRelayInktoBaseModule(BridgeModuleInfo):
     """ Bridge Relay module from Ink to Base  """
-    fee: float = 0.0
     source_network: str = Ink.name
     destination_network: str = Base.name
     source_network_chain_id: int = Ink.chain_id
