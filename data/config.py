@@ -21,6 +21,7 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_relay_base_to_ink": BridgeRelayBasetoInkModule,
     "bridge_relay_ink_to_op": BridgeRelayInktoOPModule,
     "bridge_relay_ink_to_base": BridgeRelayInktoBaseModule,
+    "bridge_gg_ethereum_to_ink": BridGGEthereumtoInkModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -38,6 +39,7 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "bridge_relay_base_to_ink": bridge_relay_base_to_ink,
     "bridge_relay_ink_to_op": bridge_relay_ink_to_op,
     "bridge_relay_ink_to_base": bridge_relay_ink_to_base,
+    "bridge_gg_ethereum_to_ink": bridge_gg_ethereum_to_ink
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()

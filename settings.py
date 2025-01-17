@@ -13,15 +13,16 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    # ["bridge_owlto_op_to_ink"],
-    # ["bridge_owlto_base_to_ink"],
-    # ["bridge_owlto_ink_to_op"],
-    # ["bridge_owlto_ink_to_base"],
-    # ["bridge_relay_op_to_ink"],
-    # ["bridge_relay_base_to_ink"],
-    # ["bridge_relay_ink_to_op"],
+    ["bridge_owlto_op_to_ink"],
+    ["bridge_owlto_base_to_ink"],
+    ["bridge_owlto_ink_to_op"],
+    ["bridge_owlto_ink_to_base"],
+    ["bridge_relay_op_to_ink"],
+    ["bridge_relay_base_to_ink"],
+    ["bridge_relay_ink_to_op"],
     ["bridge_relay_ink_to_base"],
-
+    ["bridge_rhino_op_to_ink"],
+    ["bridge_gg_ethereum_to_ink"]
 ]
 
 NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {

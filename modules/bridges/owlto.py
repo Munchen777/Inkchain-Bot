@@ -36,7 +36,7 @@ class BridgeOwltoOPtoInkWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the Optimism network to Ink'
+            f'{self.client.name} Sending {balance} ETH via the Owlto bridge from the Optimism network to Ink'
         )
 
         proxy_address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -93,7 +93,7 @@ class BridgeOwltoBasetoInkWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the Base network to Ink'
+            f'{self.client.name} Sending {balance} ETH via the Owlto bridge from the Base network to Ink'
         )
 
         proxy_address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -150,7 +150,7 @@ class BridgeOwltoInktoOPWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the Ink network to OP'
+            f'{self.client.name} Sending {balance} ETH via the Owlto bridge from the Ink network to OP'
         )
 
         proxy_address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -207,7 +207,7 @@ class BridgeOwltoInktoBaseWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the Ink network to Base'
+            f'{self.client.name} Sending {balance} ETH via the Owlto bridge from the Ink network to Base'
         )
 
         proxy_address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(

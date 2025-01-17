@@ -60,3 +60,10 @@ async def bridge_relay_ink_to_base(account_name: str, private_key: str, proxy: s
         module_info=module_info
     )
     return await worker.run()
+
+async def bridge_gg_ethereum_to_ink(account_name: str, private_key: str, proxy: str | None, module_info: BridGGEthereumtoInkModule):
+    worker = BridGGEthereumtoInkWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()

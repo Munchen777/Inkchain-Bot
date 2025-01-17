@@ -80,7 +80,7 @@ class BridgeRelayOPtoInkWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the OP network to Ink'
+            f'{self.client.name} Sending {balance} ETH via the Relay bridge from the OP network to Ink'
         )
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
@@ -128,7 +128,7 @@ class BridgeRelayBasetoInkWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the Base network to Ink'
+            f'{self.client.name} Sending {balance} ETH via the Relay bridge from the Base network to Ink'
         )
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
@@ -176,7 +176,7 @@ class BridgeRelayInktoOPWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the Ink network to OP'
+            f'{self.client.name} Sending {balance} ETH via the Relay bridge from the Ink network to OP'
         )
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
@@ -213,9 +213,9 @@ class BridgeRelayInktoBaseWorker(Logger):
     async def run(self):
         result = await self.client.get_value_and_normalized_value(
             normalized_fee=self.module_info.fee,
-            normalized_min_available_balance=0.0001,
-            normalized_min_amount_out=0.0001,
-            normalized_min_amount_residue=0.0001
+            normalized_min_available_balance=self.module_info.min_available_balance,
+            normalized_min_amount_out=self.module_info.min_amount_out,
+            normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
         if result is None:
@@ -224,7 +224,7 @@ class BridgeRelayInktoBaseWorker(Logger):
         value, balance = result
 
         self.logger.info(
-            f'{self.client.name} Sending {balance} ETH via the official bridge from the Ink network to Base'
+            f'{self.client.name} Sending {balance} ETH via the Relay bridge from the Ink network to Base'
         )
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)

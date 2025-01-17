@@ -54,9 +54,9 @@ class BridgeModuleInfo(BaseModuleInfo):
     
     """
     fee: float = 0.0
-    min_available_balance: float = 0.008
-    min_amount_residue: float = 0.005
-    min_amount_out: float = 0.002
+    min_available_balance: float = 0.005
+    min_amount_residue: float = 0.003
+    min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
     destination_network: str = None
@@ -145,3 +145,17 @@ class BridgeRelayInktoBaseModule(BridgeModuleInfo):
     module_priority: int = 2
     module_name: str = "bridge_relay_ink_to_base"
     module_display_name: str = "Bridge Relay Ink to Base"
+
+class BridGGEthereumtoInkModule(BridgeModuleInfo):
+    """ Bridge GG module from Ethereum to Ink  """
+    min_available_balance: float = 0.01
+    min_amount_residue: float = 0.005
+    min_amount_out: float = 0.003
+    max_amount_out: float = 0.005
+    source_network: str = Ethereum.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ethereum.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "bridge_gg_ethereum_to_ink"
+    module_display_name: str = "Bridge GG Ethereum to Ink"
