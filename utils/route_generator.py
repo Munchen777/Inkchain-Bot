@@ -1,10 +1,12 @@
 import random
 import json
+import sys
 
+from pydantic import ValidationError
 from typing import Any, Dict, List, Set
 
 from data.config import ACCOUNT_NAMES, MODULES_CLASSES
-from generall_settings import GLOBAL_NETWORK, SHUFFLE_ROUTE
+from generall_settings import SHUFFLE_ROUTE
 from functions import*
 from modules import Logger
 from modules.interfaces import BaseModuleInfo
@@ -56,25 +58,25 @@ class RouteGenerator(Logger):
 
             raise SoftwareException(f"There is no module with the name {module_name} in the software!")
 
-        route.sort(key=lambda x: x.module_priority)
+        route.sort(key=lambda x: x.module_priority, reverse=True)
 
         return route
     
     @classmethod
     def create_route_from_dict(cls, route_dict: Dict[str, Any]) -> BaseModuleInfo:
-        module_name, module_display_name = (
-            route_dict.get("module_name"),
-            route_dict.get("module_display_name")
-        )
-        module_class: BaseModuleInfo | None = MODULES_CLASSES.get(module_name) or \
-                                                MODULES_CLASSES.get(module_display_name)
+        module_name: str = route_dict.get("module_name")
 
-        # validated_module = module_class.model_validate(route_dict)
+        module_class: BaseModuleInfo | None = MODULES_CLASSES.get(module_name)
 
         if not module_class:
-            raise ValueError(f"Unknown module name: {module_name} or {module_display_name}")
+            raise ValueError(f"Unknown module name: {module_name}")
 
-        return module_class(**route_dict)
+        try:
+            validated_module: BaseModuleInfo = module_class.model_validate(route_dict)
+            return validated_module
+
+        except ValidationError as error:
+            raise ValidationError(f"Error while validating module {module_name}.\nError: {error}")
 
     def sort_classic_route(self, route: list[str], landing_mode: bool) -> List[str]:
         """
@@ -134,26 +136,85 @@ class RouteGenerator(Logger):
 
         return new_route_with_dep
 
-    async def smart_generate_route(self, account_name: str, private_key: str, proxy: str | None):
-        route: List[BaseModuleInfo] = []
-        """
-        - доступный перед бриджем,
-        а второй это баланс который должен остаться с вычетом бриджа
-        
-        - Мин и макс это значение отправляемых токенов
-        В этом диапазоне выбирается рандомное число
-        
-        - 
-        
-        """
-        # словарь с модулями (название модуля - класс модуля)
-        all_available_modules: Dict[str, BaseModuleInfo] = MODULES_CLASSES
-        all_available_networks: Dict[str, Network] = NETWORKS
-        # словарь с балансами токенов (название сети: словарь с названием токена и балансом)
-        all_available_wallet_balances: Dict[str, Dict[str, int]] = await Client.get_wallet_balance(
-            account_name=account_name, private_key=private_key, proxy=proxy
-        )
+    async def smart_generate_route(self, account_name: str, private_key: str, proxy: str | None) -> None:
+        route_modules_dict: Dict[str, BaseModuleInfo] = {}
 
+        try:
+            try:
+                all_available_modules: Dict[str, BaseModuleInfo] | None = {
+                    module_name: module_class()
+                    for module_name, module_class in MODULES_CLASSES.items()
+                }
+
+            except ValidationError as error:
+                self.logger_msg(account_name, None,
+                                f"Error while creating all available modules.\nError: {error}", "error")
+                raise error
+
+            if not all_available_modules:
+                self.logger_msg(account_name, None,
+                                f"There is no any module for account {account_name}", "warning")
+                raise SoftwareException
+
+            all_available_networks: Dict[str, Network] = NETWORKS
+            all_available_wallet_balances: Dict[str, Dict[str, int]] = await Client.get_wallet_balance(
+                account_name=account_name, private_key=private_key, proxy=proxy
+            )
+
+            if not all_available_wallet_balances:
+                self.logger_msg(account_name, None,
+                                f"There is no any wallet balance for acccount {account_name}", "error")
+                return
+
+            for network_name, network_balances in all_available_wallet_balances.items():
+                current_network: Network | None = all_available_networks.get(network_name)
+
+                if not current_network:
+                    continue
+
+                for token_name, token_balance in network_balances.items():
+                    suitable_modules: List[BaseModuleInfo] = [
+                        module_instance
+                        for _, module_instance in all_available_modules.items()
+                        if module_instance.source_network == current_network.name and \
+                            module_instance.min_available_balance <= float(token_balance)
+                    ]
+                    if not suitable_modules:
+                        self.logger_msg(account_name, None,
+                                        f"There is no any suitable modules for account {account_name} on network {network_name}", "warning")
+                        continue
+
+                    suitable_modules.sort(key=lambda x: (x.module_priority, x.count_of_operations), reverse=True)
+
+                    account_data: Dict[str, Any] = {
+                        "current_step": 0,
+                        "route": [module_obj.model_dump() for module_obj in suitable_modules],
+                    }
+
+                    route_modules_dict[str(account_name)] = account_data
+
+            try:
+                with open(file="./data/service/wallets_progress.json", mode="w") as file:
+                    json.dump(route_modules_dict, file, indent=4)
+
+                self.logger_msg(account_name, None,
+                    f"Successfully generated {len(route_modules_dict)} routes into /data/services/wallets_progress.json", "success")
+                return
+
+            except FileNotFoundError as error:
+                self.logger_msg(account_name, None,
+                                f"File ./data/service/wallets_progress.json not found.\nError: {error}", "error")
+                return
+
+        except SoftwareException as error:
+            self.logger_msg(account_name, None,
+                            f"Error while smart generate route. Check settings or config modules.\nError: {error}", "error")
+            sys.exit(1)
+
+        except Exception as error:
+            self.logger_msg(account_name, None,
+                            f"Error in smart_generate_route function.\nError: {error}", "error")
+            return
 
     def classic_routes_json_save(self):
         clean_progress_file()
