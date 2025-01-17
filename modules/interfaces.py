@@ -136,3 +136,14 @@ class BridgeRelayInktoOPModule(BridgeModuleInfo):
     module_priority: int = 2
     module_name: str = "bridge_relay_ink_to_op"
     module_display_name: str = "Bridge Relay Ink to OP"
+
+class BridgeRelayInktoBaseModule(BridgeModuleInfo):
+    """ Bridge Relay module from Ink to Base  """
+    fee: float = 0.0
+    source_network: str = Ink.name
+    destination_network: str = Base.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Base.chain_id
+    module_priority: int = 2
+    module_name: str = "bridge_relay_ink_to_base"
+    module_display_name: str = "Bridge Relay Ink to Base"

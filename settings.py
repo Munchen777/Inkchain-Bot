@@ -19,7 +19,8 @@ CLASSIC_ROUTES_MODULES_USING = [
     # ["bridge_owlto_ink_to_base"],
     # ["bridge_relay_op_to_ink"],
     # ["bridge_relay_base_to_ink"],
-    ["bridge_relay_ink_to_op"],
+    # ["bridge_relay_ink_to_op"],
+    ["bridge_relay_ink_to_base"],
 
 ]
 

@@ -53,3 +53,10 @@ async def bridge_relay_ink_to_op(account_name: str, private_key: str, proxy: str
         module_info=module_info
     )
     return await worker.run()
+
+async def bridge_relay_ink_to_base(account_name: str, private_key: str, proxy: str | None, module_info: BridgeRelayInktoBaseModule):
+    worker = BridgeRelayInktoBaseWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
