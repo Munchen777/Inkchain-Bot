@@ -164,20 +164,20 @@ class Client(Logger):
     async def get_decimals(self, token_name: str = None, check_native: bool = False) -> int:
         if check_native:
             return 18
-        contract = await self.get_contract(NETWORK_TOKEN_CONTRACTS[token_name])
+        contract: AsyncContract = await self.get_contract(NETWORK_TOKEN_CONTRACTS.get(self.network.name, {}).get(token_name, ""))
         return await contract.functions.decimals().call()
     
     async def get_normalize_amount(self, token_name: str, amount_in_wei: int) -> float:
         decimals = await self.get_decimals(token_name)
         return float(amount_in_wei / 10 ** decimals)
 
-    async def get_token_balance(self, token: str = None, check_native: bool = False) -> int | None:
+    async def get_token_balance(self, token_name: str = None, check_native: bool = False) -> int | None:
         try:
             if check_native:
                 token_balance = await self.w3.eth.get_balance(self.address)
                 return token_balance or None
 
-            contract: AsyncContract = await self.get_contract(NETWORK_TOKEN_CONTRACTS.get(self.network.name, {}).get(token, ""))
+            contract: AsyncContract = await self.get_contract(NETWORK_TOKEN_CONTRACTS.get(self.network.name, {}).get(token_name, ""))
             token_balance = await contract.functions.balanceOf(self.address).call()
             return token_balance or None
 
