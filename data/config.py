@@ -23,6 +23,8 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_relay_ink_to_base": BridgeRelayInktoBaseModule,
     "bridge_gg_ethereum_to_ink": BridgGGEthereumtoInkModule,
     "swap_inkswap_eth_to_iswap": SwapInkswapETHtoISWAPModule,
+    "swap_inkswap_eth_to_sink": SwapInkswapETHtoSINKModule,
+
 
 }
 
@@ -43,6 +45,8 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "bridge_relay_ink_to_base": bridge_relay_ink_to_base,
     "bridge_gg_ethereum_to_ink": bridge_gg_ethereum_to_ink,
     "swap_inkswap_eth_to_iswap": swap_inkswap_eth_to_iswap,
+    "swap_inkswap_eth_to_sink": swap_inkswap_eth_to_sink,
+
 
 }
 

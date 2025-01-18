@@ -75,3 +75,10 @@ async def swap_inkswap_eth_to_iswap(account_name: str, private_key: str, proxy: 
         module_info=module_info
     )
     return await worker.run()
+
+async def swap_inkswap_eth_to_sink(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapETHtoSINKModule):
+    worker = SwapInkswapETHtoSINKWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()

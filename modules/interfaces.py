@@ -190,8 +190,6 @@ class SwapDyorETHtoUSDCeModule(SwapModuleInfo):
 
 class SwapInkswapETHtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from ETH to ISWAP """
-    min_amount_out: float = 0.0001
-    max_amount_out: float = 0.0003
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -199,3 +197,13 @@ class SwapInkswapETHtoISWAPModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_iswap"
     module_display_name: str = "Swap Inkswap ETH to ISWAP"
+
+class SwapInkswapETHtoSINKModule(SwapModuleInfo):
+    """ Swap Inkswap module from ETH to SINK """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_eth_to_sink"
+    module_display_name: str = "Swap Inkswap ETH to SINK"
