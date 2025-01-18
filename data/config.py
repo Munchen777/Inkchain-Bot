@@ -9,6 +9,27 @@ from utils.tools import get_accounts_data
 """
 Available modules:
     - bridge_owlto_op_to_ink
+    - bridge_owlto_base_to_ink
+    - bridge_owlto_ink_to_op
+    - bridge_owlto_ink_to_base
+    - bridge_relay_op_to_ink
+    - bridge_relay_base_to_ink
+    - bridge_relay_ink_to_op
+    - bridge_relay_ink_to_base
+    - bridge_gg_ethereum_to_ink
+    - swap_inkswap_eth_to_iswap
+    - swap_inkswap_eth_to_sink
+    - swap_inkswap_eth_to_weth
+    - swap_inkswap_iswap_to_eth
+    - swap_inkswap_sink_to_eth
+    - swap_inkswap_weth_to_eth
+    - swap_inkswap_iswap_to_sink
+    - swap_inkswap_sink_to_iswap
+    - swap_inkswap_sink_to_weth
+    - swap_inkswap_weth_to_sink
+    - swap_inkswap_weth_to_iswap
+    - swap_inkswap_iswap_to_weth
+    - 
 """
 
 # Mapping of module names to module classes
@@ -24,7 +45,16 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_gg_ethereum_to_ink": BridgGGEthereumtoInkModule,
     "swap_inkswap_eth_to_iswap": SwapInkswapETHtoISWAPModule,
     "swap_inkswap_eth_to_sink": SwapInkswapETHtoSINKModule,
-    "swap_inkswap_eth_to_weth": SwapInkswapETHtoWETHModule
+    "swap_inkswap_eth_to_weth": SwapInkswapETHtoWETHModule,
+    "swap_inkswap_iswap_to_eth": SwapInkswapISWAPtoETHModule,
+    "swap_inkswap_sink_to_eth": SwapInkswapSINKtoETHModule,
+    "swap_inkswap_weth_to_eth": SwapInkswapWETHtoETHModule,
+    "swap_inkswap_iswap_to_sink": SwapInkswapISWAPtoSINKModule,
+    "swap_inkswap_sink_to_iswap": SwapInkswapSINKtoISWAPModule,
+    "swap_inkswap_sink_to_weth": SwapInkswapSINKtoWETHModule,
+    "swap_inkswap_weth_to_sink": SwapInkswapWETHtoSINKModule,
+    "swap_inkswap_weth_to_iswap": SwapInkswapWETHtoISWAPModule,
+    "swap_inkswap_iswap_to_weth": SwapInkswapISWAPtoWETHModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -45,7 +75,16 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "bridge_gg_ethereum_to_ink": bridge_gg_ethereum_to_ink,
     "swap_inkswap_eth_to_iswap": swap_inkswap_eth_to_iswap,
     "swap_inkswap_eth_to_sink": swap_inkswap_eth_to_sink,
-    "swap_inkswap_eth_to_weth": swap_inkswap_eth_to_weth
+    "swap_inkswap_eth_to_weth": swap_inkswap_eth_to_weth,
+    "swap_inkswap_iswap_to_eth": swap_inkswap_iswap_to_eth,
+    "swap_inkswap_sink_to_eth": swap_inkswap_sink_to_eth,
+    "swap_inkswap_weth_to_eth": swap_inkswap_weth_to_eth,
+    "swap_inkswap_iswap_to_sink": swap_inkswap_iswap_to_sink,
+    "swap_inkswap_sink_to_iswap": swap_inkswap_sink_to_iswap,
+    "swap_inkswap_sink_to_weth": swap_inkswap_sink_to_weth,
+    "swap_inkswap_weth_to_sink": swap_inkswap_weth_to_sink,
+    "swap_inkswap_weth_to_iswap": swap_inkswap_weth_to_iswap,
+    "swap_inkswap_iswap_to_weth": swap_inkswap_iswap_to_weth
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()

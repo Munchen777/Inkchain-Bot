@@ -89,3 +89,66 @@ async def swap_inkswap_eth_to_weth(account_name: str, private_key: str, proxy: s
         module_info=module_info
     )
     return await worker.run()
+
+async def swap_inkswap_iswap_to_eth(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapISWAPtoETHModule):
+    worker = SwapInkswapISWAPtoETHWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_sink_to_eth(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapSINKtoETHModule):
+    worker = SwapInkswapISWAPtoETHWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_weth_to_eth(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapWETHtoETHModule):
+    worker = SwapInkswapWETHtoETHWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_iswap_to_sink(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapISWAPtoSINKModule):
+    worker = SwapInkswapISWAPtoSINKWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_sink_to_iswap(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapSINKtoISWAPModule):
+    worker = SwapInkswapSINKtoISWAPWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_sink_to_weth(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapSINKtoWETHModule):
+    worker = SwapInkswapSINKtoWETHWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_weth_to_sink(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapWETHtoSINKModule):
+    worker = SwapInkswapWETHtoSINKWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_weth_to_iswap(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapWETHtoISWAPModule):
+    worker = SwapInkswapWETHtoISWAPWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_iswap_to_weth(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapISWAPtoWETHModule):
+    worker = SwapInkswapISWAPtoWETHWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()

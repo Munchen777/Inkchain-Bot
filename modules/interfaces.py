@@ -217,3 +217,92 @@ class SwapInkswapETHtoWETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_weth"
     module_display_name: str = "Swap Inkswap ETH to WETH"
+
+class SwapInkswapISWAPtoETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from ISWAP to ETH """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_iswap_to_eth"
+    module_display_name: str = "Swap Inkswap ISWAP to ETH"
+
+class SwapInkswapSINKtoETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from SINK to ETH """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_sink_to_eth"
+    module_display_name: str = "Swap Inkswap SINK to ETH"
+
+class SwapInkswapWETHtoETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from WETH to ETH """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_weth_to_eth"
+    module_display_name: str = "Swap Inkswap WETH to ETH"
+
+class SwapInkswapISWAPtoSINKModule(SwapModuleInfo):
+    """ Swap Inkswap module from ISWAP to SINK """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_iswap_to_sink"
+    module_display_name: str = "Swap Inkswap ISWAP to SINK"
+
+class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
+    """ Swap Inkswap module from SINK to ISWAP """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_sink_to_iswap"
+    module_display_name: str = "Swap Inkswap SINK to ISWAP"
+
+class SwapInkswapSINKtoWETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from SINK to WETH """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_sink_to_weth"
+    module_display_name: str = "Swap Inkswap SINK to WETH"
+
+class SwapInkswapWETHtoSINKModule(SwapModuleInfo):
+    """ Swap Inkswap module from WETH to SINK """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_weth_to_sink"
+    module_display_name: str = "Swap Inkswap WETH to SINK"
+
+class SwapInkswapWETHtoISWAPModule(SwapModuleInfo):
+    """ Swap Inkswap module from WETH to ISWAP """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_weth_to_iswap"
+    
+class SwapInkswapISWAPtoWETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from ISWAP to WETH """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_iswap_to_weth"
+    module_display_name: str = "Swap Inkswap ISWAP to WETH"
