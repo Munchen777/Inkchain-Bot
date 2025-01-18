@@ -12,7 +12,7 @@ from utils.client import Client
 from data.abi import SWAP_INKSWAP_ABI
 from modules.interfaces import *
 
-# ETH ↔ WETH
+
 # WETH ↔ ISWAP
 # WETH ↔ SINK
 # ISWAP ↔ SINK
@@ -25,7 +25,7 @@ async def canculate_amount_out_swaps_eth_to_only(
     ):
     balance = await client.get_token_balance(token_name=token_get_name)      
     decimals = await client.get_decimals(token_name=token_get_name)
-    value = balance / 10 ** decimals 
+    value = 0 if balance is None else balance / 10 ** decimals
     if value > min_available_balance_token or min_available_balance_token - value < min_clearance:
         logger.warning(
             f'{client.name} Skip the swap {token_out_name} to {token_get_name} on the Ink network, because we already have enough tokens {token_get_name}'
@@ -95,8 +95,9 @@ class SwapInkswapETHtoISWAPWorker(Logger):
 
         value = int(amounts_in[0] * (1 + slippage_tolerance)) 
 
-        balance_nativ = await self.client.get_token_balance(check_native=True)  
-        if balance_nativ - self.module_info.min_available_balance * 10 ** 18 < value:
+        balance_nativ = await self.client.get_token_balance(check_native=True) 
+        min_balance = int(self.module_info.min_available_balance * 10 ** 18) 
+        if balance_nativ < min_balance + value:
             self.logger.warning(
                 f'{self.client.name} Skip the swap ETH to ISWAP on the Ink network. Insufficient ETH'
             )
@@ -167,8 +168,9 @@ class SwapInkswapETHtoSINKWorker(Logger):
 
         value = int(amounts_in[0] * (1 + slippage_tolerance)) 
 
-        balance_nativ = await self.client.get_token_balance(check_native=True)  
-        if balance_nativ - self.module_info.min_available_balance * 10 ** 18 < value:
+        balance_nativ = await self.client.get_token_balance(check_native=True) 
+        min_balance = int(self.module_info.min_available_balance * 10 ** 18) 
+        if balance_nativ < min_balance + value:
             self.logger.warning(
                 f'{self.client.name} Skip the swap ETH to SINK on the Ink network. Insufficient ETH'
             )
@@ -186,4 +188,76 @@ class SwapInkswapETHtoSINKWorker(Logger):
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to SINK on the Ink network. Error: {error} '
+            )
+
+class SwapInkswapETHtoWETHWorker(Logger):
+    def __init__(self, client: Client, module_info: SwapInkswapETHtoWETHModule):
+        super().__init__()
+
+        self.client: Client = client
+        self.module_info: SwapInkswapETHtoWETHModule = module_info
+        self.destination_network: str | None = module_info.destination_network
+        self.source_network: str | None = module_info.source_network
+        self.source_network_chain_id: int | None = module_info.source_network_chain_id
+        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
+        self.module_priority: int | None = module_info.module_priority
+        self.module_name: str | None = module_info.module_name
+        self.module_display_name: str | None = module_info.module_display_name
+
+        self.deadline = int(time.time()) + 20 * 60
+
+    async def run(self):
+        result = await canculate_amount_out_swaps_eth_to_only(
+            client=self.client, token_out_name='ETH', token_get_name='WETH',
+            min_available_balance_token=50000.0, min_clearance=10000.0
+        )
+        
+        if result is None: return
+
+        amount_out, decimals = result
+
+        self.logger.info(
+            f'{self.client.name} Swap ETH to {amount_out} WETH on the Ink network'
+        )
+
+        proxy_address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+            '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
+        )
+
+        contract: AsyncContract = self.client.w3.eth.contract(
+            address=proxy_address_contract,
+            abi=SWAP_INKSWAP_ABI
+        )
+
+        amount_out = int(amount_out * 10 ** decimals)
+        path = [
+            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+        ]
+        slippage_tolerance = 0.005 
+
+        amounts_in = await contract.functions.getAmountsIn(amount_out, path).call()
+
+        value = int(amounts_in[0] * (1 + slippage_tolerance)) 
+
+        balance_nativ = await self.client.get_token_balance(check_native=True) 
+        min_balance = int(self.module_info.min_available_balance * 10 ** 18) 
+        if balance_nativ < min_balance + value:
+            self.logger.warning(
+                f'{self.client.name} Skip the swap ETH to WETH on the Ink network. Insufficient ETH'
+            )
+            return
+
+        try:
+            tx_params = await self.client.prepare_transaction(value=value)
+            transaction = await contract.functions.swapETHForExactTokens(
+                amount_out,
+                path,
+                self.client.address,
+                self.deadline
+            ).build_transaction(tx_params)
+            await self.client.send_transaction(transaction, need_hash=True)
+        except Exception as error:
+            self.logger.error(
+                f'{self.client.name} Failed the swap ETH to WETH on the Ink network. Error: {error} '
             )

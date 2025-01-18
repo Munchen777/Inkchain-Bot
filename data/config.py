@@ -24,8 +24,7 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_gg_ethereum_to_ink": BridgGGEthereumtoInkModule,
     "swap_inkswap_eth_to_iswap": SwapInkswapETHtoISWAPModule,
     "swap_inkswap_eth_to_sink": SwapInkswapETHtoSINKModule,
-
-
+    "swap_inkswap_eth_to_weth": SwapInkswapETHtoWETHModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -46,8 +45,7 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "bridge_gg_ethereum_to_ink": bridge_gg_ethereum_to_ink,
     "swap_inkswap_eth_to_iswap": swap_inkswap_eth_to_iswap,
     "swap_inkswap_eth_to_sink": swap_inkswap_eth_to_sink,
-
-
+    "swap_inkswap_eth_to_weth": swap_inkswap_eth_to_weth
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()

@@ -25,8 +25,7 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["bridge_gg_ethereum_to_ink"],
     ["swap_inkswap_eth_to_iswap"],
     ["swap_inkswap_eth_to_sink"],
-
-
+    ["swap_inkswap_eth_to_weth"]
 ]
 
 NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
@@ -39,5 +38,6 @@ NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
     "Ink Mainnet": {
         "ISWAP": "0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302",
         "SINK": "0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B",
+        "WETH": "0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"
     },
 }

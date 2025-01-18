@@ -207,3 +207,13 @@ class SwapInkswapETHtoSINKModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_sink"
     module_display_name: str = "Swap Inkswap ETH to SINK"
+
+class SwapInkswapETHtoWETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from ETH to WETH """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_eth_to_weth"
+    module_display_name: str = "Swap Inkswap ETH to WETH"
