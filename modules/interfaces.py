@@ -177,7 +177,8 @@ class SwapModuleInfo(BaseModuleInfo):
     destination_network: str = None
     module_type: str = "swap"
 
-# class SwapDyorETHtoUSDCeModule(SwapModuleInfo):
+class SwapDyorETHtoUSDCeModule(SwapModuleInfo):
+    pass
 #     """ Swap Dyor module from ETH to USDC.e  """
 #     source_network: str = Ink.name
 #     destination_network: str = Ink.name

@@ -1,5 +1,6 @@
 from utils.client import Client
 from modules.bridges import *
+from modules.swaps import *
 from modules.interfaces import *
 
 def get_client(account_name, private_key, proxy, source_network: str) -> Client:
@@ -63,6 +64,13 @@ async def bridge_relay_ink_to_base(account_name: str, private_key: str, proxy: s
 
 async def bridge_gg_ethereum_to_ink(account_name: str, private_key: str, proxy: str | None, module_info: BridgGGEthereumtoInkModule):
     worker = BridGGEthereumtoInkWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def swap_inkswap_eth_to_iswap(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapETHtoISWAPModule):
+    worker = SwapInkswapETHtoISWAPWorker(
         client=get_client(account_name, private_key, proxy, module_info.source_network),
         module_info=module_info
     )

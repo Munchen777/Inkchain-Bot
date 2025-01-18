@@ -22,7 +22,9 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["bridge_relay_ink_to_op"],
     ["bridge_relay_ink_to_base"],
     ["bridge_rhino_op_to_ink"],
-    ["bridge_gg_ethereum_to_ink"]
+    ["bridge_gg_ethereum_to_ink"],
+    ["swap_inkswap_eth_to_iswap"],
+
 ]
 
 NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
@@ -31,5 +33,8 @@ NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
     },
     "OP Mainnet": {
         "ETH": "0x4200000000000000000000000000000000000006",
+    },
+    "Ink Mainnet": {
+        "ISWAP": "0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302",
     },
 }
