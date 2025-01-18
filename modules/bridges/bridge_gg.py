@@ -7,15 +7,15 @@ from web3.eth.async_eth import ChecksumAddress
 from modules import *
 from utils.client import Client
 from data.abi import BRIDGE_GG_ABI
-from modules.interfaces import BridGGEthereumtoInkModule
+from modules.interfaces import BridgGGEthereumtoInkModule
 
 
 class BridGGEthereumtoInkWorker(Logger):
-    def __init__(self, client: Client, module_info: BridGGEthereumtoInkModule):
+    def __init__(self, client: Client, module_info: BridgGGEthereumtoInkModule):
         super().__init__()
 
         self.client: Client = client
-        self.module_info: BridGGEthereumtoInkModule = module_info
+        self.module_info: BridgGGEthereumtoInkModule = module_info
         self.destination_network: str | None = module_info.destination_network
         self.source_network: str | None = module_info.source_network
         self.source_network_chain_id: int | None = module_info.source_network_chain_id
@@ -25,12 +25,17 @@ class BridGGEthereumtoInkWorker(Logger):
         self.module_display_name: str | None = module_info.module_display_name
 
     async def run(self):
-        value, balance = await self.client.get_value_and_normalized_value(
+        result = await self.client.get_value_and_normalized_value(
             normalized_fee=self.module_info.fee,
             normalized_min_available_balance=self.module_info.min_available_balance,
             normalized_min_amount_out=self.module_info.min_amount_out,
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
+
+        if result is None:
+            return
+
+        value, balance = result
 
         self.logger.info(
             f'{self.client.name} Sending {balance} ETH via the official bridge from the Ethereum network to Ink'

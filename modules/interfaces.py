@@ -138,7 +138,7 @@ class BridgeRelayInktoBaseModule(BridgeModuleInfo):
     module_name: str = "bridge_relay_ink_to_base"
     module_display_name: str = "Bridge Relay Ink to Base"
 
-class BridGGEthereumtoInkModule(BridgeModuleInfo):
+class BridgGGEthereumtoInkModule(BridgeModuleInfo):
     """ Bridge GG module from Ethereum to Ink  """
     min_available_balance: float = 0.01
     min_amount_residue: float = 0.005
@@ -168,11 +168,33 @@ class SwapModuleInfo(BaseModuleInfo):
         module_type: str = "swap" - тип модуля (дефолтное значение)
     
     """
-    fee: float = 0.0005
-    min_available_balance: float = 0.008
-    min_amount_residue: float = 0.005
-    min_amount_out: float = 0.002
+    fee: float = 0.0
+    min_available_balance: float = 0.005
+    min_amount_residue: float = 0.003
+    min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
     destination_network: str = None
     module_type: str = "swap"
+
+# class SwapDyorETHtoUSDCeModule(SwapModuleInfo):
+#     """ Swap Dyor module from ETH to USDC.e  """
+#     source_network: str = Ink.name
+#     destination_network: str = Ink.name
+#     source_network_chain_id: int = Ink.chain_id
+#     destination_network_chain_id: int = Ink.chain_id
+#     module_priority: int = 2
+#     module_name: str = "swap_dyor_eth_to_usdc.e"
+#     module_display_name: str = "Swap Dyor ETH to USDC.e"
+
+class SwapInkswapETHtoISWAPModule(SwapModuleInfo):
+    """ Swap Inkswap module from ETH to ISWAP """
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0003
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_inkswap_eth_to_iswap"
+    module_display_name: str = "Swap Inkswap ETH to ISWAP"

@@ -21,7 +21,7 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "bridge_relay_base_to_ink": BridgeRelayBasetoInkModule,
     "bridge_relay_ink_to_op": BridgeRelayInktoOPModule,
     "bridge_relay_ink_to_base": BridgeRelayInktoBaseModule,
-    "bridge_gg_ethereum_to_ink": BridGGEthereumtoInkModule
+    "bridge_gg_ethereum_to_ink": BridgGGEthereumtoInkModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
