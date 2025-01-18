@@ -186,7 +186,7 @@ class Client(Logger):
             return None
 
     async def get_allowance(self, token_address: str, spender_address: str) -> int:
-        contract = self.get_contract(token_address)
+        contract = await self.get_contract(token_address)
         return await contract.functions.allowance(
             self.address,
             spender_address
