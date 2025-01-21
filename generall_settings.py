@@ -34,7 +34,7 @@ MIN_AVAILABLE_BALANCE = int(100000000000000)                        # Minimum ba
 
 RANDOM_RANGE = (0.01, 0.1)                                          # Range of random values
 
-ROUNDING_LEVELS = (4, 5)                                            # Rounding levels
+ROUNDING_LEVELS = (4, 7)                                            # Rounding levels
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 # EXCEL INFO

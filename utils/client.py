@@ -196,11 +196,14 @@ class Client(Logger):
         fee_history = await self.w3.eth.fee_history(25, 'latest', [20.0])
         non_empty_block_priority_fees = [fee[0] for fee in fee_history["reward"] if fee[0] != 0]
 
+        # Если данные отсутствуют, установить минимальное значение
+        if not non_empty_block_priority_fees:
+            return 1  # Установите минимально приемлемую комиссию
+
         divisor_priority = max(len(non_empty_block_priority_fees), 1)
-
         priority_fee = int(round(sum(non_empty_block_priority_fees) / divisor_priority))
+        return max(priority_fee, 1)  # Убедитесь, что комиссия не меньше 1
 
-        return priority_fee
     
     async def prepare_transaction(self, value: int = 0):
         try:
@@ -212,10 +215,13 @@ class Client(Logger):
             }
             if self.network.eip1559_support:
                 base_fee = await self.w3.eth.gas_price
-                max_priority_fee_per_gas = await self.get_priotiry_fee()
+                max_priority_fee_per_gas = max(await self.get_priotiry_fee(), 1)  # Минимум 1 Gwei
                 max_fee_per_gas = base_fee + max_priority_fee_per_gas
-                tx_params['maxPriorityFeePerGas'] = max_priority_fee_per_gas
-                tx_params['maxFeePerGas'] = int(max_fee_per_gas)
+
+                # Убедитесь, что max_fee_per_gas не ниже минимального порога
+                min_fee = 1_000_000_000  # 1 Gwei
+                tx_params['maxPriorityFeePerGas'] = max(max_priority_fee_per_gas, min_fee)
+                tx_params['maxFeePerGas'] = max(int(max_fee_per_gas), tx_params['maxPriorityFeePerGas'] + min_fee)
                 tx_params['type'] = '0x2'
             else:
                 tx_params['gasPrice'] = int(await self.w3.eth.gas_price)
@@ -245,6 +251,11 @@ class Client(Logger):
                 singed_tx = self.w3.eth.account.sign_transaction(transaction, self.private_key)
                 tx_hash = await self.w3.eth.send_raw_transaction(singed_tx.raw_transaction)
             except Exception as error:
+                if self.get_normalize_error(error) == 'transaction underpriced':
+                    self.logger.warning("Комиссия занижена. Увеличиваем и повторяем отправку...")
+                    transaction['maxPriorityFeePerGas'] = transaction.get('maxPriorityFeePerGas', 1_000_000_000) + 1_000_000_000
+                    transaction['maxFeePerGas'] = transaction['maxPriorityFeePerGas'] + await self.w3.eth.gas_price
+                    return await self.send_transaction(transaction, need_hash, without_gas, poll_latency, timeout, test_mode)
                 if self.get_normalize_error(error) == 'already known':
                     self.logger.warning(f'RPC получил ошибку, но tx был отправлен | {self.address}')
                     return True

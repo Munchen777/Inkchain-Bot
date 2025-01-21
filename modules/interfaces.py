@@ -177,17 +177,6 @@ class SwapModuleInfo(BaseModuleInfo):
     destination_network: str = None
     module_type: str = "swap"
 
-class SwapDyorETHtoUSDCeModule(SwapModuleInfo):
-    pass
-#     """ Swap Dyor module from ETH to USDC.e  """
-#     source_network: str = Ink.name
-#     destination_network: str = Ink.name
-#     source_network_chain_id: int = Ink.chain_id
-#     destination_network_chain_id: int = Ink.chain_id
-#     module_priority: int = 2
-#     module_name: str = "swap_dyor_eth_to_usdc.e"
-#     module_display_name: str = "Swap Dyor ETH to USDC.e"
-
 class SwapInkswapETHtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from ETH to ISWAP """
     source_network: str = Ink.name
@@ -208,15 +197,15 @@ class SwapInkswapETHtoSINKModule(SwapModuleInfo):
     module_name: str = "swap_inkswap_eth_to_sink"
     module_display_name: str = "Swap Inkswap ETH to SINK"
 
-class SwapInkswapETHtoWETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from ETH to WETH """
+class SwapInkswapETHtoKRAKENModule(SwapModuleInfo):
+    """ Swap Inkswap module from ETH to KRAKEN """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     destination_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "swap_inkswap_eth_to_weth"
-    module_display_name: str = "Swap Inkswap ETH to WETH"
+    module_name: str = "swap_inkswap_eth_to_kraken"
+    module_display_name: str = "Swap Inkswap ETH to KRAKEN"
 
 class SwapInkswapISWAPtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to ETH """
@@ -238,15 +227,15 @@ class SwapInkswapSINKtoETHModule(SwapModuleInfo):
     module_name: str = "swap_inkswap_sink_to_eth"
     module_display_name: str = "Swap Inkswap SINK to ETH"
 
-class SwapInkswapWETHtoETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from WETH to ETH """
+class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from KRAKEN to ETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     destination_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "swap_inkswap_weth_to_eth"
-    module_display_name: str = "Swap Inkswap WETH to ETH"
+    module_name: str = "swap_inkswap_kraken_to_eth"
+    module_display_name: str = "Swap Inkswap KRAKEN to ETH"
 
 class SwapInkswapISWAPtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to SINK """
@@ -268,41 +257,351 @@ class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
     module_name: str = "swap_inkswap_sink_to_iswap"
     module_display_name: str = "Swap Inkswap SINK to ISWAP"
 
-class SwapInkswapSINKtoWETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from SINK to WETH """
+class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
+    """ Swap Inkswap module from SINK to KRAKEN """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     destination_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "swap_inkswap_sink_to_weth"
-    module_display_name: str = "Swap Inkswap SINK to WETH"
+    module_name: str = "swap_inkswap_sink_to_kraken"
+    module_display_name: str = "Swap Inkswap SINK to KRAKEN"
 
-class SwapInkswapWETHtoSINKModule(SwapModuleInfo):
-    """ Swap Inkswap module from WETH to SINK """
+class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
+    """ Swap Inkswap module from KRAKEN to SINK """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     destination_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "swap_inkswap_weth_to_sink"
-    module_display_name: str = "Swap Inkswap WETH to SINK"
+    module_name: str = "swap_inkswap_kraken_to_sink"
+    module_display_name: str = "Swap Inkswap KRAKEN to SINK"
 
-class SwapInkswapWETHtoISWAPModule(SwapModuleInfo):
-    """ Swap Inkswap module from WETH to ISWAP """
+class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
+    """ Swap Inkswap module from KRAKEN to ISWAP """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     destination_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "swap_inkswap_weth_to_iswap"
+    module_name: str = "swap_inkswap_kraken_to_iswap"
     
-class SwapInkswapISWAPtoWETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from ISWAP to WETH """
+class SwapInkswapISWAPtoKRAKENModule(SwapModuleInfo):
+    """ Swap Inkswap module from ISWAP to KRAKEN """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     destination_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "swap_inkswap_iswap_to_weth"
-    module_display_name: str = "Swap Inkswap ISWAP to WETH"
+    module_name: str = "swap_inkswap_iswap_to_kraken"
+    module_display_name: str = "Swap Inkswap ISWAP to KRAKEN"
+
+class SwapDyorETHtoUSDCModule(SwapModuleInfo):
+    """ Swap Dyor module from ETH to USDC.e  """
+    min_amount_out: float = 0.00035
+    max_amount_out: float = 0.001
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_eth_to_usdc"
+    module_display_name: str = "Swap Dyor ETH to USDC.e"
+
+class SwapDyorETHtoKrakenModule(SwapModuleInfo):
+    """ Swap Dyor module from ETH to Kraken  """
+    min_amount_out: float = 0.00035
+    max_amount_out: float = 0.001
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_eth_to_kraken"
+    module_display_name: str = "Swap Dyor ETH to Kraken"
+
+class SwapDyorETHtoUSDTModule(SwapModuleInfo):
+    """ Swap Dyor module from ETH to USDT  """
+    min_amount_out: float = 0.00035
+    max_amount_out: float = 0.001
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_eth_to_usdt"
+    module_display_name: str = "Swap Dyor ETH to USDT"
+
+class SwapDyorETHtoWETHModule(SwapModuleInfo):
+    """ Swap Dyor module from ETH to WETH  """
+    min_amount_out: float = 0.00035
+    max_amount_out: float = 0.001
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_eth_to_weth"
+    module_display_name: str = "Swap Dyor ETH to WETH"
+
+class SwapDyorETHtoWORMModule(SwapModuleInfo):
+    """ Swap Dyor module from ETH to WORM  """
+    min_amount_out: float = 0.00035
+    max_amount_out: float = 0.001
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_eth_to_worm"
+    module_display_name: str = "Swap Dyor ETH to WORM"
+
+class SwapDyorWETHtoETHModule(SwapModuleInfo):
+    """ Swap Dyor module from WETH to ETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_weth_to_eth"
+    module_display_name: str = "Swap Dyor WETH to ETH"
+
+class SwapDyorUSDCtoETHModule(SwapModuleInfo):
+    """ Swap Dyor module from USDC.e to ETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdc_to_eth"
+    module_display_name: str = "Swap Dyor USDC.e to ETH"
+
+class SwapDyorUSDTtoETHModule(SwapModuleInfo):
+    """ Swap Dyor module from USDT to ETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdt_to_eth"
+    module_display_name: str = "Swap Dyor USDT to ETH"
+
+class SwapDyorWORMtoETHModule(SwapModuleInfo):
+    """ Swap Dyor module from WORM to ETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_worm_to_eth"
+    module_display_name: str = "Swap Dyor WORM to ETH"
+
+class SwapDyorKRAKENtoETHModule(SwapModuleInfo):
+    """ Swap Dyor module from KRAKEN to ETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_kraken_to_eth"
+    module_display_name: str = "Swap Dyor KRAKEN to ETH"
+
+class SwapDyorKRAKENtoWORMModule(SwapModuleInfo):
+    """ Swap Dyor module from KRAKEN to WORM  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_kraken_to_worm"
+    module_display_name: str = "Swap Dyor KRAKEN to WORM"
+
+class SwapDyorWORMtoKRAKENModule(SwapModuleInfo):
+    """ Swap Dyor module from WORM to KRAKEN  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_worm_to_kraken"
+    module_display_name: str = "Swap Dyor WORM to KRAKEN"
+
+class SwapDyorWORMtoUSDTModule(SwapModuleInfo):
+    """ Swap Dyor module from WORM to USDT  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_worm_to_usdt"
+    module_display_name: str = "Swap Dyor WORM to USDT"
+
+class SwapDyorWORMtoUSDCModule(SwapModuleInfo):
+    """ Swap Dyor module from WORM to USDC  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_worm_to_usdc"
+    module_display_name: str = "Swap Dyor WORM to USDC"
+
+class SwapDyorWORMtoWETHModule(SwapModuleInfo):
+    """ Swap Dyor module from WORM to WETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_worm_to_weth"
+    module_display_name: str = "Swap Dyor WORM to WETH"
+
+class SwapDyorKRAKENtoWETHModule(SwapModuleInfo):
+    """ Swap Dyor module from KRAKEN to WETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_kraken_to_weth"
+    module_display_name: str = "Swap Dyor KRAKEN to WETH"
+
+class SwapDyorKRAKENtoUSDCModule(SwapModuleInfo):
+    """ Swap Dyor module from KRAKEN to USDC  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_kraken_to_usdc"
+    module_display_name: str = "Swap Dyor KRAKEN to USDC"
+
+class SwapDyorUSDCtoKRAKENModule(SwapModuleInfo):
+    """ Swap Dyor module from USDC to KRAKEN  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdc_to_kraken"
+    module_display_name: str = "Swap Dyor USDC to KRAKEN"
+
+class SwapDyorUSDCtoWORMModule(SwapModuleInfo):
+    """ Swap Dyor module from USDC to WORM  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdc_to_worm"
+    module_display_name: str = "Swap Dyor USDC to WORM"
+
+class SwapDyorUSDCtoUSDTModule(SwapModuleInfo):
+    """ Swap Dyor module from USDC to USDT  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdc_to_usdt"
+    module_display_name: str = "Swap Dyor USDC to USDT"
+
+class SwapDyorUSDCtoWETHModule(SwapModuleInfo):
+    """ Swap Dyor module from USDC to WETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdc_to_weth"
+    module_display_name: str = "Swap Dyor USDC to WETH"
+
+class SwapDyorWETHtoUSDCModule(SwapModuleInfo):
+    """ Swap Dyor module from WETH to USDC  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_weth_to_usdc"
+    module_display_name: str = "Swap Dyor WETH to USDC"
+
+class SwapDyorWETHtoUSDTModule(SwapModuleInfo):
+    """ Swap Dyor module from WETH to USDT  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_weth_to_usdt"
+    module_display_name: str = "Swap Dyor WETH to USDT"
+
+class SwapDyorWETHtoWORMModule(SwapModuleInfo):
+    """ Swap Dyor module from WETH to WORM  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_weth_to_worm"
+    module_display_name: str = "Swap Dyor WETH to WORM"
+
+class SwapDyorUSDTtoWETHModule(SwapModuleInfo):
+    """ Swap Dyor module from USDT to WETH  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdt_to_weth"
+    module_display_name: str = "Swap Dyor USDT to WETH"
+
+class SwapDyorWETHtoKRAKENModule(SwapModuleInfo):
+    """ Swap Dyor module from WETH to KRAKEN  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_weth_to_kraken"
+    module_display_name: str = "Swap Dyor WETH to KRAKEN"
+
+class SwapDyorUSDTtoUSDCModule(SwapModuleInfo):
+    """ Swap Dyor module from USDT to USDC  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdt_to_usdc"
+    module_display_name: str = "Swap Dyor USDT to USDC"
+
+class SwapDyorUSDTtoWORMModule(SwapModuleInfo):
+    """ Swap Dyor module from USDT to WORM  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdt_to_worm"
+    module_display_name: str = "Swap Dyor USDT to WORM"
+
+class SwapDyorUSDTtoKRAKENModule(SwapModuleInfo):
+    """ Swap Dyor module from USDT to KRAKEN  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_usdt_to_kraken"
+    module_display_name: str = "Swap Dyor USDT to KRAKEN"
+
+class SwapDyorKRAKENtoUSDTModule(SwapModuleInfo):
+    """ Swap Dyor module from KRAKEN to USDT  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "swap_dyor_kraken_to_usdt"
+    module_display_name: str = "Swap Dyor KRAKEN to USDT"

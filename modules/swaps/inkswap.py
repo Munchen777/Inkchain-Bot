@@ -20,11 +20,11 @@ async def approve(
         client: Client, token_out_name: str, amount_out: int, address_contract: ChecksumAddress = None,
         spender_address: ChecksumAddress = '0xb5B494e63c3a52391E6C8E4a4D6aa1AEF369Fb6B'
     ):
-    address_contract = NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, "")
+    address_contract = AsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, ""))
 
     contract: AsyncContract = client.w3.eth.contract(
         address=address_contract,
-        abi=INKSWAP_TOKEN_ABI
+        abi=SWAP_TOKEN_ABI
     )
 
     allowance = await contract.functions.allowance(client.address, spender_address).call()
@@ -33,7 +33,7 @@ async def approve(
 
     contract: AsyncContract = client.w3.eth.contract(
         address=address_contract,
-        abi=INKSWAP_TOKEN_ABI
+        abi=SWAP_TOKEN_ABI
     )
 
     try:
@@ -85,13 +85,10 @@ async def canculate_amount_out_swaps(
         percent = random.randint(50, 100)
 
     amount_out = round(free_amount * (1 - percent / 100), random.randint(2, 4))
+
     if amount_out < min_clearance:
-        if from_eth:
-            amount_out = random.randint(int(min_clearance), int(min_clearance * 2))
-        if not from_eth:
-            amount_out = random.randint(int(min_clearance / 2), int(min_clearance))
-
-
+        amount_out = (random.randint(int(min_clearance * 10 ** decimals), int(free_amount * 10 ** decimals)) / 10 ** decimals)
+        
     return amount_out, decimals
 
 
@@ -241,12 +238,12 @@ class SwapInkswapETHtoSINKWorker(Logger):
             )
 
 
-class SwapInkswapETHtoWETHWorker(Logger):
-    def __init__(self, client: Client, module_info: SwapInkswapETHtoWETHModule):
+class SwapInkswapETHtoKRAKENWorker(Logger):
+    def __init__(self, client: Client, module_info: SwapInkswapETHtoKRAKENModule):
         super().__init__()
 
         self.client: Client = client
-        self.module_info: SwapInkswapETHtoWETHModule = module_info
+        self.module_info: SwapInkswapETHtoKRAKENModule = module_info
         self.destination_network: str | None = module_info.destination_network
         self.source_network: str | None = module_info.source_network
         self.source_network_chain_id: int | None = module_info.source_network_chain_id
@@ -259,7 +256,7 @@ class SwapInkswapETHtoWETHWorker(Logger):
 
     async def run(self):
         result = await canculate_amount_out_swaps(
-            client=self.client, token_out_name='ETH', token_get_name='WETH',
+            client=self.client, token_out_name='ETH', token_get_name='KRAKEN',
             min_available_balance_token=50000.0, min_clearance=10000.0, from_eth=True
         )
         
@@ -268,7 +265,7 @@ class SwapInkswapETHtoWETHWorker(Logger):
         amount_out, decimals = result
 
         self.logger.info(
-            f'{self.client.name} Swap ETH to {amount_out} WETH on the Ink network'
+            f'{self.client.name} Swap ETH to {amount_out} KRAKEN on the Ink network'
         )
 
         address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -295,7 +292,7 @@ class SwapInkswapETHtoWETHWorker(Logger):
         min_balance = int(self.module_info.min_available_balance * 10 ** 18) 
         if balance_nativ < min_balance + value:
             self.logger.warning(
-                f'{self.client.name} Skip the swap ETH to WETH on the Ink network. Insufficient ETH'
+                f'{self.client.name} Skip the swap ETH to KRAKEN on the Ink network. Insufficient ETH'
             )
             return
 
@@ -310,7 +307,7 @@ class SwapInkswapETHtoWETHWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap ETH to WETH on the Ink network. Error: {error}'
+                f'{self.client.name} Failed the swap ETH to KRAKEN on the Ink network. Error: {error}'
             )
 
 
@@ -450,12 +447,12 @@ class SwapInkswapISWAPtoETHWorker(Logger):
             )
 
 
-class SwapInkswapWETHtoETHWorker(Logger):
-    def __init__(self, client: Client, module_info: SwapInkswapWETHtoETHModule):
+class SwapInkswapKRAKENtoETHWorker(Logger):
+    def __init__(self, client: Client, module_info: SwapInkswapKRAKENtoETHModule):
         super().__init__()
 
         self.client: Client = client
-        self.module_info: SwapInkswapWETHtoETHModule = module_info
+        self.module_info: SwapInkswapKRAKENtoETHModule = module_info
         self.destination_network: str | None = module_info.destination_network
         self.source_network: str | None = module_info.source_network
         self.source_network_chain_id: int | None = module_info.source_network_chain_id
@@ -468,7 +465,7 @@ class SwapInkswapWETHtoETHWorker(Logger):
 
     async def run(self):       
         result = await canculate_amount_out_swaps(
-            client=self.client, token_out_name='WETH', token_get_name='ETH',
+            client=self.client, token_out_name='KRAKEN', token_get_name='ETH',
             min_available_balance_token=50_000.0, min_clearance=10_000.0, from_eth=False
         )
         
@@ -477,11 +474,11 @@ class SwapInkswapWETHtoETHWorker(Logger):
         amount_out, decimals = result
 
         await approve(
-            client=self.client, token_out_name='WETH', amount_out=int(amount_out * 10 ** decimals)
+            client=self.client, token_out_name='KRAKEN', amount_out=int(amount_out * 10 ** decimals)
         )
 
         self.logger.info(
-            f'{self.client.name} Swap {amount_out} WETH to ETH on the Ink network'
+            f'{self.client.name} Swap {amount_out} KRAKEN to ETH on the Ink network'
         )
 
         address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -514,7 +511,7 @@ class SwapInkswapWETHtoETHWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap WETH to ETH on the Ink network. Error: {error}'
+                f'{self.client.name} Failed the swap KRAKEN to ETH on the Ink network. Error: {error}'
             )
 
 
@@ -656,12 +653,12 @@ class SwapInkswapSINKtoISWAPWorker(Logger):
             )
 
 
-class SwapInkswapSINKtoWETHWorker(Logger):
-    def __init__(self, client: Client, module_info: SwapInkswapSINKtoWETHModule):
+class SwapInkswapSINKtoKRAKENWorker(Logger):
+    def __init__(self, client: Client, module_info: SwapInkswapSINKtoKRAKENModule):
         super().__init__()
 
         self.client: Client = client
-        self.module_info: SwapInkswapSINKtoWETHModule = module_info
+        self.module_info: SwapInkswapSINKtoKRAKENModule = module_info
         self.destination_network: str | None = module_info.destination_network
         self.source_network: str | None = module_info.source_network
         self.source_network_chain_id: int | None = module_info.source_network_chain_id
@@ -674,7 +671,7 @@ class SwapInkswapSINKtoWETHWorker(Logger):
 
     async def run(self):       
         result = await canculate_amount_out_swaps(
-            client=self.client, token_out_name='SINK', token_get_name='WETH',
+            client=self.client, token_out_name='SINK', token_get_name='KRAKEN',
             min_available_balance_token=5000.0, min_clearance=750.0, from_eth=False
         )
         
@@ -687,7 +684,7 @@ class SwapInkswapSINKtoWETHWorker(Logger):
         )
 
         self.logger.info(
-            f'{self.client.name} Swap {amount_out} SINK to WETH on the Ink network'
+            f'{self.client.name} Swap {amount_out} SINK to KRAKEN on the Ink network'
         )
 
         address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -721,16 +718,16 @@ class SwapInkswapSINKtoWETHWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap SINK to WETH on the Ink network. Error: {error}'
+                f'{self.client.name} Failed the swap SINK to KRAKEN on the Ink network. Error: {error}'
             )
 
 
-class SwapInkswapWETHtoSINKWorker(Logger):
-    def __init__(self, client: Client, module_info: SwapInkswapWETHtoSINKModule):
+class SwapInkswapKRAKENtoSINKWorker(Logger):
+    def __init__(self, client: Client, module_info: SwapInkswapKRAKENtoSINKModule):
         super().__init__()
 
         self.client: Client = client
-        self.module_info: SwapInkswapWETHtoSINKModule = module_info
+        self.module_info: SwapInkswapKRAKENtoSINKModule = module_info
         self.destination_network: str | None = module_info.destination_network
         self.source_network: str | None = module_info.source_network
         self.source_network_chain_id: int | None = module_info.source_network_chain_id
@@ -743,7 +740,7 @@ class SwapInkswapWETHtoSINKWorker(Logger):
 
     async def run(self):       
         result = await canculate_amount_out_swaps(
-            client=self.client, token_out_name='WETH', token_get_name='SINK',
+            client=self.client, token_out_name='KRAKEN', token_get_name='SINK',
             min_available_balance_token=50_000.0, min_clearance=10_000.0, from_eth=False
         )
         
@@ -752,11 +749,11 @@ class SwapInkswapWETHtoSINKWorker(Logger):
         amount_out, decimals = result
         
         await approve(
-            client=self.client, token_out_name='WETH', amount_out=int(amount_out * 10 ** decimals)
+            client=self.client, token_out_name='KRAKEN', amount_out=int(amount_out * 10 ** decimals)
         )
 
         self.logger.info(
-            f'{self.client.name} Swap {amount_out} WETH to SINK on the Ink network'
+            f'{self.client.name} Swap {amount_out} KRAKEN to SINK on the Ink network'
         )
 
         address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -790,16 +787,16 @@ class SwapInkswapWETHtoSINKWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap WETH to SINK on the Ink network. Error: {error}'
+                f'{self.client.name} Failed the swap KRAKEN to SINK on the Ink network. Error: {error}'
             )
 
 
-class SwapInkswapWETHtoISWAPWorker(Logger):
-    def __init__(self, client: Client, module_info: SwapInkswapWETHtoISWAPModule):
+class SwapInkswapKRAKENtoISWAPWorker(Logger):
+    def __init__(self, client: Client, module_info: SwapInkswapKRAKENtoISWAPModule):
         super().__init__()
 
         self.client: Client = client
-        self.module_info: SwapInkswapWETHtoISWAPModule = module_info
+        self.module_info: SwapInkswapKRAKENtoISWAPModule = module_info
         self.destination_network: str | None = module_info.destination_network
         self.source_network: str | None = module_info.source_network
         self.source_network_chain_id: int | None = module_info.source_network_chain_id
@@ -812,7 +809,7 @@ class SwapInkswapWETHtoISWAPWorker(Logger):
 
     async def run(self):       
         result = await canculate_amount_out_swaps(
-            client=self.client, token_out_name='WETH', token_get_name='ISWAP',
+            client=self.client, token_out_name='KRAKEN', token_get_name='ISWAP',
             min_available_balance_token=50_000.0, min_clearance=10_000.0, from_eth=False
         )
         
@@ -821,11 +818,11 @@ class SwapInkswapWETHtoISWAPWorker(Logger):
         amount_out, decimals = result
         
         await approve(
-            client=self.client, token_out_name='WETH', amount_out=int(amount_out * 10 ** decimals)
+            client=self.client, token_out_name='KRAKEN', amount_out=int(amount_out * 10 ** decimals)
         )
 
         self.logger.info(
-            f'{self.client.name} Swap {amount_out} WETH to ISWAP on the Ink network'
+            f'{self.client.name} Swap {amount_out} KRAKEN to ISWAP on the Ink network'
         )
 
         address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -859,16 +856,16 @@ class SwapInkswapWETHtoISWAPWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap WETH to ISWAP on the Ink network. Error: {error}'
+                f'{self.client.name} Failed the swap KRAKEN to ISWAP on the Ink network. Error: {error}'
             )
 
 
-class SwapInkswapISWAPtoWETHWorker(Logger):
-    def __init__(self, client: Client, module_info: SwapInkswapISWAPtoWETHModule):
+class SwapInkswapISWAPtoKRAKENWorker(Logger):
+    def __init__(self, client: Client, module_info: SwapInkswapISWAPtoKRAKENModule):
         super().__init__()
 
         self.client: Client = client
-        self.module_info: SwapInkswapISWAPtoWETHModule = module_info
+        self.module_info: SwapInkswapISWAPtoKRAKENModule = module_info
         self.destination_network: str | None = module_info.destination_network
         self.source_network: str | None = module_info.source_network
         self.source_network_chain_id: int | None = module_info.source_network_chain_id
@@ -881,7 +878,7 @@ class SwapInkswapISWAPtoWETHWorker(Logger):
 
     async def run(self):       
         result = await canculate_amount_out_swaps(
-            client=self.client, token_out_name='ISWAP', token_get_name='WETH',
+            client=self.client, token_out_name='ISWAP', token_get_name='KRAKEN',
             min_available_balance_token=25.0, min_clearance=10.0, from_eth=False
         )
         
@@ -894,7 +891,7 @@ class SwapInkswapISWAPtoWETHWorker(Logger):
         )
 
         self.logger.info(
-            f'{self.client.name} Swap {amount_out} ISWAP to WETH on the Ink network'
+            f'{self.client.name} Swap {amount_out} ISWAP to KRAKEN on the Ink network'
         )
 
         address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
@@ -928,5 +925,5 @@ class SwapInkswapISWAPtoWETHWorker(Logger):
             await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap ISWAP to WETH on the Ink network. Error: {error}'
+                f'{self.client.name} Failed the swap ISWAP to KRAKEN on the Ink network. Error: {error}'
             )
