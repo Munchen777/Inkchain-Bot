@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Set
 
 """
 Handle installation of classic route.
@@ -78,6 +78,10 @@ CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to wit
 CLASSIC_ROUTES_MODULES_USING = [
     ["swap_dyor_kraken_to_usdt"],
 ]
+
+PRIORITY_NETWORK_NAMES: Set[str] = { # Priority Network names to work with
+    "Ink Mainnet",
+}
 
 NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
     "Base Mainnet": {

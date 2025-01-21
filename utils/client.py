@@ -4,7 +4,7 @@ import os
 import json
 
 from curl_cffi.requests import AsyncSession, Response, RequestsError
-from typing import Any, Dict, Set
+from typing import Any, Dict, List, Set
 from web3.contract import AsyncContract
 from web3.exceptions import TransactionNotFound, TimeExhausted
 from web3 import AsyncHTTPProvider, AsyncWeb3
@@ -295,76 +295,131 @@ class Client(Logger):
                 raise BlockchainException(f'{self.get_normalize_error(error)}')
 
     async def get_wallet_balance(self, MAX_RETRIES: int = 3) -> Dict[str, Dict[str, int]]:
+        wallet_balances: Dict[str, Dict[str, float]] = {}
         params: Dict[str, str] = {
             'id': self.address,
-            "is_core": "true",
+            "is_all": "true",
         }
         counter: int = 1
 
-        try:
-            for network_name in NETWORKS_IN_RABBY:
-                response_json: Dict[str, Any] = {}
+        if NETWORKS_IN_RABBY:
+            try:
+                for network_name in NETWORKS_IN_RABBY:
+                    response_json: Dict[str, Any] = {}
 
-                async with AsyncSession() as session:
-                    while counter <= MAX_RETRIES:
-                        try:
-                            response: Response = await session.get(
-                                url="https://api.rabby.io/v1/user/total_balance",
-                                params=params,
-                            )
-                            response_json: Dict[str, Any] = response.json()
-                            rabby_response_path: str = os.path.join(
-                                (os.path.dirname(os.path.dirname(__file__))),
-                                "data",
-                                "rabby_response.json"
-                            )
-                            with open(rabby_response_path, "w") as file:
-                                json.dump(response_json, file, indent=4)
+                    async with AsyncSession() as session:
+                        while counter <= MAX_RETRIES:
+                            try:
+                                response: Response = await session.get(
+                                    url="https://api.rabby.io/v1/user/token_list",
+                                    params={**params,
+                                            "chain_id": network_name
+                                            },
+                                )
+                                if response.status_code == 200:
+                                    response_json_list: List[Dict[str, Any]] = response.json()
+                                # rabby_response_path: str = os.path.join(
+                                #     (os.path.dirname(os.path.dirname(__file__))),
+                                #     "data",
+                                #     "rabby_response.json"
+                                # )
+                                # with open(rabby_response_path, "w") as file:
+                                #     json.dump(response_json, file, indent=4)
 
-                            break
+                                    break
 
-                        except (RequestsError, Exception) as error:
+                            except (RequestsError, Exception) as error:
+                                self.logger_msg(self.name, self.address,
+                                                f"Error while receiving wallet balances.\nError: {error}", "warning")
+
+                            counter += 1
                             self.logger_msg(self.name, self.address,
-                                            f"Error while receiving wallet balances.\nError: {error}", "warning")
+                                            f"Try to send request again to get wallet balances. Counter: {counter}", "warning")
 
-                        counter += 1
+                    if "message" not in response_json_list:
+                        for token_data in response_json_list:
+                            try:
+                                token_name: str = token_data.get("symbol")
+                                rabby_network_name: str = token_data.get("id")
+                                network: Network | None = NETWORKS_IN_RABBY.get(rabby_network_name)
+
+                                if not network:
+                                    self.logger_msg(self.name, self.address,
+                                                    f"Network {rabby_network_name} not found in NETWORKS_IN_RABBY", "warning")
+                                    continue
+
+                                network_token_contracts: Dict[str, str] | None = NETWORK_TOKEN_CONTRACTS.get(network.name)
+
+                                if not network_token_contracts:
+                                    native_tokens_names: Set[str] = set(network.token for network in NETWORKS.values())
+                                    if token_name not in native_tokens_names:
+                                        self.logger_msg(self.name, self.address,
+                                                        f"Token {token_name} not found in native tokens names for network: {network.name}", "warning")
+                                        continue
+                                    
+                                    token_balance: float | None = token_data.get("amount", 0)
+                                    if not token_balance:
+                                        self.logger_msg(self.name, self.address,
+                                                        f"There is no token amount for {token_name} on network: {network.name}", "warning")
+                                        continue
+                                    
+                                    wallet_balances.setdefault(network.name, {})[token_name] = float(token_balance)
+                                    
+                                    # self.logger_msg(self.name, self.address,
+                                    #                 f"Network token contracts not found for network: {network.name}", "warning")
+                                    # continue
+                                
+                                else:
+
+                                # if token_name in network_token_contracts:
+                                    token_balance: float | None = token_data.get("amount", 0)
+                                    if not token_balance:
+                                        self.logger_msg(self.name, self.address,
+                                            f"Token balance not found for token: {token_name} on network: {network.name}", "warning")
+                                        continue
+
+                                    wallet_balances.setdefault(network.name, {})[token_name] = float(token_balance)
+
+                            except Exception as error:
+                                self.logger_msg(self.name, self.address,
+                                                f"Error while receiving {token_name} wallet balance on network {network.name}.\nError: {error}", "warning")
+                                pass
+
+                    else:
                         self.logger_msg(self.name, self.address,
-                                        f"Try to send request again to get wallet balances. Counter: {counter}")
+                                        f"Error while receiving wallet balances.\nError: {response_json_list}", "warning")
 
-                for network_data in response_json.get("chain_list", []):
-                    rabby_network_name: str = network_data.get("name")
-                    network: Network | None= NETWORKS_IN_RABBY.get(rabby_network_name)
+                        
 
-                    if not network:
-                        self.logger_msg(self.name, self.address,
-                                        f"Network {rabby_network_name} not found in NETWORKS_IN_RABBY", "warning")
-                        continue
-
-                    network_name: str = network.name
-                    """TODO: Добавить балансы в словарь
+                        
+                        
+                        
                     
-                    wallet_balances: Dict[str, Dict[str, float]] = {
-                        network_name: {
-                            token_name: token_balance
+                        """TODO: Добавить балансы в словарь
+                        
+                        wallet_balances: Dict[str, Dict[str, float]] = {
+                            network_name: {
+                                token_name: token_balance
+                            }
                         }
-                    }
-                    
-                    wallet_balances.setdefault(network_name, {})[token_name] = token_balance
-                    
-                    token_balance - высчитанный баланс
+                        
+                        wallet_balances.setdefault(network_name, {})[token_name] = token_balance
+                        
+                        token_balance - высчитанный баланс
 
-                    """
-                    
-                    
-                    
-        except Exception as error:
-            self.logger_msg(self.name, self.address,
-                            f"Error while receiving wallet balances.\nError: {error}", "error")
-            raise error
+                        """
+                        
+                        
+                        
+            except Exception as error:
+                self.logger_msg(self.name, self.address,
+                                f"Error while receiving wallet balances.\nError: {error}", "error")
+                raise error
+            
+            return wallet_balances
 
+        raise SoftwareException("Networks not found! Please, add networks to the networks module.")
 
-        
-        
         # """ Метод для получения всех балансов кошелька во всех сетях """
         # client: Client = Client(account_name, private_key, proxy)
 

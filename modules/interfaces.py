@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Any, Dict, Optional, Literal
+from pydantic import BaseModel, Field
+from typing import Any, Dict, Optional, Literal, Set
 
 from utils.networks import *
 
@@ -10,6 +10,19 @@ MODULE_TYPES = Literal[
     "add_liquidity",
     "remove_liquidity"
 ]
+
+class ModuleDependency(BaseModel):
+    """ Module for describing dependencies between modules """
+    required_modules: Set[str] = Field(
+        default_factory=set,
+        description="Имена модулей, которые должны быть выполнены до этого",
+        exclude=True
+    )
+    # blocked_by_modules: Set[str] = Field(
+    #     default_factory=set,
+    #     description="Имена модулей, которые блокируют выполнение этого",
+    #     exclude=True
+    # )
 
 class BaseModuleInfo(BaseModel):
     """
@@ -28,6 +41,11 @@ class BaseModuleInfo(BaseModel):
     module_priority: int = 0
     module_type: MODULE_TYPES = "base"
     count_of_operations: int = 0
+
+    required_on_first_run: bool = False
+    
+    # dependencies
+    dependencies: ModuleDependency = Field(default_factory=ModuleDependency)
 
 
 class BridgeModuleInfo(BaseModuleInfo):
@@ -65,6 +83,10 @@ class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
     module_name: str = "bridge_owlto_op_to_ink"
     module_display_name: str = "Bridge Owlto OP to Ink"
 
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules=set(),
+    )
+
 class BridgeOwltoBasetoInkModule(BridgeModuleInfo):
     """ Bridge Owlto module from Base to Ink  """
     fee: float = 0.0005
@@ -76,6 +98,10 @@ class BridgeOwltoBasetoInkModule(BridgeModuleInfo):
     module_name: str = "bridge_owlto_base_to_ink"
     module_display_name: str = "Bridge Owlto Base to Ink"
 
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules=set(),
+    )
+
 class BridgeOwltoInktoOPModule(BridgeModuleInfo):
     """ Bridge Owlto module from Ink to OP """
     fee: float = 0.00065
@@ -86,6 +112,15 @@ class BridgeOwltoInktoOPModule(BridgeModuleInfo):
     module_priority: int = 2
     module_name: str = "bridge_owlto_ink_to_op"
     module_display_name: str = "Bridge Owlto Ink to OP"
+    
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules={
+            "bridge_owlto_base_to_ink",
+            "bridge_owlto_op_to_ink",
+            "bridge_relay_op_to_ink",
+            "bridge_relay_base_to_ink",
+        }
+    )
 
 class BridgeOwltoInktoBaseModule(BridgeModuleInfo):
     """ Bridge Owlto module from Ink to Base """
@@ -98,6 +133,15 @@ class BridgeOwltoInktoBaseModule(BridgeModuleInfo):
     module_name: str = "bridge_owlto_ink_to_base"
     module_display_name: str = "Bridge Owlto Ink to Base"
 
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules={
+            "bridge_owlto_base_to_ink",
+            "bridge_owlto_op_to_ink",
+            "bridge_relay_op_to_ink",
+            "bridge_relay_base_to_ink",
+        }
+    )
+
 class BridgeRelayOPtoInkModule(BridgeModuleInfo):
     """ Bridge Relay module from OP to Ink  """
     source_network: str = OP.name
@@ -107,6 +151,10 @@ class BridgeRelayOPtoInkModule(BridgeModuleInfo):
     module_priority: int = 1
     module_name: str = "bridge_relay_op_to_ink"
     module_display_name: str = "Bridge Relay OP to Ink"
+    
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules=set(),
+    )
 
 class BridgeRelayBasetoInkModule(BridgeModuleInfo):
     """ Bridge Relay module from Base to Ink  """
@@ -117,6 +165,10 @@ class BridgeRelayBasetoInkModule(BridgeModuleInfo):
     module_priority: int = 1
     module_name: str = "bridge_relay_base_to_ink"
     module_display_name: str = "Bridge Relay Base to Ink"
+    
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules=set(),
+    )
 
 class BridgeRelayInktoOPModule(BridgeModuleInfo):
     """ Bridge Relay module from Ink to OP  """
@@ -127,6 +179,15 @@ class BridgeRelayInktoOPModule(BridgeModuleInfo):
     module_priority: int = 1
     module_name: str = "bridge_relay_ink_to_op"
     module_display_name: str = "Bridge Relay Ink to OP"
+    
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules={
+            "bridge_owlto_base_to_ink",
+            "bridge_owlto_op_to_ink",
+            "bridge_relay_op_to_ink",
+            "bridge_relay_base_to_ink",
+        }
+    )
 
 class BridgeRelayInktoBaseModule(BridgeModuleInfo):
     """ Bridge Relay module from Ink to Base  """
@@ -137,6 +198,15 @@ class BridgeRelayInktoBaseModule(BridgeModuleInfo):
     module_priority: int = 2
     module_name: str = "bridge_relay_ink_to_base"
     module_display_name: str = "Bridge Relay Ink to Base"
+
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules={
+            "bridge_owlto_base_to_ink",
+            "bridge_owlto_op_to_ink",
+            "bridge_relay_op_to_ink",
+            "bridge_relay_base_to_ink",
+        }
+    )
 
 class BridgGGEthereumtoInkModule(BridgeModuleInfo):
     """ Bridge GG module from Ethereum to Ink  """
@@ -151,6 +221,12 @@ class BridgGGEthereumtoInkModule(BridgeModuleInfo):
     module_priority: int = 2
     module_name: str = "bridge_gg_ethereum_to_ink"
     module_display_name: str = "Bridge GG Ethereum to Ink"
+
+    required_on_first_run: bool = True
+
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules=set(),
+    )
 
 
 class SwapModuleInfo(BaseModuleInfo):
@@ -176,6 +252,16 @@ class SwapModuleInfo(BaseModuleInfo):
     source_network: str = None
     destination_network: str = None
     module_type: str = "swap"
+    
+    dependencies: ModuleDependency = ModuleDependency(
+        required_modules={
+            "bridge_gg_ethereum_to_ink",
+            "bridge_relay_base_to_ink",
+            "bridge_relay_op_to_ink",
+            "bridge_owlto_op_to_ink",
+            "bridge_owlto_base_to_ink",
+        }
+    )
 
 class SwapInkswapETHtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from ETH to ISWAP """
@@ -186,6 +272,8 @@ class SwapInkswapETHtoISWAPModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_iswap"
     module_display_name: str = "Swap Inkswap ETH to ISWAP"
+    
+    dependencies: ModuleDependency = ModuleDependency()
 
 class SwapInkswapETHtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from ETH to SINK """
@@ -199,6 +287,10 @@ class SwapInkswapETHtoSINKModule(SwapModuleInfo):
 
 class SwapInkswapETHtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from ETH to KRAKEN """
+    pass
+    
+class SwapInkswapETHtoWETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from ETH to WETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -206,6 +298,8 @@ class SwapInkswapETHtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_kraken"
     module_display_name: str = "Swap Inkswap ETH to KRAKEN"
+
+    dependencies: ModuleDependency = ModuleDependency()
 
 class SwapInkswapISWAPtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to ETH """
@@ -216,6 +310,8 @@ class SwapInkswapISWAPtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_iswap_to_eth"
     module_display_name: str = "Swap Inkswap ISWAP to ETH"
+
+    dependencies: ModuleDependency = ModuleDependency()
 
 class SwapInkswapSINKtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to ETH """
@@ -229,6 +325,10 @@ class SwapInkswapSINKtoETHModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ETH """
+    pass
+
+class SwapInkswapWETHtoETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from WETH to ETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -236,6 +336,8 @@ class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_kraken_to_eth"
     module_display_name: str = "Swap Inkswap KRAKEN to ETH"
+
+    dependencies: ModuleDependency = ModuleDependency()
 
 class SwapInkswapISWAPtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to SINK """
@@ -246,6 +348,8 @@ class SwapInkswapISWAPtoSINKModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_iswap_to_sink"
     module_display_name: str = "Swap Inkswap ISWAP to SINK"
+
+    dependencies: ModuleDependency = ModuleDependency()
 
 class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to ISWAP """
@@ -259,6 +363,10 @@ class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
 
 class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to KRAKEN """
+    pass
+
+class SwapInkswapSINKtoWETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from SINK to WETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -269,6 +377,10 @@ class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to SINK """
+    pass
+
+class SwapInkswapWETHtoSINKModule(SwapModuleInfo):
+    """ Swap Inkswap module from WETH to SINK """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -279,6 +391,10 @@ class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ISWAP """
+    pass
+
+class SwapInkswapWETHtoISWAPModule(SwapModuleInfo):
+    """ Swap Inkswap module from WETH to ISWAP """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -288,6 +404,10 @@ class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
     
 class SwapInkswapISWAPtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to KRAKEN """
+    module_name: str = "swap_inkswap_weth_to_iswap"
+
+class SwapInkswapISWAPtoWETHModule(SwapModuleInfo):
+    """ Swap Inkswap module from ISWAP to WETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -605,3 +725,7 @@ class SwapDyorKRAKENtoUSDTModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_kraken_to_usdt"
     module_display_name: str = "Swap Dyor KRAKEN to USDT"
+    module_name: str = "swap_inkswap_iswap_to_weth"
+    module_display_name: str = "Swap Inkswap ISWAP to WETH"
+
+    dependencies: ModuleDependency = ModuleDependency()
