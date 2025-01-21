@@ -157,9 +157,8 @@ class RouteGenerator(Logger):
                 raise SoftwareException
 
             all_available_networks: Dict[str, Network] = NETWORKS
-            all_available_wallet_balances: Dict[str, Dict[str, int]] = await Client.get_wallet_balance(
-                account_name=account_name, private_key=private_key, proxy=proxy
-            )
+            client: Client = Client(account_name, private_key, proxy)
+            all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()
 
             if not all_available_wallet_balances:
                 self.logger_msg(account_name, None,
