@@ -123,7 +123,7 @@ class MintNFTGuildWorker(Logger):
                 cid,
                 signature
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True, test_mode=True)
+            await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             if str(error) == "('0x646cf558', '0x646cf558')":
                 self.logger.info(
