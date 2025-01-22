@@ -111,7 +111,7 @@ class SwapInkswapETHtoISWAPWorker(Logger):
     async def run(self):
         result = await canculate_amount_out_swaps(
             client=self.client, token_out_name='ETH', token_get_name='ISWAP',
-            min_available_balance_token=25.0, min_clearance=10.0, from_eth=True
+            min_available_balance_token=35.0, min_clearance=15.0, from_eth=True
         )
         
         if result is None: return
@@ -257,7 +257,7 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
     async def run(self):
         result = await canculate_amount_out_swaps(
             client=self.client, token_out_name='ETH', token_get_name='KRAKEN',
-            min_available_balance_token=50000.0, min_clearance=10000.0, from_eth=True
+            min_available_balance_token=100_000.0, min_clearance=20_000.0, from_eth=True
         )
         
         if result is None: return
@@ -311,7 +311,7 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
             )
 
 
-class SwapInkswapSINKtoETHWorker(Logger):
+class SwapInkswapISWAPtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapISWAPtoETHModule):
         super().__init__()
 
@@ -330,7 +330,7 @@ class SwapInkswapSINKtoETHWorker(Logger):
     async def run(self):       
         result = await canculate_amount_out_swaps(
             client=self.client, token_out_name='ISWAP', token_get_name='ETH',
-            min_available_balance_token=25.0, min_clearance=10.0, from_eth=False
+            min_available_balance_token=35.0, min_clearance=15.0, from_eth=False
         )
         
         if result is None: return
@@ -379,7 +379,7 @@ class SwapInkswapSINKtoETHWorker(Logger):
             )
 
 
-class SwapInkswapISWAPtoETHWorker(Logger):
+class SwapInkswapSINKtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapSINKtoETHModule):
         super().__init__()
 
@@ -466,7 +466,7 @@ class SwapInkswapKRAKENtoETHWorker(Logger):
     async def run(self):       
         result = await canculate_amount_out_swaps(
             client=self.client, token_out_name='KRAKEN', token_get_name='ETH',
-            min_available_balance_token=50_000.0, min_clearance=10_000.0, from_eth=False
+            min_available_balance_token=100_000.0, min_clearance=20_000.0, from_eth=False
         )
         
         if result is None: return
@@ -810,7 +810,7 @@ class SwapInkswapKRAKENtoISWAPWorker(Logger):
     async def run(self):       
         result = await canculate_amount_out_swaps(
             client=self.client, token_out_name='KRAKEN', token_get_name='ISWAP',
-            min_available_balance_token=50_000.0, min_clearance=10_000.0, from_eth=False
+            min_available_balance_token=100_000.0, min_clearance=20_000.0, from_eth=False
         )
         
         if result is None: return
@@ -879,7 +879,7 @@ class SwapInkswapISWAPtoKRAKENWorker(Logger):
     async def run(self):       
         result = await canculate_amount_out_swaps(
             client=self.client, token_out_name='ISWAP', token_get_name='KRAKEN',
-            min_available_balance_token=25.0, min_clearance=10.0, from_eth=False
+            min_available_balance_token=35.0, min_clearance=15.0, from_eth=False
         )
         
         if result is None: return
