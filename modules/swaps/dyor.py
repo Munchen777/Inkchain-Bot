@@ -89,17 +89,8 @@ async def canculate_amount_out_swaps(
 class SwapDyorETHtoUSDCWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorETHtoUSDCModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorETHtoUSDCModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -161,17 +152,8 @@ class SwapDyorETHtoUSDCWorker(Logger):
 class SwapDyorETHtoKrakenWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorETHtoKrakenModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorETHtoKrakenModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -223,17 +205,8 @@ class SwapDyorETHtoKrakenWorker(Logger):
 class SwapDyorETHtoUSDTWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorETHtoUSDTModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorETHtoUSDTModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -285,17 +258,8 @@ class SwapDyorETHtoUSDTWorker(Logger):
 class SwapDyorETHtoWETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorETHtoWETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorETHtoWETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -336,17 +300,8 @@ class SwapDyorETHtoWETHWorker(Logger):
 class SwapDyorETHtoWORMWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorETHtoWORMModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorETHtoWORMModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -398,17 +353,8 @@ class SwapDyorETHtoWORMWorker(Logger):
 class SwapDyorWETHtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWETHtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWETHtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -451,17 +397,8 @@ class SwapDyorWETHtoETHWorker(Logger):
 class SwapDyorUSDCtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDCtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDCtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -516,17 +453,8 @@ class SwapDyorUSDCtoETHWorker(Logger):
 class SwapDyorUSDTtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDTtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDTtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -581,17 +509,8 @@ class SwapDyorUSDTtoETHWorker(Logger):
 class SwapDyorWORMtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWORMtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWORMtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -646,17 +565,8 @@ class SwapDyorWORMtoETHWorker(Logger):
 class SwapDyorKRAKENtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorKRAKENtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorKRAKENtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -711,17 +621,8 @@ class SwapDyorKRAKENtoETHWorker(Logger):
 class SwapDyorKRAKENtoWORMWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorKRAKENtoWORMModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorKRAKENtoWORMModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -777,17 +678,8 @@ class SwapDyorKRAKENtoWORMWorker(Logger):
 class SwapDyorWORMtoKRAKENWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWORMtoKRAKENModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWORMtoKRAKENModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -843,17 +735,8 @@ class SwapDyorWORMtoKRAKENWorker(Logger):
 class SwapDyorWORMtoUSDTWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWORMtoUSDTModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWORMtoUSDTModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -909,17 +792,8 @@ class SwapDyorWORMtoUSDTWorker(Logger):
 class SwapDyorWORMtoUSDCWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWORMtoUSDCModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWORMtoUSDCModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -975,17 +849,8 @@ class SwapDyorWORMtoUSDCWorker(Logger):
 class SwapDyorWORMtoWETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWORMtoWETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWORMtoWETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1040,17 +905,8 @@ class SwapDyorWORMtoWETHWorker(Logger):
 class SwapDyorKRAKENtoWETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorKRAKENtoWETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorKRAKENtoWETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1105,17 +961,8 @@ class SwapDyorKRAKENtoWETHWorker(Logger):
 class SwapDyorKRAKENtoUSDCWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorKRAKENtoUSDCModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorKRAKENtoUSDCModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1170,17 +1017,8 @@ class SwapDyorKRAKENtoUSDCWorker(Logger):
 class SwapDyorUSDCtoKRAKENWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDCtoKRAKENModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDCtoKRAKENModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1235,17 +1073,8 @@ class SwapDyorUSDCtoKRAKENWorker(Logger):
 class SwapDyorUSDCtoWORMWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDCtoWORMModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDCtoWORMModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1301,17 +1130,8 @@ class SwapDyorUSDCtoWORMWorker(Logger):
 class SwapDyorUSDCtoUSDTWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDCtoUSDTModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDCtoUSDTModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1367,17 +1187,8 @@ class SwapDyorUSDCtoUSDTWorker(Logger):
 class SwapDyorUSDCtoWETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDCtoWETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDCtoWETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1432,17 +1243,8 @@ class SwapDyorUSDCtoWETHWorker(Logger):
 class SwapDyorWETHtoUSDCWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWETHtoUSDCModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWETHtoUSDCModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1497,17 +1299,8 @@ class SwapDyorWETHtoUSDCWorker(Logger):
 class SwapDyorWETHtoUSDTWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWETHtoUSDTModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWETHtoUSDTModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1562,17 +1355,8 @@ class SwapDyorWETHtoUSDTWorker(Logger):
 class SwapDyorWETHtoWORMWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWETHtoWORMModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWETHtoWORMModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1627,17 +1411,8 @@ class SwapDyorWETHtoWORMWorker(Logger):
 class SwapDyorUSDTtoWETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDTtoWETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDTtoWETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1692,17 +1467,8 @@ class SwapDyorUSDTtoWETHWorker(Logger):
 class SwapDyorWETHtoKRAKENWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWETHtoKRAKENModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorWETHtoKRAKENModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1757,17 +1523,8 @@ class SwapDyorWETHtoKRAKENWorker(Logger):
 class SwapDyorUSDTtoUSDCWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDTtoUSDCModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDTtoUSDCModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1823,17 +1580,7 @@ class SwapDyorUSDTtoUSDCWorker(Logger):
 class SwapDyorWORMtoUSDCWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorWORMtoUSDCModule):
         super().__init__()
-
         self.client: Client = client
-        self.module_info: SwapDyorWORMtoUSDCModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1889,17 +1636,8 @@ class SwapDyorWORMtoUSDCWorker(Logger):
 class SwapDyorUSDTtoWORMWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDTtoWORMModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDTtoWORMModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -1955,17 +1693,8 @@ class SwapDyorUSDTtoWORMWorker(Logger):
 class SwapDyorUSDTtoKRAKENWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorUSDTtoKRAKENModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorUSDTtoKRAKENModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            
@@ -2021,17 +1750,8 @@ class SwapDyorUSDTtoKRAKENWorker(Logger):
 class SwapDyorKRAKENtoUSDTWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorKRAKENtoUSDTModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapDyorKRAKENtoUSDTModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):            

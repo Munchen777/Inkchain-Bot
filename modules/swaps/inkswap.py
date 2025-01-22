@@ -95,17 +95,8 @@ async def canculate_amount_out_swaps(
 class SwapInkswapETHtoISWAPWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapETHtoISWAPModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapETHtoISWAPModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -168,17 +159,8 @@ class SwapInkswapETHtoISWAPWorker(Logger):
 class SwapInkswapETHtoSINKWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapETHtoSINKModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapETHtoSINKModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -241,17 +223,8 @@ class SwapInkswapETHtoSINKWorker(Logger):
 class SwapInkswapETHtoKRAKENWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapETHtoKRAKENModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapETHtoKRAKENModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):
@@ -314,17 +287,8 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
 class SwapInkswapISWAPtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapISWAPtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapISWAPtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -382,17 +346,8 @@ class SwapInkswapISWAPtoETHWorker(Logger):
 class SwapInkswapSINKtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapSINKtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapSINKtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -450,17 +405,8 @@ class SwapInkswapSINKtoETHWorker(Logger):
 class SwapInkswapKRAKENtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapKRAKENtoETHModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapKRAKENtoETHModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -518,17 +464,8 @@ class SwapInkswapKRAKENtoETHWorker(Logger):
 class SwapInkswapISWAPtoSINKWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapISWAPtoSINKModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapISWAPtoSINKModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -587,17 +524,8 @@ class SwapInkswapISWAPtoSINKWorker(Logger):
 class SwapInkswapSINKtoISWAPWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapSINKtoISWAPModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapSINKtoISWAPModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -656,17 +584,8 @@ class SwapInkswapSINKtoISWAPWorker(Logger):
 class SwapInkswapSINKtoKRAKENWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapSINKtoKRAKENModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapSINKtoKRAKENModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -725,17 +644,8 @@ class SwapInkswapSINKtoKRAKENWorker(Logger):
 class SwapInkswapKRAKENtoSINKWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapKRAKENtoSINKModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapKRAKENtoSINKModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -794,17 +704,8 @@ class SwapInkswapKRAKENtoSINKWorker(Logger):
 class SwapInkswapKRAKENtoISWAPWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapKRAKENtoISWAPModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapKRAKENtoISWAPModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
@@ -863,17 +764,8 @@ class SwapInkswapKRAKENtoISWAPWorker(Logger):
 class SwapInkswapISWAPtoKRAKENWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapISWAPtoKRAKENModule):
         super().__init__()
-
         self.client: Client = client
         self.module_info: SwapInkswapISWAPtoKRAKENModule = module_info
-        self.destination_network: str | None = module_info.destination_network
-        self.source_network: str | None = module_info.source_network
-        self.source_network_chain_id: int | None = module_info.source_network_chain_id
-        self.destination_network_chain_id: int | None = module_info.destination_network_chain_id
-        self.module_priority: int | None = module_info.module_priority
-        self.module_name: str | None = module_info.module_name
-        self.module_display_name: str | None = module_info.module_display_name
-
         self.deadline = int(time.time()) + 20 * 60
 
     async def run(self):       
