@@ -644,7 +644,7 @@ class AddLiquidityModuleInfo(BaseModuleInfo):
     destination_network: str = None
     module_type: str = "add_liquidity"
 
-class AddLiquidityDyorETHtoUSDCModule(SwapModuleInfo):
+class AddLiquidityDyorETHtoUSDCModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and USDC  """
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -652,7 +652,7 @@ class AddLiquidityDyorETHtoUSDCModule(SwapModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_usdc"
     module_display_name: str = "Add Liquidity Dyor ETH and USDC"
 
-class AddLiquidityDyorETHtoUSDTModule(SwapModuleInfo):
+class AddLiquidityDyorETHtoUSDTModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and USDT  """
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -660,7 +660,7 @@ class AddLiquidityDyorETHtoUSDTModule(SwapModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_usdt"
     module_display_name: str = "Add Liquidity Dyor ETH and USDT"
 
-class AddLiquidityDyorETHtoKRAKENModule(SwapModuleInfo):
+class AddLiquidityDyorETHtoKRAKENModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and KRAKEN  """
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -668,7 +668,7 @@ class AddLiquidityDyorETHtoKRAKENModule(SwapModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_kraken"
     module_display_name: str = "Add Liquidity Dyor ETH and KRAKEN"
 
-class AddLiquidityDyorETHtoWORMModule(SwapModuleInfo):
+class AddLiquidityDyorETHtoWORMModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and WORM  """
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -701,7 +701,7 @@ class MintNFTModuleInfo(BaseModuleInfo):
     destination_network: str = None
     module_type: str = "mint_nft"
 
-class MintNFTParagrafModule(SwapModuleInfo):
+class MintNFTParagrafModule(MintNFTModuleInfo):
     """ Mint Paragraf NFT module  """
     source_network: str = OP.name
     source_network_chain_id: int = OP.chain_id
