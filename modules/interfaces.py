@@ -708,3 +708,11 @@ class MintNFTParagrafModule(MintNFTModuleInfo):
     module_priority: int = 2
     module_name: str = "mint_paragraf_nft"
     module_display_name: str = "Mint Paragraf NFT"
+
+class MintNFTOGModule(MintNFTModuleInfo):
+    """ Mint OG NFT module  """
+    source_network: str = OP.name
+    source_network_chain_id: int = OP.chain_id
+    module_priority: int = 2
+    module_name: str = "mint_og_nft"
+    module_display_name: str = "Mint OG NFT"

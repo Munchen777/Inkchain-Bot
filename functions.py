@@ -400,3 +400,10 @@ async def mint_paragraf_nft(account_name: str, private_key: str, proxy: str | No
         module_info=module_info
     )
     return await worker.run()
+
+async def mint_og_nft(account_name: str, private_key: str, proxy: str | None, module_info: MintNFTOGModule):
+    worker = MintNFTOGWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
