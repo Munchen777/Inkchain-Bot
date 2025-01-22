@@ -7,7 +7,6 @@ from modules import *
 from utils.client import Client
 from data.abi import PARAGRAF_MINT_NFT
 from modules.interfaces import *
-from settings import NETWORK_TOKEN_CONTRACTS
 
 
 class MintNFTParagrafWorker(Logger):
@@ -39,7 +38,7 @@ class MintNFTParagrafWorker(Logger):
                 self.client.address,
                 address_mint_referrer
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            await self.client.send_transaction(transaction, need_hash=True, test_mode=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the mint nft Paragraf on the Ink network. Error: {error} '
