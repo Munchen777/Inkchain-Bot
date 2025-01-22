@@ -172,7 +172,7 @@ class Runner(Logger):
         with open("./data/service/wallets_progress.json", "w") as file:
             json.dump(wallets, file, indent=4)
 
-    async def run_account_modules(self, account_name: str, private_key: str, proxy: str | None, smart_route: bool, index: int, parallel_mode: bool = False):
+    async def run_account_modules(self, account_name: str, private_key: str, proxy: str | None, smart_route: bool, index: int, route_generator: RouteGenerator | None, parallel_mode: bool = False):
         message_list, result_list, route_paths, break_flag, module_counter = [], [], [], False, 0
 
         try:
@@ -243,6 +243,7 @@ class Runner(Logger):
                         result_list.append(account_progress)
                         break
 
+                await route_generator.add_executed_module(account_name, current_module.module_name)
                 current_step += 1
                 message_list.append(f'{"✅" if result else "❌"}   {module_display_name}\n')
                 account_progress = (result, current_module.module_name, account_name)
@@ -273,7 +274,7 @@ class Runner(Logger):
                 account_name, None, f"Error while running: {error}", "error"
             )
 
-    async def run_parallel(self, smart_route: bool):
+    async def run_parallel(self, smart_route: bool, route_generator: RouteGenerator | None):
         selected_wallets = list(self.get_wallets())
         num_accounts = len(selected_wallets)
         accounts_per_stream = ACCOUNTS_IN_STREAM
@@ -286,13 +287,27 @@ class Runner(Logger):
             start_index = stream_index * accounts_per_stream
             end_index = (stream_index + 1) * accounts_per_stream if stream_index < num_streams else num_accounts
 
-            accounts = selected_wallets[start_index: end_index]
+            accounts: List[Tuple[str, str]] = selected_wallets[start_index: end_index]
+            proxies: List[str | None] = [
+                self.get_proxy_for_account(account_name) for account_name in accounts
+            ]
+
+            if smart_route:
+                for (account_name, private_key), proxy in zip(accounts, proxies):
+                    try:
+                        await route_generator.smart_generate_route(account_name, private_key, proxy)
+
+                    except Exception as error:
+                        self.logger_msg(account_name, None,
+                                        f"Error while generating route for account_name: {account_name} in parallel mode\nError: {error}",
+                                        "error")
+                        continue
 
             tasks: List[asyncio.Task] = [
                 asyncio.create_task(
                     self.run_account_modules(
                         account_name, private_key, self.get_proxy_for_account(account_name),
-                        smart_route, index, parallel_mode=True
+                        smart_route, index, route_generator, parallel_mode=True,
                     )
                 )
                 for index, (account_name, private_key) in enumerate(accounts)
@@ -321,7 +336,7 @@ class Runner(Logger):
 
             result = await self.run_account_modules(
                 account_name, private_key, proxy,
-                smart_route, index
+                smart_route, index, route_generator
             )
 
     async def run(self, smart_route: bool):

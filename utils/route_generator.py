@@ -2,6 +2,7 @@ import random
 import json
 import sys
 
+from pathlib import Path
 from pydantic import ValidationError
 from typing import Any, Dict, List, Set
 
@@ -11,7 +12,7 @@ from functions import*
 from modules import Logger
 from modules.interfaces import BaseModuleInfo
 from utils.networks import Network
-from settings import CLASSIC_ROUTES_MODULES_USING, CLASSIC_WITHDRAW_DEPENDENCIES
+from settings import CLASSIC_ROUTES_MODULES_USING, CLASSIC_WITHDRAW_DEPENDENCIES, PRIORITY_NETWORK_NAMES
 from utils.networks import NETWORKS
 from utils.client import SoftwareException
 from utils.tools import clean_progress_file
@@ -32,8 +33,41 @@ def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo 
 
 
 class RouteGenerator(Logger):
-    def __init__(self):
+    def __init__(self, file_path: str = "./data/service/history.json"):
         super().__init__()
+        self.file_path: Path = Path(file_path)
+        self.history: Dict[str, Set[str]] = {}
+        self.load_history()
+
+    def load_history(self):
+        """ Download history of accounts that have been run """
+        if self.file_path.exists():
+            with open(self.file_path, "r") as file:
+                data: Dict[str, Set[str]] = json.load(file)
+
+                self.history: Dict[str, Set[str]] = {
+                    account_name: set(modules)
+                    for account_name, modules in data.items()
+                }
+        else:
+            self.history: Dict[str, Set[str]] = {}
+
+    async def add_executed_module(self, account_name: str, module_name: str) -> None:
+        self.history.setdefault(account_name, set()).add(module_name)
+        await self.save_history()
+
+    async def save_history(self) -> None:
+        data: Dict[str, List[str]] = {
+            account_name: list(modules)
+            for account_name, modules in self.history.items()
+        }
+        self.file_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(self.file_path, "w") as file:
+            json.dump(data, file, indent=4)
+
+    async def check_first_run_modules(self, account_name: str) -> bool:
+        return account_name not in self.history
 
     @staticmethod
     def classic_generate_route() -> List[BaseModuleInfo]:
@@ -58,10 +92,10 @@ class RouteGenerator(Logger):
 
             raise SoftwareException(f"There is no module with the name {module_name} in the software!")
 
-        route.sort(key=lambda x: x.module_priority, reverse=True)
+        # route.sort(key=lambda x: x.module_priority, reverse=True)
 
         return route
-    
+
     @classmethod
     def create_route_from_dict(cls, route_dict: Dict[str, Any]) -> BaseModuleInfo:
         module_name: str = route_dict.get("module_name")
@@ -135,6 +169,38 @@ class RouteGenerator(Logger):
             new_route_with_dep = route_with_priority
 
         return new_route_with_dep
+    
+    async def get_available_modules(self,
+                                    all_available_modules: Dict[str, BaseModuleInfo],
+                                    executed_modules: Set[str],
+                                    all_available_wallet_balances: Dict[str, Dict[str, float]],
+                                    is_first_run: bool = False
+                                    ) -> List[BaseModuleInfo] | None:
+        available_modules: List[BaseModuleInfo] = []
+
+        for module_name, module_class in all_available_modules.items():
+            # если такой модуль уже был добавлен или был выполнен, то пропускаем его
+            if module_name in executed_modules:
+                continue
+
+            if is_first_run and not module_class.required_on_first_run:
+                continue
+
+            # if not is_first_run and module_class.required_on_first_run:
+            #     continue
+
+            if not module_class.dependencies.required_modules.issubset(executed_modules):
+                continue
+
+            network_balances: Dict[str, int] = all_available_wallet_balances.get(
+                    module_class.source_network, {}
+            )
+            # Проверяем на наличие баланса в сети
+            for token_name, token_balance in network_balances.items():
+                if float(token_balance) > module_class.min_available_balance:
+                    available_modules.append(module_class)
+
+        return available_modules
 
     async def smart_generate_route(self, account_name: str, private_key: str, proxy: str | None) -> None:
         route_modules_dict: Dict[str, BaseModuleInfo] = {}
@@ -156,7 +222,7 @@ class RouteGenerator(Logger):
                                 f"There is no any module for account {account_name}", "warning")
                 raise SoftwareException
 
-            all_available_networks: Dict[str, Network] = NETWORKS
+            # all_available_networks: Dict[str, Network] = NETWORKS
             client: Client = Client(account_name, private_key, proxy)
             all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()
 
@@ -165,32 +231,68 @@ class RouteGenerator(Logger):
                                 f"There is no any wallet balance for acccount {account_name}", "error")
                 return
 
-            for network_name, network_balances in all_available_wallet_balances.items():
-                current_network: Network | None = all_available_networks.get(network_name)
+            # 1. Проверяем, запускаем ли мы софт впервые
+            is_first_run: bool = await self.check_first_run_modules(account_name)
 
-                if not current_network:
-                    continue
+            suitable_modules: List[BaseModuleInfo] = []
+            executed_modules: Set[str] = set()
 
-                for token_name, token_balance in network_balances.items():
-                    suitable_modules: List[BaseModuleInfo] = [
-                        module_instance
-                        for _, module_instance in all_available_modules.items()
-                        if module_instance.source_network == current_network.name and \
-                            module_instance.min_available_balance <= float(token_balance)
-                    ]
-                    if not suitable_modules:
-                        self.logger_msg(account_name, None,
-                                        f"There is no any suitable modules for account {account_name} on network {network_name}", "warning")
-                        continue
+            # 2. Если это первый запуск
+            if is_first_run:                
+                first_run_available_modules = await self.get_available_modules(
+                    all_available_modules,
+                    executed_modules,
+                    all_available_wallet_balances,
+                    is_first_run=True
+                )
 
-                    suitable_modules.sort(key=lambda x: (x.module_priority, x.count_of_operations), reverse=True)
+                if not first_run_available_modules:
+                    self.logger_msg(account_name, None,
+                                    f"No available modules for first run for account {account_name}", "warning")
+                    return
 
-                    account_data: Dict[str, Any] = {
+                for module_class in first_run_available_modules:
+                    suitable_modules.append(module_class)
+                    executed_modules.add(module_class.module_name)
+
+            while True:
+                available_modules: List[BaseModuleInfo] | None = await self.get_available_modules(
+                    all_available_modules,
+                    executed_modules,
+                    all_available_wallet_balances
+                )
+                if not available_modules:
+                    break
+
+                available_modules.sort(key=lambda x: x.count_of_operations)
+
+                suitable_modules.extend(available_modules)
+
+                executed_modules.update(
+                    [module_class.module_name for module_class in available_modules]
+                )
+                if len(executed_modules) == len(suitable_modules):
+                    break
+
+            if not suitable_modules:
+                self.logger_msg(account_name, None,
+                                f"There is no any suitable modules for account {account_name}", "warning")
+                return
+
+            # if not is_first_run:
+            #     random.shuffle(suitable_modules)
+
+            try:
+                route_modules_dict: Dict[str, Any] = {
+                    str(account_name): {
                         "current_step": 0,
                         "route": [module_obj.model_dump() for module_obj in suitable_modules],
                     }
-
-                    route_modules_dict[str(account_name)] = account_data
+                }
+            except Exception as error:
+                self.logger_msg(account_name, None,
+                                f"Error while serializing route modules.\nError: {error}", "error")
+                return
 
             try:
                 with open(file="./data/service/wallets_progress.json", mode="w") as file:
@@ -213,7 +315,7 @@ class RouteGenerator(Logger):
         except Exception as error:
             self.logger_msg(account_name, None,
                             f"Error in smart_generate_route function.\nError: {error}", "error")
-            return
+            raise error
 
     def classic_routes_json_save(self):
         clean_progress_file()
