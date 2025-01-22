@@ -80,7 +80,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 
     ["mint_paragraf_nft"],
     ["mint_og_nft"],
-    
+    ["mint_guild_nft"]    
 ]
 
 """
@@ -88,7 +88,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["mint_og_nft"],
+    ["mint_guild_nft"],
 ]
 
 PRIORITY_NETWORK_NAMES: Set[str] = { # Priority Network names to work with

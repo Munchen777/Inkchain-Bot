@@ -716,3 +716,11 @@ class MintNFTOGModule(MintNFTModuleInfo):
     module_priority: int = 2
     module_name: str = "mint_og_nft"
     module_display_name: str = "Mint OG NFT"
+
+class MintNFTGuildModule(MintNFTModuleInfo):
+    """ Mint Guild NFT module  """
+    source_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "mint_guild_nft"
+    module_display_name: str = "Mint Guild NFT"

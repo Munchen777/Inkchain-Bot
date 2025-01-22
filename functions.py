@@ -407,3 +407,10 @@ async def mint_og_nft(account_name: str, private_key: str, proxy: str | None, mo
         module_info=module_info
     )
     return await worker.run()
+
+async def mint_guild_nft(account_name: str, private_key: str, proxy: str | None, module_info: MintNFTGuildModule):
+    worker = MintNFTGuildWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()

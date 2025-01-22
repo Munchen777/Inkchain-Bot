@@ -90,7 +90,8 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "add_liquidity_dyor_eth_and_kraken": AddLiquidityDyorETHtoKRAKENModule,
     "add_liquidity_dyor_eth_and_worm": AddLiquidityDyorETHtoWORMModule,
     "mint_paragraf_nft": MintNFTParagrafModule,
-    "mint_og_nft": MintNFTOGModule
+    "mint_og_nft": MintNFTOGModule,
+    "mint_guild_nft": MintNFTGuildModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -156,7 +157,8 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "add_liquidity_dyor_eth_and_kraken": add_liquidity_dyor_eth_and_kraken,
     "add_liquidity_dyor_eth_and_worm": add_liquidity_dyor_eth_and_worm,
     "mint_paragraf_nft": mint_paragraf_nft,
-    "mint_og_nft": mint_og_nft
+    "mint_og_nft": mint_og_nft,
+    "mint_guild_nft": mint_guild_nft
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()
