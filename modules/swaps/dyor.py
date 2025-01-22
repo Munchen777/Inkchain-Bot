@@ -8,7 +8,7 @@ from web3.eth.async_eth import ChecksumAddress
 
 from modules import *
 from utils.client import Client
-from data.abi import SWAP_DYORSWAP_ABI, WRAPED_ETH_ABI, SWAP_TOKEN_ABI
+from data.abi import DYOR_ABI, WRAPED_ETH_ABI, SWAP_TOKEN_ABI
 from modules.interfaces import *
 from settings import NETWORK_TOKEN_CONTRACTS
 
@@ -17,8 +17,8 @@ logger: Logger = Logger().get_logger()
 
 
 address_contract_dyor_swap: ChecksumAddress = AsyncWeb3.to_checksum_address(
-        '0x9b17690de96fcfa80a3acaefe11d936629cd7a77'
-    )
+    '0x9b17690de96fcfa80a3acaefe11d936629cd7a77'
+)
 
 async def approve(
         client: Client, token_out_name: str, amount_out: int, address_contract: ChecksumAddress = None,
@@ -85,12 +85,6 @@ async def canculate_amount_out_swaps(
 
     return amount_out, decimals
 
-    # if value > min_available_balance_out_token or min_available_balance_out_token - value < min_clearance:
-    #     logger.warning(
-    #         f'{client.name} Skip the swap {token_out_name} to {token_get_name} on the Ink network, because we already have enough tokens {token_get_name}'
-    #     )
-    #     return None
-
 
 class SwapDyorETHtoUSDCWorker(Logger):
     def __init__(self, client: Client, module_info: SwapDyorETHtoUSDCModule):
@@ -136,7 +130,7 @@ class SwapDyorETHtoUSDCWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         path = [
@@ -198,7 +192,7 @@ class SwapDyorETHtoKrakenWorker(Logger):
 
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         path = [
@@ -260,7 +254,7 @@ class SwapDyorETHtoUSDTWorker(Logger):
 
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         path = [
@@ -373,7 +367,7 @@ class SwapDyorETHtoWORMWorker(Logger):
 
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         path = [
@@ -490,7 +484,7 @@ class SwapDyorUSDCtoETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -555,7 +549,7 @@ class SwapDyorUSDTtoETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -620,7 +614,7 @@ class SwapDyorWORMtoETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -685,7 +679,7 @@ class SwapDyorKRAKENtoETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -750,7 +744,7 @@ class SwapDyorKRAKENtoWORMWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -816,7 +810,7 @@ class SwapDyorWORMtoKRAKENWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -882,7 +876,7 @@ class SwapDyorWORMtoUSDTWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -948,7 +942,7 @@ class SwapDyorWORMtoUSDCWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1014,7 +1008,7 @@ class SwapDyorWORMtoWETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1079,7 +1073,7 @@ class SwapDyorKRAKENtoWETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1144,7 +1138,7 @@ class SwapDyorKRAKENtoUSDCWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1209,7 +1203,7 @@ class SwapDyorUSDCtoKRAKENWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1274,7 +1268,7 @@ class SwapDyorUSDCtoWORMWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1340,7 +1334,7 @@ class SwapDyorUSDCtoUSDTWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1406,7 +1400,7 @@ class SwapDyorUSDCtoWETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1471,7 +1465,7 @@ class SwapDyorWETHtoUSDCWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1536,7 +1530,7 @@ class SwapDyorWETHtoUSDTWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1601,7 +1595,7 @@ class SwapDyorWETHtoWORMWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1666,7 +1660,7 @@ class SwapDyorUSDTtoWETHWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1731,7 +1725,7 @@ class SwapDyorWETHtoKRAKENWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1796,7 +1790,7 @@ class SwapDyorUSDTtoUSDCWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1862,7 +1856,7 @@ class SwapDyorWORMtoUSDCWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1928,7 +1922,7 @@ class SwapDyorUSDTtoWORMWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -1994,7 +1988,7 @@ class SwapDyorUSDTtoKRAKENWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
@@ -2060,7 +2054,7 @@ class SwapDyorKRAKENtoUSDTWorker(Logger):
         
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor_swap,
-            abi=SWAP_DYORSWAP_ABI
+            abi=DYOR_ABI
         )
 
         amount_out = int(amount_out * 10 ** decimals)
