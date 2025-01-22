@@ -69,12 +69,17 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["swap_dyor_usdt_to_kraken"],
     ["swap_dyor_kraken_to_usdt"]
 
-    ***Add Liquidity DyorSwap https://dyorswap.finance/liquidity ***
+    *** Add Liquidity DyorSwap https://dyorswap.finance/liquidity ***
 
     ["add_liquidity_dyor_eth_and_usdc"],
     ["add_liquidity_dyor_eth_and_usdt"],
     ["add_liquidity_dyor_eth_and_kraken"],
     ["add_liquidity_dyor_eth_and_worm"]
+
+    *** Mint NFTs ***
+
+    ["mint_paragraf_nft"],
+    
 ]
 
 """
@@ -82,7 +87,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["swap_dyor_eth_to_kraken"],
+    ["mint_paragraf_nft"],
 ]
 
 PRIORITY_NETWORK_NAMES: Set[str] = { # Priority Network names to work with

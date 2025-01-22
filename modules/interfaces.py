@@ -70,7 +70,7 @@ class BridgeModuleInfo(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: str = None
+    destination_network: Optional[str] = None
     module_type: str = "bridge"
 
 class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
@@ -251,7 +251,7 @@ class SwapModuleInfo(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: str = None
+    destination_network: Optional[str] = None
     module_type: str = "swap"
     
     dependencies: ModuleDependency = ModuleDependency(
@@ -641,7 +641,7 @@ class AddLiquidityModuleInfo(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: str = None
+    destination_network: Optional[str] = None
     module_type: str = "add_liquidity"
 
 class AddLiquidityDyorETHtoUSDCModule(AddLiquidityModuleInfo):
@@ -698,7 +698,7 @@ class MintNFTModuleInfo(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: str = None
+    destination_network: Optional[str] = None
     module_type: str = "mint_nft"
 
 class MintNFTParagrafModule(MintNFTModuleInfo):

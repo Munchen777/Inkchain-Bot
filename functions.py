@@ -2,6 +2,7 @@ from utils.client import Client
 from modules.bridges import *
 from modules.swaps import *
 from modules.add_liquidity import *
+from modules.mint_nfts import *
 from modules.interfaces import *
 
 
@@ -388,6 +389,13 @@ async def add_liquidity_dyor_eth_and_kraken(account_name: str, private_key: str,
 
 async def add_liquidity_dyor_eth_and_worm(account_name: str, private_key: str, proxy: str | None, module_info: AddLiquidityDyorETHtoWORMModule):
     worker = AddLiquidityDyorETHtoWORMWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def mint_paragraf_nft(account_name: str, private_key: str, proxy: str | None, module_info: MintNFTParagrafModule):
+    worker = MintNFTParagrafWorker(
         client=get_client(account_name, private_key, proxy, module_info.source_network),
         module_info=module_info
     )
