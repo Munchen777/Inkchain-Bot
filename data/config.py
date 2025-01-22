@@ -84,7 +84,11 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "swap_dyor_usdt_to_usdc": SwapDyorUSDTtoUSDCModule,
     "swap_dyor_usdt_to_worm": SwapDyorUSDTtoWORMModule,
     "swap_dyor_usdt_to_kraken": SwapDyorUSDTtoKRAKENModule,
-    "swap_dyor_kraken_to_usdt": SwapDyorKRAKENtoUSDTModule
+    "swap_dyor_kraken_to_usdt": SwapDyorKRAKENtoUSDTModule,
+    "add_liquidity_dyor_eth_and_usdc": AddLiquidityDyorETHtoUSDCModule,
+    "add_liquidity_dyor_eth_and_usdt": AddLiquidityDyorETHtoUSDTModule,
+    "add_liquidity_dyor_eth_and_kraken": AddLiquidityDyorETHtoKRAKENModule,
+    "add_liquidity_dyor_eth_and_worm": AddLiquidityDyorETHtoWORMModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -144,7 +148,11 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "swap_dyor_usdt_to_usdc": swap_dyor_usdt_to_usdc,
     "swap_dyor_usdt_to_worm": swap_dyor_usdt_to_worm,
     "swap_dyor_usdt_to_kraken": swap_dyor_usdt_to_kraken,
-    "swap_dyor_kraken_to_usdt": swap_dyor_kraken_to_usdt
+    "swap_dyor_kraken_to_usdt": swap_dyor_kraken_to_usdt,
+    "add_liquidity_dyor_eth_and_usdc": add_liquidity_dyor_eth_and_usdc,
+    "add_liquidity_dyor_eth_and_usdt": add_liquidity_dyor_eth_and_usdt,
+    "add_liquidity_dyor_eth_and_kraken": add_liquidity_dyor_eth_and_kraken,
+    "add_liquidity_dyor_eth_and_worm": add_liquidity_dyor_eth_and_worm
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()

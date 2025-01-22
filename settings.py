@@ -21,7 +21,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 
     ["bridge_gg_ethereum_to_ink"],
 
-    ***Swaps InkSwap https://dex.inkswap.io/#/swap***
+    ***Swaps InkSwap https://dex.inkswap.io/#/swap ***
 
     ["swap_inkswap_eth_to_iswap"],
     ["swap_inkswap_eth_to_sink"],
@@ -36,7 +36,7 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["swap_inkswap_kraken_to_iswap"],
     ["swap_inkswap_iswap_to_kraken"]
 
-    ***Swaps DyorSwap https://dyorswap.finance/swap***
+    ***Swaps DyorSwap https://dyorswap.finance/swap ***
 
     ["swap_dyor_eth_to_usdc"],
     ["swap_dyor_eth_to_kraken"],
@@ -67,8 +67,14 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["swap_dyor_usdt_to_usdc"],
     ["swap_dyor_usdt_to_worm"],
     ["swap_dyor_usdt_to_kraken"],
-    ["swap_dyor_kraken_to_usdt"],
+    ["swap_dyor_kraken_to_usdt"]
 
+    ***Add Liquidity DyorSwap https://dyorswap.finance/liquidity ***
+
+    ["add_liquidity_dyor_eth_and_usdc"],
+    ["add_liquidity_dyor_eth_and_usdt"],
+    ["add_liquidity_dyor_eth_and_kraken"],
+    ["add_liquidity_dyor_eth_and_worm"]
 ]
 
 """
@@ -76,15 +82,15 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["swap_dyor_kraken_to_usdt"],
+    ["add_liquidity_dyor_eth_and_worm"],
 ]
 
 NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
     "Base Mainnet": {
-        "ETH": "0x4200000000000000000000000000000000000006",
+        "": "",
     },
     "OP Mainnet": {
-        "ETH": "0x4200000000000000000000000000000000000006",
+        "": "",
     },
     "Ink Mainnet": {
         "WETH": "0x4200000000000000000000000000000000000006",

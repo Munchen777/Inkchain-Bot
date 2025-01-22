@@ -1,7 +1,9 @@
 from utils.client import Client
 from modules.bridges import *
 from modules.swaps import *
+from modules.add_liquidity import *
 from modules.interfaces import *
+
 
 def get_client(account_name, private_key, proxy, source_network: str) -> Client:
     return Client(account_name, private_key, proxy, source_network)
@@ -98,7 +100,7 @@ async def swap_inkswap_iswap_to_eth(account_name: str, private_key: str, proxy: 
     return await worker.run()
 
 async def swap_inkswap_sink_to_eth(account_name: str, private_key: str, proxy: str | None, module_info: SwapInkswapSINKtoETHModule):
-    worker = SwapInkswapISWAPtoETHWorker(
+    worker = SwapInkswapSINKtoETHWorker(
         client=get_client(account_name, private_key, proxy, module_info.source_network),
         module_info=module_info
     )
@@ -358,6 +360,34 @@ async def swap_dyor_usdt_to_kraken(account_name: str, private_key: str, proxy: s
 
 async def swap_dyor_kraken_to_usdt(account_name: str, private_key: str, proxy: str | None, module_info: SwapDyorKRAKENtoUSDTModule):
     worker = SwapDyorKRAKENtoUSDTWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def add_liquidity_dyor_eth_and_usdc(account_name: str, private_key: str, proxy: str | None, module_info: AddLiquidityDyorETHtoUSDCModule):
+    worker = AddLiquidityDyorETHtoUSDCWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def add_liquidity_dyor_eth_and_usdt(account_name: str, private_key: str, proxy: str | None, module_info: AddLiquidityDyorETHtoUSDTModule):
+    worker = AddLiquidityDyorETHtoUSDTWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def add_liquidity_dyor_eth_and_kraken(account_name: str, private_key: str, proxy: str | None, module_info: AddLiquidityDyorETHtoKRAKENModule):
+    worker = AddLiquidityDyorETHtoKRAKENWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def add_liquidity_dyor_eth_and_worm(account_name: str, private_key: str, proxy: str | None, module_info: AddLiquidityDyorETHtoWORMModule):
+    worker = AddLiquidityDyorETHtoWORMWorker(
         client=get_client(account_name, private_key, proxy, module_info.source_network),
         module_info=module_info
     )

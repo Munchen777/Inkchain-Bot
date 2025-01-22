@@ -605,3 +605,68 @@ class SwapDyorKRAKENtoUSDTModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_kraken_to_usdt"
     module_display_name: str = "Swap Dyor KRAKEN to USDT"
+
+
+class AddLiquidityModuleInfo(BaseModuleInfo):
+    """
+    Add Liquidity module info class for all bridge modules
+    
+    Attributes:
+        fee: float - 0.005 комиссия за транзакцию (дефолтное значение)
+        min_available_balance: float - минимальный доступный баланс для транзакции (дефолтное значение)
+        min_amount_residue: float - минимальный остаток на счете после транзакции, который будет оставлен на счете (дефолтное значение)
+        min_amount_out: float - минимальная сумма для вывода (дефолтное значение)
+        max_amount_out: float - максимальная сумма для вывода (дефолтное значение)
+        source_network: Optional[str] - сеть, с которой происходит транзакция (опциональное значение)
+        destination_network: Optional[str] - сеть, на которую происходит транзакция (опциональное значение)
+        module_type: str = "swap" - тип модуля (дефолтное значение)
+    
+    """
+    fee: float = 0.0
+    min_available_balance: float = 0.005
+    min_amount_residue: float = 0.003
+    min_amount_out: float = 0.001
+    max_amount_out: float = 0.003
+    source_network: str = None
+    destination_network: str = None
+    module_type: str = "add_liquidity"
+
+class AddLiquidityDyorETHtoUSDCModule(SwapModuleInfo):
+    """ Add Liquidity Dyor module from ETH and USDC  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "add_liquidity_dyor_eth_and_usdc"
+    module_display_name: str = "Add Liquidity Dyor ETH and USDC"
+
+class AddLiquidityDyorETHtoUSDTModule(SwapModuleInfo):
+    """ Add Liquidity Dyor module from ETH and USDT  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "add_liquidity_dyor_eth_and_usdt"
+    module_display_name: str = "Add Liquidity Dyor ETH and USDT"
+
+class AddLiquidityDyorETHtoKRAKENModule(SwapModuleInfo):
+    """ Add Liquidity Dyor module from ETH and KRAKEN  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "add_liquidity_dyor_eth_and_kraken"
+    module_display_name: str = "Add Liquidity Dyor ETH and KRAKEN"
+
+class AddLiquidityDyorETHtoWORMModule(SwapModuleInfo):
+    """ Add Liquidity Dyor module from ETH and WORM  """
+    source_network: str = Ink.name
+    destination_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    destination_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "add_liquidity_dyor_eth_and_worm"
+    module_display_name: str = "Add Liquidity Dyor ETH and WORM"

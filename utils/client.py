@@ -295,6 +295,7 @@ class Client(Logger):
                 raise BlockchainException(f'{self.get_normalize_error(error)}')
 
     async def get_wallet_balance(self, MAX_RETRIES: int = 3) -> Dict[str, Dict[str, int]]:
+        return
         params: Dict[str, str] = {
             'id': self.address,
             "is_core": "true",
