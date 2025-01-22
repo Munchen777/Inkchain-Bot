@@ -82,7 +82,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["add_liquidity_dyor_eth_and_worm"],
+    ["swap_dyor_eth_to_kraken"],
 ]
 
 PRIORITY_NETWORK_NAMES: Set[str] = { # Priority Network names to work with

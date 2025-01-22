@@ -287,10 +287,6 @@ class SwapInkswapETHtoSINKModule(SwapModuleInfo):
 
 class SwapInkswapETHtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from ETH to KRAKEN """
-    pass
-    
-class SwapInkswapETHtoWETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from ETH to WETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -325,10 +321,6 @@ class SwapInkswapSINKtoETHModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ETH """
-    pass
-
-class SwapInkswapWETHtoETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from WETH to ETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -363,10 +355,6 @@ class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
 
 class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to KRAKEN """
-    pass
-
-class SwapInkswapSINKtoWETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from SINK to WETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -377,10 +365,6 @@ class SwapInkswapSINKtoWETHModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to SINK """
-    pass
-
-class SwapInkswapWETHtoSINKModule(SwapModuleInfo):
-    """ Swap Inkswap module from WETH to SINK """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -391,10 +375,6 @@ class SwapInkswapWETHtoSINKModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ISWAP """
-    pass
-
-class SwapInkswapWETHtoISWAPModule(SwapModuleInfo):
-    """ Swap Inkswap module from WETH to ISWAP """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -404,10 +384,6 @@ class SwapInkswapWETHtoISWAPModule(SwapModuleInfo):
     
 class SwapInkswapISWAPtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to KRAKEN """
-    module_name: str = "swap_inkswap_weth_to_iswap"
-
-class SwapInkswapISWAPtoWETHModule(SwapModuleInfo):
-    """ Swap Inkswap module from ISWAP to WETH """
     source_network: str = Ink.name
     destination_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
@@ -729,7 +705,7 @@ class SwapDyorKRAKENtoUSDTModule(SwapModuleInfo):
 
 class AddLiquidityModuleInfo(BaseModuleInfo):
     """
-    Add Liquidity module info class for all bridge modules
+    Add Liquidity module info class for all add liquidity modules
     
     Attributes:
         fee: float - 0.005 комиссия за транзакцию (дефолтное значение)
@@ -790,3 +766,28 @@ class AddLiquidityDyorETHtoWORMModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "add_liquidity_dyor_eth_and_worm"
     module_display_name: str = "Add Liquidity Dyor ETH and WORM"
+
+
+class MintNFTModuleInfo(BaseModuleInfo):
+    """
+    Mint NFT module info class for all mint nft modules
+    
+    Attributes:
+        fee: float - 0.005 комиссия за транзакцию (дефолтное значение)
+        min_available_balance: float - минимальный доступный баланс для транзакции (дефолтное значение)
+        min_amount_residue: float - минимальный остаток на счете после транзакции, который будет оставлен на счете (дефолтное значение)
+        min_amount_out: float - минимальная сумма для вывода (дефолтное значение)
+        max_amount_out: float - максимальная сумма для вывода (дефолтное значение)
+        source_network: Optional[str] - сеть, с которой происходит транзакция (опциональное значение)
+        destination_network: Optional[str] - сеть, на которую происходит транзакция (опциональное значение)
+        module_type: str = "swap" - тип модуля (дефолтное значение)
+    
+    """
+    fee: float = 0.0
+    min_available_balance: float = 0.005
+    min_amount_residue: float = 0.003
+    min_amount_out: float = 0.001
+    max_amount_out: float = 0.003
+    source_network: str = None
+    destination_network: str = None
+    module_type: str = "add_liquidity"
