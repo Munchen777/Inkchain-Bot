@@ -305,7 +305,7 @@ class Client(Logger):
         if NETWORKS_IN_RABBY:
             try:
                 for network_name in NETWORKS_IN_RABBY:
-                    response_json: Dict[str, Any] = {}
+                    response_json_list: Dict[str, Any] = {}
 
                     async with AsyncSession() as session:
                         while counter <= MAX_RETRIES:
