@@ -177,7 +177,7 @@ class AddLiquidityDyorETHtoUSDCWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True, test_mode=True)
+            await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} USDC.e on the Ink network. Error: {error} '
@@ -242,7 +242,7 @@ class AddLiquidityDyorETHtoUSDTWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True, test_mode=True)
+            await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} USDT on the Ink network. Error: {error} '
@@ -307,7 +307,7 @@ class AddLiquidityDyorETHtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True, test_mode=True)
+            await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} KRAKEN on the Ink network. Error: {error} '
@@ -372,7 +372,7 @@ class AddLiquidityDyorETHtoWORMWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True, test_mode=True)
+            await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} WORM on the Ink network. Error: {error} '
