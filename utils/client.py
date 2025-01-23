@@ -198,16 +198,15 @@ class Client(Logger):
         fee_history = await self.w3.eth.fee_history(25, 'latest', [20.0])
         non_empty_block_priority_fees = [fee[0] for fee in fee_history["reward"] if fee[0] != 0]
 
-        # Если данные отсутствуют, установить минимальное значение
         if not non_empty_block_priority_fees:
-            return 1  # Установите минимально приемлемую комиссию
+            return 1
 
         divisor_priority = max(len(non_empty_block_priority_fees), 1)
         priority_fee = int(round(sum(non_empty_block_priority_fees) / divisor_priority))
-        return max(priority_fee, 1)  # Убедитесь, что комиссия не меньше 1
+        return max(priority_fee, 1)
 
     
-    async def prepare_transaction(self, value: int = 0):
+    async def prepare_transaction(self, value: int = 0, eip1559: bool = True):
         try:
             tx_params = {
                 'from': self.address,
@@ -215,13 +214,12 @@ class Client(Logger):
                 'value': value,
                 'chainId': self.network.chain_id
             }
-            if self.network.eip1559_support:
+            if self.network.eip1559_support and eip1559:
                 base_fee = await self.w3.eth.gas_price
-                max_priority_fee_per_gas = max(await self.get_priotiry_fee(), 1)  # Минимум 1 Gwei
+                max_priority_fee_per_gas = max(await self.get_priotiry_fee(), 1)
                 max_fee_per_gas = base_fee + max_priority_fee_per_gas
 
-                # Убедитесь, что max_fee_per_gas не ниже минимального порога
-                min_fee = 1_000_000_000  # 1 Gwei
+                min_fee = 1_000_000_000
                 tx_params['maxPriorityFeePerGas'] = max(max_priority_fee_per_gas, min_fee)
                 tx_params['maxFeePerGas'] = max(int(max_fee_per_gas), tx_params['maxPriorityFeePerGas'] + min_fee)
                 tx_params['type'] = '0x2'

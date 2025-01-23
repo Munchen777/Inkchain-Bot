@@ -46,8 +46,8 @@ EXCEL_FILE_PATH: str = os.path.join(
 )
 
 # TELEGRAM DATA
-TG_TOKEN = ""  # https://t.me/BotFather
-TG_ID = ""  # https://t.me/getmyid_bot
+TG_TOKEN = "7619979077:AAFMP2JcwzC5n-sYkJS34biD7GVWEAlVR3g"  # https://t.me/BotFather
+TG_ID = "5944442777"  # https://t.me/getmyid_bot
 
 # OTHERS SETTINGS
 LOGS_FILE_PATH: str = os.path.join(

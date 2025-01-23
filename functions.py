@@ -3,6 +3,7 @@ from modules.bridges import *
 from modules.swaps import *
 from modules.add_liquidity import *
 from modules.mint_nfts import *
+from modules.others import *
 from modules.interfaces import *
 
 
@@ -410,6 +411,13 @@ async def mint_og_nft(account_name: str, private_key: str, proxy: str | None, mo
 
 async def mint_guild_nft(account_name: str, private_key: str, proxy: str | None, module_info: MintNFTGuildModule):
     worker = MintNFTGuildWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()
+
+async def deploy_contract_ink_network(account_name: str, private_key: str, proxy: str | None, module_info: DeployContractInkModule):
+    worker = DeployContractInkWorker(
         client=get_client(account_name, private_key, proxy, module_info.source_network),
         module_info=module_info
     )
