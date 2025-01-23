@@ -86,6 +86,8 @@ CLASSIC_ROUTES_MODULES_USING = [
 
     ["buy_znc_domen_ink_network"],
     
+    ["calim_daily_gm"],
+
 ]
 
 """
@@ -93,7 +95,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["buy_znc_domen_ink_network"],
+    ["calim_daily_gm"],
 ]
 
 PRIORITY_NETWORK_NAMES: Set[str] = { # Priority Network names to work with

@@ -803,3 +803,36 @@ class BuyZNCDomenInkModule(BuyZNCDomenModule):
     module_priority: int = 2
     module_name: str = "buy_znc_domen_ink_network"
     module_display_name: str = "Buy ZNC domen in the Ink network"
+
+
+class ClaimDailyGMModule(BaseModuleInfo):
+    """
+    Claim Daily module info class for all claim daily modules
+    
+    Attributes:
+        fee: float - 0.0 комиссия за транзакцию (дефолтное значение)
+        min_available_balance: float - минимальный доступный баланс для транзакции (дефолтное значение)
+        min_amount_residue: float - минимальный остаток на счете после транзакции, который будет оставлен на счете (дефолтное значение)
+        min_amount_out: float - минимальная сумма для вывода (дефолтное значение)
+        max_amount_out: float - максимальная сумма для вывода (дефолтное значение)
+        source_network: Optional[str] - сеть, с которой происходит транзакция (опциональное значение)
+        destination_network: Optional[str] - сеть, на которую происходит транзакция (опциональное значение)
+        module_type: str = "swap" - тип модуля (дефолтное значение)
+    
+    """
+    fee: float = 0.0
+    min_available_balance: float = 0.005
+    min_amount_residue: float = 0.003
+    min_amount_out: float = 0.001
+    max_amount_out: float = 0.003
+    source_network: str = None
+    destination_network: Optional[str] = None
+    module_type: str = "buy_domen"
+
+class ClaimDailyGMModule(ClaimDailyGMModule):
+    """ Claim Daily GM in the Ink network """
+    source_network: str = Ink.name
+    source_network_chain_id: int = Ink.chain_id
+    module_priority: int = 2
+    module_name: str = "calim_daily_gm"
+    module_display_name: str = "Claim Daily GM in the Ink network"
