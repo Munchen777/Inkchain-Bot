@@ -4,6 +4,7 @@ import os
 GLOBAL_NETWORK = 1
 SOFTWARE_MODE = 0                                    # 0 - consistently / 1 - parallel
 SAVE_PROGRESS = True                                 # Save progress of modules execution
+USE_L2_TO_DEPOSIT: bool = True                       # Use L2 chains to deposit
 BREAK_ROUTE = False                                  # Break route in case of appearing error
 TELEGRAM_NOTIFICATIONS = True                        # Enable Telegram Notification via Bot
 
