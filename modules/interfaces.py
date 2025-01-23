@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Any, Dict, Optional, Literal, Set
+from typing import Any, Dict, Optional, List, Literal, Set
 
 from utils.networks import *
 
@@ -19,11 +19,22 @@ class ModuleDependency(BaseModel):
         description="Имена модулей, которые должны быть выполнены до этого",
         exclude=True
     )
-    # blocked_by_modules: Set[str] = Field(
-    #     default_factory=set,
-    #     description="Имена модулей, которые блокируют выполнение этого",
-    #     exclude=True
-    # )
+
+
+class RequiredModulesToExecute(BaseModel):
+    required_modules: List[str] = Field(
+        default=[
+            "swap_inkswap_eth_to_sink",
+            "bridge_gg_ethereum_to_ink",
+            "swap_inkswap_sink_to_eth",
+            "bridge_relay_op_to_ink",
+            "bridge_relay_base_to_ink",
+            "bridge_owlto_op_to_ink",
+            "bridge_owlto_base_to_ink",
+        ],
+        description="Список модулей, которые должны быть обязательно выполнены",
+    )
+
 
 class BaseModuleInfo(BaseModel):
     """
