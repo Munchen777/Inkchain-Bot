@@ -422,3 +422,10 @@ async def deploy_contract_ink_network(account_name: str, private_key: str, proxy
         module_info=module_info
     )
     return await worker.run()
+
+async def buy_znc_domen_ink_network(account_name: str, private_key: str, proxy: str | None, module_info: BuyZNCDomenInkModule):
+    worker = BuyZNCDomenInkWorker(
+        client=get_client(account_name, private_key, proxy, module_info.source_network),
+        module_info=module_info
+    )
+    return await worker.run()

@@ -92,7 +92,8 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "mint_paragraf_nft": MintNFTParagrafModule,
     "mint_og_nft": MintNFTOGModule,
     "mint_guild_nft": MintNFTGuildModule,
-    "deploy_contract_ink_network": DeployContractInkModule
+    "deploy_contract_ink_network": DeployContractInkModule,
+    "buy_znc_domen_ink_network": BuyZNCDomenInkModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -160,7 +161,8 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "mint_paragraf_nft": mint_paragraf_nft,
     "mint_og_nft": mint_og_nft,
     "mint_guild_nft": mint_guild_nft,
-    "deploy_contract_ink_network": deploy_contract_ink_network
+    "deploy_contract_ink_network": deploy_contract_ink_network,
+    "buy_znc_domen_ink_network": buy_znc_domen_ink_network
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()
