@@ -4,7 +4,7 @@ import aiohttp
 
 from typing import Any, Dict
 from web3.contract import AsyncContract
-from web3.exceptions import TransactionNotFound, TimeExhausted
+from web3.exceptions import TransactionNotFound
 from web3 import AsyncHTTPProvider, AsyncWeb3
 
 from .networks import NETWORKS
@@ -13,6 +13,15 @@ from modules import Logger
 from data.abi import ERC20_ABI
 from settings import NETWORK_TOKEN_CONTRACTS
 from generall_settings import RANDOM_RANGE, ROUNDING_LEVELS
+
+
+class BlockchainException(Exception):
+    pass
+
+
+class SoftwareException(Exception):
+    pass
+
 
 class CustomAsyncHTTPProvider(AsyncHTTPProvider):
     def __init__(self, endpoint_uri, *args, **kwargs):
@@ -41,13 +50,6 @@ class CustomAsyncWeb3(AsyncWeb3):
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if hasattr(self.provider, "close") and callable(self.provider.close):
             await self.provider.close()
-
-
-class BlockchainException(Exception):
-    pass
-
-class SoftwareException(Exception):
-    pass
 
 
 class Client(Logger):
@@ -259,62 +261,67 @@ class Client(Logger):
         if test_mode:
             try:
                 result = await self.w3.eth.call(transaction)
-                self.logger.info(f"Симуляция транзакции прошла успешно: {result}")
+                self.logger.info(f"The transaction simulation was successful: {result}")
                 return True
             except Exception as error:
-                self.logger.error(f"Симуляция транзакции не удалась: {self.get_normalize_error(error)}")
-                raise BlockchainException(f"Ошибка симуляции: {self.get_normalize_error(error)}")
+                self.logger.error(f"The transaction simulation failed: {self.get_normalize_error(error)}")
+                return False
         else:
             try:
                 if not without_gas:
                     transaction['gas'] = int(await self.w3.eth.estimate_gas(transaction))
             except Exception as error:
-                raise BlockchainException(f'{self.get_normalize_error(error)}')
+                self.logger.error(f"The transaction simulation failed: {self.get_normalize_error(error)}")
+                return False
 
             try:
                 singed_tx = self.w3.eth.account.sign_transaction(transaction, self.private_key)
                 tx_hash = await self.w3.eth.send_raw_transaction(singed_tx.raw_transaction)
             except Exception as error:
                 if self.get_normalize_error(error) == 'transaction underpriced':
-                    self.logger.warning("Комиссия занижена. Увеличиваем и повторяем отправку...")
+                    self.logger.warning("The commission is understated. Increase and repeat shipment....")
                     transaction['maxPriorityFeePerGas'] = transaction.get('maxPriorityFeePerGas', 1_000_000_000) + 1_000_000_000
                     transaction['maxFeePerGas'] = transaction['maxPriorityFeePerGas'] + await self.w3.eth.gas_price
                     return await self.send_transaction(transaction, need_hash, without_gas, poll_latency, timeout, test_mode)
                 if self.get_normalize_error(error) == 'already known':
-                    self.logger.warning(f'RPC получил ошибку, но tx был отправлен | {self.address}')
+                    self.logger.warning(f'RPC received an error, but the tx was sent | {self.address}')
                     return True
                 else:
-                    raise BlockchainException(f'{self.get_normalize_error(error)}')
-
+                    self.logger.error(f"Transaction sending error: {self.get_normalize_error(error)}")
+                    return False
             try:
                 total_time = 0
                 timeout = 1200
-
                 while True:
                     try:
-                        receipts = await self.w3.eth.get_transaction_receipt(tx_hash) 
+                        receipts = await self.w3.eth.get_transaction_receipt(tx_hash)
                         status = receipts.get("status")
+                        
                         if status == 1:
-                            self.logger.info(f'Транзакция прошла успешно: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
-                            if need_hash:
-                                return tx_hash
+                            self.logger.info(f'The transaction was successful: {self.network.explorer}/tx/0x{tx_hash.hex()} | {self.address}')
                             return True
                         elif status is None:
                             await asyncio.sleep(poll_latency)
                         else:
-                            return SoftwareException(f'Транзакция не выполнилась: {self.network.explorer}/tx/0x{tx_hash.hex()}')
+                            self.logger.error(f'The transaction failed: {self.network.explorer}/tx/0x{tx_hash.hex()}')
+                            return False
+
                     except TransactionNotFound:
                         if total_time > timeout:
-                            raise TimeExhausted(f"Транзакция отсутствует в цепочке после {timeout} секунд")
+                            self.logger.error(f"Transaction is missing from the chain after {timeout} seconds")
+                            return False
+                        
                         total_time += poll_latency
                         await asyncio.sleep(poll_latency)
 
                     except Exception as error:
-                        self.logger.error(f'RPC получил автоматический ответ. Ошибка: {error} | {self.address}')
+                        self.logger.error(f'RPC received an automated response. Error: {error} | {self.address}')
                         total_time += poll_latency
                         await asyncio.sleep(poll_latency)
+
             except Exception as error:
-                raise BlockchainException(f'{self.get_normalize_error(error)}')
+                self.logger.error(f'Error during transaction processing: {self.get_normalize_error(error)}')
+                return False
 
     async def get_wallet_balance(self) -> Dict[str, Any]:
         """ Method to get all wallet balances in all networks """
