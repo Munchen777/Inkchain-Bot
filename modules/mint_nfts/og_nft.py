@@ -93,7 +93,7 @@ class MintNFTOGWorker(Logger):
                 max_eth_to_spend,
                 0
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the mint nft OG on the Ink network. Error: {error} '

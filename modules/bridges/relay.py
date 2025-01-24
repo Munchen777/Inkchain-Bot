@@ -93,7 +93,7 @@ class BridgeRelayOPtoInkWorker(Logger):
                 'to': AsyncWeb3.to_checksum_address(tx_data["steps"][0]['items'][0]['data']['to']),
                 'data': tx_data["steps"][0]['items'][0]['data']['data']
             })
-            await self.client.send_transaction(tx_params, need_hash=True)
+            return await self.client.send_transaction(tx_params, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the OP network to Ink. Error: {error} '
@@ -141,7 +141,7 @@ class BridgeRelayBasetoInkWorker(Logger):
                 'to': AsyncWeb3.to_checksum_address(tx_data["steps"][0]['items'][0]['data']['to']),
                 'data': tx_data["steps"][0]['items'][0]['data']['data']
             })
-            await self.client.send_transaction(tx_params, need_hash=True)
+            return await self.client.send_transaction(tx_params, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink. Error: {error} '
@@ -189,7 +189,7 @@ class BridgeRelayInktoOPWorker(Logger):
                 'to': AsyncWeb3.to_checksum_address(tx_data["steps"][0]['items'][0]['data']['to']),
                 'data': tx_data["steps"][0]['items'][0]['data']['data']
             })
-            await self.client.send_transaction(tx_params, need_hash=True)
+            return await self.client.send_transaction(tx_params, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP. Error: {error} '
@@ -237,7 +237,7 @@ class BridgeRelayInktoBaseWorker(Logger):
                 'to': AsyncWeb3.to_checksum_address(tx_data["steps"][0]['items'][0]['data']['to']),
                 'data': tx_data["steps"][0]['items'][0]['data']['data']
             })
-            await self.client.send_transaction(tx_params, need_hash=True)
+            return await self.client.send_transaction(tx_params, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to Base. Error: {error} '

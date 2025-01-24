@@ -18,7 +18,7 @@ class DeployContractInkWorker(Logger):
         try:
             tx_params = await self.client.prepare_transaction(eip1559=False)
             transaction = {**tx_params, 'data': data}
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Deployment Error: {error} '

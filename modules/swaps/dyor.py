@@ -142,7 +142,7 @@ class SwapDyorETHtoUSDCWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to USDC.e on the Ink network. Error: {error} '
@@ -195,7 +195,7 @@ class SwapDyorETHtoKrakenWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to Kraken on the Ink network. Error: {error} '
@@ -248,7 +248,7 @@ class SwapDyorETHtoUSDTWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to USDT on the Ink network. Error: {error} '
@@ -290,7 +290,7 @@ class SwapDyorETHtoWETHWorker(Logger):
         try:
             tx_params = await self.client.prepare_transaction(value=value)
             transaction = await contract.functions.deposit().build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to WETH on the Ink network. Error: {error} '
@@ -343,7 +343,7 @@ class SwapDyorETHtoWORMWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to WORM on the Ink network. Error: {error} '
@@ -387,7 +387,7 @@ class SwapDyorWETHtoETHWorker(Logger):
             transaction = await contract.functions.withdraw(
                 amount_out
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to ETH on the Ink network. Error: {error} '
@@ -443,7 +443,7 @@ class SwapDyorUSDCtoETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC.e to ETH on the Ink network. Error: {error} '
@@ -499,7 +499,7 @@ class SwapDyorUSDTtoETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDT to ETH on the Ink network. Error: {error} '
@@ -555,7 +555,7 @@ class SwapDyorWORMtoETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to ETH on the Ink network. Error: {error} '
@@ -611,7 +611,7 @@ class SwapDyorKRAKENtoETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to ETH on the Ink network. Error: {error} '
@@ -668,7 +668,7 @@ class SwapDyorKRAKENtoWORMWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to WORM on the Ink network. Error: {error} '
@@ -725,7 +725,7 @@ class SwapDyorWORMtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to KRAKEN on the Ink network. Error: {error} '
@@ -782,7 +782,7 @@ class SwapDyorWORMtoUSDTWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to USDT on the Ink network. Error: {error} '
@@ -839,7 +839,7 @@ class SwapDyorWORMtoUSDCWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to USDC on the Ink network. Error: {error} '
@@ -895,7 +895,7 @@ class SwapDyorWORMtoWETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to WETH on the Ink network. Error: {error} '
@@ -951,7 +951,7 @@ class SwapDyorKRAKENtoWETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to WETH on the Ink network. Error: {error} '
@@ -1007,7 +1007,7 @@ class SwapDyorKRAKENtoUSDCWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to USDC on the Ink network. Error: {error} '
@@ -1063,7 +1063,7 @@ class SwapDyorUSDCtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to KRAKEN on the Ink network. Error: {error} '
@@ -1120,7 +1120,7 @@ class SwapDyorUSDCtoWORMWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to WORM on the Ink network. Error: {error} '
@@ -1177,7 +1177,7 @@ class SwapDyorUSDCtoUSDTWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to USDT on the Ink network. Error: {error} '
@@ -1233,7 +1233,7 @@ class SwapDyorUSDCtoWETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to WETH on the Ink network. Error: {error} '
@@ -1289,7 +1289,7 @@ class SwapDyorWETHtoUSDCWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to USDC on the Ink network. Error: {error} '
@@ -1345,7 +1345,7 @@ class SwapDyorWETHtoUSDTWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to USDT on the Ink network. Error: {error} '
@@ -1401,7 +1401,7 @@ class SwapDyorWETHtoWORMWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to WORM on the Ink network. Error: {error} '
@@ -1457,7 +1457,7 @@ class SwapDyorUSDTtoWETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDT to WETH on the Ink network. Error: {error} '
@@ -1513,7 +1513,7 @@ class SwapDyorWETHtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to KRAKEN on the Ink network. Error: {error} '
@@ -1570,7 +1570,7 @@ class SwapDyorUSDTtoUSDCWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDT to USDC on the Ink network. Error: {error} '
@@ -1626,7 +1626,7 @@ class SwapDyorWORMtoUSDCWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to USDC on the Ink network. Error: {error} '
@@ -1683,7 +1683,7 @@ class SwapDyorUSDTtoWORMWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDT to WORM on the Ink network. Error: {error} '
@@ -1740,7 +1740,7 @@ class SwapDyorUSDTtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap USDT to KRAKEN on the Ink network. Error: {error} '
@@ -1797,7 +1797,7 @@ class SwapDyorKRAKENtoUSDTWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to USDT on the Ink network. Error: {error} '

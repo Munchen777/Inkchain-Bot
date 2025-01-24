@@ -388,7 +388,7 @@ class SwapDyorETHtoUSDCModule(SwapModuleInfo):
     max_amount_out: float = 0.001
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
-    module_priority: int = 2
+    module_priority: int = 1
     module_name: str = "swap_dyor_eth_to_usdc"
     module_display_name: str = "Swap Dyor ETH to USDC.e"
 
@@ -834,5 +834,5 @@ class ClaimDailyGMModule(ClaimDailyGMModule):
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
-    module_name: str = "calim_daily_gm"
+    module_name: str = "claim_daily_gm"
     module_display_name: str = "Claim Daily GM in the Ink network"

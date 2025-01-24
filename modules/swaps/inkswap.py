@@ -149,7 +149,7 @@ class SwapInkswapETHtoISWAPWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to ISWAP on the Ink network. Error: {error}'
@@ -213,7 +213,7 @@ class SwapInkswapETHtoSINKWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to SINK on the Ink network. Error: {error}'
@@ -277,7 +277,7 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to KRAKEN on the Ink network. Error: {error}'
@@ -336,7 +336,7 @@ class SwapInkswapISWAPtoETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ISWAP to ETH on the Ink network. Error: {error}'
@@ -395,7 +395,7 @@ class SwapInkswapSINKtoETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap SINK to ETH on the Ink network. Error: {error}'
@@ -454,7 +454,7 @@ class SwapInkswapKRAKENtoETHWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to ETH on the Ink network. Error: {error}'
@@ -514,7 +514,7 @@ class SwapInkswapISWAPtoSINKWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ISWAP to SINK on the Ink network. Error: {error}'
@@ -574,7 +574,7 @@ class SwapInkswapSINKtoISWAPWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap SINK to ISWAP on the Ink network. Error: {error}'
@@ -634,7 +634,7 @@ class SwapInkswapSINKtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap SINK to KRAKEN on the Ink network. Error: {error}'
@@ -694,7 +694,7 @@ class SwapInkswapKRAKENtoSINKWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to SINK on the Ink network. Error: {error}'
@@ -754,7 +754,7 @@ class SwapInkswapKRAKENtoISWAPWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to ISWAP on the Ink network. Error: {error}'
@@ -814,7 +814,7 @@ class SwapInkswapISWAPtoKRAKENWorker(Logger):
                 self.client.address,
                 self.deadline
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the swap ISWAP to KRAKEN on the Ink network. Error: {error}'
