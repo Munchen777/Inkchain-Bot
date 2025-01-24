@@ -430,7 +430,7 @@ async def buy_znc_domen_ink_network(account_name: str, private_key: str, proxy: 
     )
     return await worker.run()
 
-async def calim_daily_gm(account_name: str, private_key: str, proxy: str | None, module_info: ClaimDailyGMModule):
+async def claim_daily_gm(account_name: str, private_key: str, proxy: str | None, module_info: ClaimDailyGMModule):
     worker = ClaimDailyGMWorker(
         client=get_client(account_name, private_key, proxy, module_info.source_network),
         module_info=module_info
