@@ -55,7 +55,7 @@ async def canculate_amount_out_swaps(
     if from_eth:
         balance = await client.get_token_balance(token_name=token_get_name)      
         decimals = await client.get_decimals(token_name=token_get_name)
-    if not from_eth:
+    else:
         balance = await client.get_token_balance(token_name=token_out_name)      
         decimals = await client.get_decimals(token_name=token_out_name)
 
