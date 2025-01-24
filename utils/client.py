@@ -1,20 +1,46 @@
 import asyncio
 import random
-import os
-import json
+import aiohttp
 
-from curl_cffi.requests import AsyncSession, Response, RequestsError
-from typing import Any, Dict, List, Set
+from typing import Any, Dict
 from web3.contract import AsyncContract
 from web3.exceptions import TransactionNotFound, TimeExhausted
 from web3 import AsyncHTTPProvider, AsyncWeb3
 
-from .networks import NETWORKS, NETWORKS_IN_RABBY
-from utils.networks import*
+from .networks import NETWORKS
+from utils.networks import *
 from modules import Logger
 from data.abi import ERC20_ABI
 from settings import NETWORK_TOKEN_CONTRACTS
 from generall_settings import RANDOM_RANGE, ROUNDING_LEVELS
+
+class CustomAsyncHTTPProvider(AsyncHTTPProvider):
+    def __init__(self, endpoint_uri, *args, **kwargs):
+        super().__init__(endpoint_uri, *args, **kwargs)
+        self._session = None
+    @property
+    def session(self):
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+        return self._session
+
+    async def make_request(self, method, params):
+        async with self.session.post(self.endpoint_uri, json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1}) as response:
+            return await response.json()
+
+    async def close(self):
+        if self._session:
+            await self._session.close()
+            self._session = None
+
+
+class CustomAsyncWeb3(AsyncWeb3):
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if hasattr(self.provider, "close") and callable(self.provider.close):
+            await self.provider.close()
 
 
 class BlockchainException(Exception):
@@ -30,7 +56,7 @@ class Client(Logger):
         self.name: str = account_name
         self.private_key: str = private_key
         self.proxy_init: str = proxy
-        self.request_kwargs = {"proxy": f'{proxy}', "verify_ssl": False} if proxy else {"verify_ssl": False}
+        self.request_kwargs = {"proxy": f'{self.proxy_init}', "verify_ssl": False} if self.proxy_init else {"verify_ssl": False}
         self.w3 = AsyncWeb3(AsyncHTTPProvider(None, request_kwargs=self.request_kwargs))
         self.address = AsyncWeb3.to_checksum_address(self.w3.eth.account.from_key(private_key).address)
 
@@ -139,8 +165,7 @@ class Client(Logger):
         value = int(normalized_value * (10 ** decimals))
 
         return value, normalized_value
-
-        
+       
     @staticmethod
     def get_normalize_error(error: Exception) -> Exception | str:
         try:
@@ -205,7 +230,6 @@ class Client(Logger):
         priority_fee = int(round(sum(non_empty_block_priority_fees) / divisor_priority))
         return max(priority_fee, 1)
 
-    
     async def prepare_transaction(self, value: int = 0, eip1559: bool = True):
         try:
             tx_params = {
@@ -292,198 +316,36 @@ class Client(Logger):
             except Exception as error:
                 raise BlockchainException(f'{self.get_normalize_error(error)}')
 
-    async def get_wallet_balance(self, MAX_RETRIES: int = 3) -> Dict[str, Dict[str, int]]:
-        wallet_balances: Dict[str, Dict[str, float]] = {}
-        params: Dict[str, str] = {
-            'id': self.address,
-            "is_all": "true",
-        }
-        counter: int = 1
+    async def get_wallet_balance(self) -> Dict[str, Any]:
+        """ Method to get all wallet balances in all networks """
+        result = {}
 
-        if NETWORKS_IN_RABBY:
-            try:
-                for network_name in NETWORKS_IN_RABBY:
-                    response_json_list: Dict[str, Any] = {}
+        for network in NETWORKS.values():
+            provider = CustomAsyncHTTPProvider(random.choice(network.rpc), request_kwargs=self.request_kwargs)
+            async with CustomAsyncWeb3(provider) as w3:
 
-                    async with AsyncSession() as session:
-                        while counter <= MAX_RETRIES:
-                            try:
-                                response: Response = await session.get(
-                                    url="https://api.rabby.io/v1/user/token_list",
-                                    params={**params,
-                                            "chain_id": network_name
-                                            },
-                                )
-                                if response.status_code == 200:
-                                    response_json_list: List[Dict[str, Any]] = response.json()
-                                # rabby_response_path: str = os.path.join(
-                                #     (os.path.dirname(os.path.dirname(__file__))),
-                                #     "data",
-                                #     "rabby_response.json"
-                                # )
-                                # with open(rabby_response_path, "w") as file:
-                                #     json.dump(response_json, file, indent=4)
+                balance_eth_wei = await w3.eth.get_balance(self.address)
+                balance_eth = balance_eth_wei / (10 ** 18)
+                network_balances = {"ETH": balance_eth}
 
-                                    break
-
-                            except (RequestsError, Exception) as error:
-                                self.logger_msg(self.name, self.address,
-                                                f"Error while receiving wallet balances.\nError: {error}", "warning")
-
-                            counter += 1
-                            self.logger_msg(self.name, self.address,
-                                            f"Try to send request again to get wallet balances. Counter: {counter}", "warning")
-
-                    if "message" not in response_json_list:
-                        for token_data in response_json_list:
-                            try:
-                                token_name: str = token_data.get("symbol")
-                                rabby_network_name: str = token_data.get("id")
-                                network: Network | None = NETWORKS_IN_RABBY.get(rabby_network_name)
-
-                                if not network:
-                                    self.logger_msg(self.name, self.address,
-                                                    f"Network {rabby_network_name} not found in NETWORKS_IN_RABBY", "warning")
-                                    continue
-
-                                network_token_contracts: Dict[str, str] | None = NETWORK_TOKEN_CONTRACTS.get(network.name)
-
-                                if not network_token_contracts:
-                                    native_tokens_names: Set[str] = set(network.token for network in NETWORKS.values())
-                                    if token_name not in native_tokens_names:
-                                        self.logger_msg(self.name, self.address,
-                                                        f"Token {token_name} not found in native tokens names for network: {network.name}", "warning")
-                                        continue
-                                    
-                                    token_balance: float | None = token_data.get("amount", 0)
-                                    if not token_balance:
-                                        self.logger_msg(self.name, self.address,
-                                                        f"There is no token amount for {token_name} on network: {network.name}", "warning")
-                                        continue
-                                    
-                                    wallet_balances.setdefault(network.name, {})[token_name] = float(token_balance)
-                                    
-                                    # self.logger_msg(self.name, self.address,
-                                    #                 f"Network token contracts not found for network: {network.name}", "warning")
-                                    # continue
-                                
-                                else:
-
-                                # if token_name in network_token_contracts:
-                                    token_balance: float | None = token_data.get("amount", 0)
-                                    if not token_balance:
-                                        self.logger_msg(self.name, self.address,
-                                            f"Token balance not found for token: {token_name} on network: {network.name}", "warning")
-                                        continue
-
-                                    wallet_balances.setdefault(network.name, {})[token_name] = float(token_balance)
-
-                            except Exception as error:
-                                self.logger_msg(self.name, self.address,
-                                                f"Error while receiving {token_name} wallet balance on network {network.name}.\nError: {error}", "warning")
-                                pass
-
-                    else:
-                        self.logger_msg(self.name, self.address,
-                                        f"Error while receiving wallet balances.\nError: {response_json_list}", "warning")
-
-                        
-
-                        
-                        
-                        
-                    
-                        """TODO: Добавить балансы в словарь
-                        
-                        wallet_balances: Dict[str, Dict[str, float]] = {
-                            network_name: {
-                                token_name: token_balance
-                            }
-                        }
-                        
-                        wallet_balances.setdefault(network_name, {})[token_name] = token_balance
-                        
-                        token_balance - высчитанный баланс
-
-                        """
-                        
-                        
-                        
-            except Exception as error:
-                self.logger_msg(self.name, self.address,
-                                f"Error while receiving wallet balances.\nError: {error}", "error")
-                raise error
-            
-            return wallet_balances
-
-        raise SoftwareException("Networks not found! Please, add networks to the networks module.")
-
-        # """ Метод для получения всех балансов кошелька во всех сетях """
-        # client: Client = Client(account_name, private_key, proxy)
-
-        # if NETWORKS:
-        #     wallet_balances: Dict[str, Dict[str, float]] = {}
-        #     native_tokens_names: Set[str] = set(network.token for network in NETWORKS.values() if network.token == "ETH")
-
-        # # client: Client = Client(account_name, private_key, proxy)
-
-        # # if NETWORKS:
-        # #     wallet_balances: Dict[str, Dict[str, float]] = {}
-        # #     native_tokens_names: Set[str] = set(network.token for network in NETWORKS.values())
-
-        # #     for network_name in NETWORKS:
-        # #         try:
-        # #             try:
-        # #                 client.setup_network(network_name)
-        # #             except Exception as error:
-        # #                 client.logger_msg(account_name, client.address,
-        # #                                   f"Error while setting up network.\nError: {error}", "error")
-        # #                 continue
-
-        # #             network_token_contracts: Dict[str, str] = NETWORK_TOKEN_CONTRACTS.get(network_name)
-        #             network_token_contracts: Dict[str, str] | None = NETWORK_TOKEN_CONTRACTS.get(network_name)
-                    
-        # #             if not network_token_contracts:
-        # #                 token_name: str = "ETH"
-        # #                 native_token_balance: int | None = await client.get_token_balance(token_name, check_native=True)
-
-        # #                 if not native_token_balance:
-        # #                     client.logger_msg(account_name, client.address,
-        # #                                       f"Native token balance not found for network: {network_name}", "error")
-        # #                     continue
-
-        # #                 wallet_balances.setdefault(network_name, {})[token_name] = native_token_balance
-        #                 wallet_balances.setdefault(network_name, {})[token_name] = native_token_balance / 10 ** await client.get_decimals(token_name, check_native=True)
-
-        # #             else:
-        # #                 for token_name in network_token_contracts:
-        # #                     token_contract_address: str | None = network_token_contracts.get(token_name)
-        # #                     if not token_contract_address:
-        # #                         client.logger_msg(account_name, client.address,
-        # #                                         f"Token contract address not found for token: {token_name} in network {network_name}", "error")
-        # #                         continue
+                for network_name, tokens in NETWORK_TOKEN_CONTRACTS.items():
+                    if network_name == network.name:
+                        for token_name, contract_address in tokens.items():
+                            if not contract_address: continue
                             
-        # #                     if token_name in native_tokens_names:
-        # #                         token_balance: int | None = await client.get_token_balance(token_name, check_native=True)
-        # #                     else:
-        # #                         token_balance: int | None = await client.get_token_balance(token_name)
-        #                     if token_name in native_tokens_names:
-        #                         token_balance: int | None = await client.get_token_balance(token_name, check_native=True) / 10 ** 18
-        #                     else:
-        #                         token_balance: int | None = await client.get_token_balance(token_name) / 10 ** await client.get_decimals(token_name)
+                            contract = w3.eth.contract(
+                                address=AsyncWeb3.to_checksum_address(contract_address), 
+                                abi=ERC20_ABI
+                            )
+                            
+                            try:
+                                balance_token = await contract.functions.balanceOf(self.address).call()
+                                decimals = await contract.functions.decimals().call()
+                                balance_token_readable = balance_token / (10 ** decimals)
+                                network_balances[token_name] = balance_token_readable
+                            except Exception as error:
+                                self.logger.error(f"Error while getting the balance of token {token_name} in network {network.name}: {error}")
+                
+                result[network.name] = network_balances
 
-        # #                     if not token_balance:
-        # #                         client.logger_msg(account_name, client.address,
-        # #                                         f"Token balance not found for token: {token_name}", "error")
-        # #                         continue
-
-        # #                     wallet_balances.setdefault(network_name, {})[token_name] = token_balance
-
-        # #         except Exception as error:
-        # #             client.logger_msg(account_name, client.address,
-        # #                               f"Error while receiving wallet balances in networks.\nError: {error}", "error")
-        # #             raise error
-
-        # #     return wallet_balances
-
-        # # raise SoftwareException("Networks not found! Please, add networks to the networks module.")
+        return result
