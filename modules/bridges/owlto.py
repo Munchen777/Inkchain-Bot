@@ -58,7 +58,7 @@ class BridgeOwltoOPtoInkWorker(Logger):
                 88,
                 98675412
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the OP network to Ink. Error: {error} '
@@ -115,7 +115,7 @@ class BridgeOwltoBasetoInkWorker(Logger):
                 88,
                 98675412
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink. Error: {error} '
@@ -172,7 +172,7 @@ class BridgeOwltoInktoOPWorker(Logger):
                 3,
                 98675412
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP. Error: {error} '
@@ -229,7 +229,7 @@ class BridgeOwltoInktoBaseWorker(Logger):
                 12,
                 98675412
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to Base. Error: {error} '

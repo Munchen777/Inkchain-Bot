@@ -38,7 +38,7 @@ class MintNFTParagrafWorker(Logger):
                 self.client.address,
                 address_mint_referrer
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed the mint nft Paragraf on the Ink network. Error: {error} '

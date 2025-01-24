@@ -56,7 +56,7 @@ class BridGGEthereumtoInkWorker(Logger):
                 200000,
                 b'6272696467670a'
             ).build_transaction(tx_params)
-            await self.client.send_transaction(transaction, need_hash=True)
+            return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH via the official bridge from the Ethereum network to Ink. Error: {error} '

@@ -52,7 +52,7 @@ class BuyZNCDomenInkWorker(Logger):
                     referral,
                     credits
                 ).build_transaction(tx_params)
-                await self.client.send_transaction(transaction, need_hash=True)
+                return await self.client.send_transaction(transaction, need_hash=True)
             except Exception as error:
                 if '0x3a81d6fc' in str(error):
                         logger.warning(f"Domain {domain_names} already registered, skipping...")
