@@ -6,7 +6,6 @@ import telebot
 
 from random import shuffle
 from typing import Any, Callable, Dict, List, Tuple
-from web3 import AsyncWeb3, AsyncHTTPProvider
 
 from data.config import (ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, CHAIN_NAMES, MODULE_RUNNERS)
 from generall_settings import (WALLETS_TO_WORK, SHUFFLE_WALLETS, SOFTWARE_MODE, USE_PROXY,
@@ -231,7 +230,7 @@ class Runner(Logger):
                     self.update_step(account_name, current_step + 1, current_module.module_name)
 
                     if not (current_step + 2) > (len(route_modules)):
-                        await self.smart_sleep(account_name, account_number=1)
+                        await self.smart_sleep(account_name, account_number=1, accounts_delay=True)
 
                 else:
                     self.collect_bad_wallets(account_name, module_name)
