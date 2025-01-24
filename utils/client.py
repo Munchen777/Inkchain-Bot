@@ -59,8 +59,8 @@ class Client(Logger):
         self.private_key: str = private_key
         self.proxy_init: str = proxy
         self.request_kwargs = {"proxy": f'{self.proxy_init}', "verify_ssl": False} if self.proxy_init else {"verify_ssl": False}
-        self.w3 = AsyncWeb3(AsyncHTTPProvider(None, request_kwargs=self.request_kwargs))
-        self.address = AsyncWeb3.to_checksum_address(self.w3.eth.account.from_key(private_key).address)
+        self.w3 = CustomAsyncWeb3(CustomAsyncHTTPProvider(None, request_kwargs=self.request_kwargs))
+        self.address = CustomAsyncWeb3.to_checksum_address(self.w3.eth.account.from_key(private_key).address)
 
         if source_network:
             self.setup_network(source_network)
@@ -80,7 +80,7 @@ class Client(Logger):
             "proxy": f'{self.proxy_init}',
             "verify_ssl": False
             } if self.proxy_init else {"verify_ssl": False}
-        self.w3 = AsyncWeb3(AsyncHTTPProvider(self.rpc, request_kwargs=self.request_kwargs))
+        self.w3 = CustomAsyncWeb3(CustomAsyncHTTPProvider(self.rpc, request_kwargs=self.request_kwargs))
 
     async def get_value_and_normalized_value(
         self, normalized_fee: float, normalized_min_available_balance: float, 
@@ -186,7 +186,7 @@ class Client(Logger):
     
     async def get_contract(self, contract_address: str, abi: dict = ERC20_ABI) -> AsyncContract:
         return self.w3.eth.contract(
-            address=AsyncWeb3.to_checksum_address(contract_address),
+            address=CustomAsyncWeb3.to_checksum_address(contract_address),
             abi=abi
         )
         
@@ -341,7 +341,7 @@ class Client(Logger):
                             if not contract_address: continue
                             
                             contract = w3.eth.contract(
-                                address=AsyncWeb3.to_checksum_address(contract_address), 
+                                address=CustomAsyncWeb3.to_checksum_address(contract_address), 
                                 abi=ERC20_ABI
                             )
                             
