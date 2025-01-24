@@ -86,7 +86,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 
     ["buy_znc_domen_ink_network"],
     
-    ["calim_daily_gm"],
+    ["claim_daily_gm"],
 
 ]
 
@@ -95,7 +95,21 @@ CLASSIC_ROUTES_MODULES_USING = [
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ["calim_daily_gm"],
+    ["swap_dyor_eth_to_usdc"],
+    ["mint_paragraf_nft"],
+    ["mint_og_nft"],
+    ["mint_guild_nft"],
+    ["deploy_contract_ink_network"],
+    ["buy_znc_domen_ink_network"],
+    ["claim_daily_gm"]
+]
+
+ROUTES_MODULES_GENERALS_SWAP = [
+    ["swap_dyor_eth_to_kraken"],
+    ["swap_dyor_eth_to_usdt"],
+    ["swap_dyor_eth_to_weth"],
+    ["swap_dyor_eth_to_usdc"],
+    ["swap_dyor_eth_to_worm"]
 ]
 
 PRIORITY_NETWORK_NAMES: Set[str] = { # Priority Network names to work with
