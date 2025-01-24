@@ -1,4 +1,4 @@
-from typing import Dict, Set
+from typing import Dict, List, Set
 
 """
 Handle installation of classic route.
@@ -94,7 +94,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 
 CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
 
-CLASSIC_ROUTES_MODULES_USING = [
+CLASSIC_ROUTES_MODULES_USING: List[List[str]] = [
     ["swap_dyor_eth_to_usdc"],
     ["mint_paragraf_nft"],
     ["mint_og_nft"],
@@ -112,18 +112,22 @@ ROUTES_MODULES_GENERALS_SWAP = [
     ["swap_dyor_eth_to_worm"]
 ]
 
-PRIORITY_NETWORK_NAMES: Set[str] = { # Priority Network names to work with
+ROUTES_MODULES_GENERALS_SWAPS: List[List[str]] = [
+    ["swap_dyor_eth_to_kraken"],
+    ["swap_dyor_eth_to_usdt"],
+    ["swap_dyor_eth_to_weth"],
+    ["swap_dyor_eth_to_usdc"],
+    ["swap_dyor_eth_to_worm"],
+]
+
+""" Networks which we work with """
+PRIORITY_NETWORK_NAMES: Set[str] = {
     "Ink Mainnet",
 }
 
 NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
-    "Base Mainnet": {
-        "": "",
-    },
-    "OP Mainnet": {
-        "": "",
-    },
     "Ink Mainnet": {
+        # "ETH": "0x4200000000000000000000000000000000000006",
         "WETH": "0x4200000000000000000000000000000000000006",
         "ISWAP": "0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302",
         "SINK": "0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B",

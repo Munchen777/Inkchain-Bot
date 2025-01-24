@@ -73,8 +73,8 @@ class Logger(ABC):
                 os.mkdir(LOGS_FILE_PATH)
 
             formatter: ColoredFormatter = ColoredFormatter(
-                fmt="%(levelname)s | %(name)s | %(asctime)s | %(lineno)d | %(message)s",
-                datefmt="%I:%M:%S"
+                fmt="[%(asctime)s] [%(name)s] [%(filename)s:%(lineno)d] [%(levelname)s] [%(message)s]",
+                datefmt="%H:%M:%S"
             )
 
             stream_handler: logging.StreamHandler = logging.StreamHandler()
@@ -92,7 +92,7 @@ class Logger(ABC):
         if account_name is None and address is None:
             info = f'[Inkochain] | {software_chain} | {self.__class__.__name__} |'
         elif account_name is not None and address is None:
-            info = f'[{account_name}] | {software_chain} | {self.__class__.__name__} |'
+            info = f'[{account_name}] | {address} | {self.__class__.__name__} |'
         else:
             info = f'[{account_name}] | {address} | {software_chain} | {self.__class__.__name__} |'
 
