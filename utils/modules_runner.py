@@ -16,7 +16,7 @@ from modules import Logger
 from modules.interfaces import BaseModuleInfo
 from utils.tools import clean_progress_file
 from utils.route_generator import get_func_by_name, RouteGenerator
-from utils.client import SoftwareException
+from utils.client import SoftwareException, CustomAsyncHTTPProvider, CustomAsyncWeb3
 from utils.networks import Ethereum
 
 
@@ -121,8 +121,8 @@ class Runner(Logger):
         } if proxy else {"verify_ssl": False, "timeout": 300}
 
         try:
-            w3 = AsyncWeb3(
-                AsyncHTTPProvider(
+            w3 = CustomAsyncWeb3(
+                CustomAsyncHTTPProvider(
                     random.choice(Ethereum.rpc),
                     request_kwargs=request_kwargs
                 )
