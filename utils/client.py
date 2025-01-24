@@ -191,7 +191,7 @@ class Client(Logger):
         )
         
     async def get_decimals(self, token_name: str = None, check_native: bool = False) -> int:
-        if check_native:
+        if check_native or token_name == "ETH":
             return 18
         contract: AsyncContract = await self.get_contract(NETWORK_TOKEN_CONTRACTS.get(self.network.name, {}).get(token_name, ""))
         return await contract.functions.decimals().call()
