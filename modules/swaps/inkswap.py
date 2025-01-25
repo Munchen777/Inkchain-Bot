@@ -1,13 +1,12 @@
 import time
 import random
 
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import *
 from modules.interfaces import *
 from settings import NETWORK_TOKEN_CONTRACTS
@@ -20,7 +19,7 @@ async def approve(
         client: Client, token_out_name: str, amount_out: int, address_contract: ChecksumAddress = None,
         spender_address: ChecksumAddress = '0xb5B494e63c3a52391E6C8E4a4D6aa1AEF369Fb6B'
     ):
-    address_contract = AsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, ""))
+    address_contract = CustomAsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, ""))
 
     contract: AsyncContract = client.w3.eth.contract(
         address=address_contract,
@@ -39,7 +38,7 @@ async def approve(
     try:
         tx_params = await client.prepare_transaction()
         transaction = await contract.functions.approve(
-            AsyncWeb3.to_checksum_address(spender_address),
+            CustomAsyncWeb3.to_checksum_address(spender_address),
             115792089237316195423570985008687907853269984665640564039457584007913129639935                           
         ).build_transaction(tx_params)
         await client.send_transaction(transaction, need_hash=True)
@@ -113,7 +112,7 @@ class SwapInkswapETHtoISWAPWorker(Logger):
             f'{self.client.name} Swap ETH to {amount_out} ISWAP on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5B494e63c3a52391E6C8E4a4D6aa1AEF369Fb6B'
         )
 
@@ -124,8 +123,8 @@ class SwapInkswapETHtoISWAPWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302")
         ]
         slippage_tolerance = 0.005 
 
@@ -177,7 +176,7 @@ class SwapInkswapETHtoSINKWorker(Logger):
             f'{self.client.name} Swap ETH to {amount_out} SINK on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -188,8 +187,8 @@ class SwapInkswapETHtoSINKWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B")
         ]
         slippage_tolerance = 0.005 
 
@@ -241,7 +240,7 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
             f'{self.client.name} Swap ETH to {amount_out} KRAKEN on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -252,8 +251,8 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.005 
 
@@ -309,7 +308,7 @@ class SwapInkswapISWAPtoETHWorker(Logger):
             f'{self.client.name} Swap {amount_out} ISWAP to ETH on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5B494e63c3a52391E6C8E4a4D6aa1AEF369Fb6B'
         )
 
@@ -320,8 +319,8 @@ class SwapInkswapISWAPtoETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -368,7 +367,7 @@ class SwapInkswapSINKtoETHWorker(Logger):
             f'{self.client.name} Swap {amount_out} SINK to ETH on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -379,8 +378,8 @@ class SwapInkswapSINKtoETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -427,7 +426,7 @@ class SwapInkswapKRAKENtoETHWorker(Logger):
             f'{self.client.name} Swap {amount_out} KRAKEN to ETH on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -438,8 +437,8 @@ class SwapInkswapKRAKENtoETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -486,7 +485,7 @@ class SwapInkswapISWAPtoSINKWorker(Logger):
             f'{self.client.name} Swap {amount_out} ISWAP to SINK on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -497,9 +496,9 @@ class SwapInkswapISWAPtoSINKWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B")
+            CustomAsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -546,7 +545,7 @@ class SwapInkswapSINKtoISWAPWorker(Logger):
             f'{self.client.name} Swap {amount_out} SINK to ISWAP on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -557,9 +556,9 @@ class SwapInkswapSINKtoISWAPWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302")
+            CustomAsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -606,7 +605,7 @@ class SwapInkswapSINKtoKRAKENWorker(Logger):
             f'{self.client.name} Swap {amount_out} SINK to KRAKEN on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -617,9 +616,9 @@ class SwapInkswapSINKtoKRAKENWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -666,7 +665,7 @@ class SwapInkswapKRAKENtoSINKWorker(Logger):
             f'{self.client.name} Swap {amount_out} KRAKEN to SINK on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -677,9 +676,9 @@ class SwapInkswapKRAKENtoSINKWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -726,7 +725,7 @@ class SwapInkswapKRAKENtoISWAPWorker(Logger):
             f'{self.client.name} Swap {amount_out} KRAKEN to ISWAP on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -737,9 +736,9 @@ class SwapInkswapKRAKENtoISWAPWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
@@ -786,7 +785,7 @@ class SwapInkswapISWAPtoKRAKENWorker(Logger):
             f'{self.client.name} Swap {amount_out} ISWAP to KRAKEN on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0xb5b494e63c3a52391e6c8e4a4d6aa1aef369fb6b'
         )
 
@@ -797,9 +796,9 @@ class SwapInkswapISWAPtoKRAKENWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.05 
         amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()

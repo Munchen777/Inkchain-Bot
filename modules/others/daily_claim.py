@@ -1,10 +1,9 @@
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import DAILY_GM
 from modules.interfaces import *
 
@@ -16,7 +15,7 @@ class ClaimDailyGMWorker(Logger):
         self.module_info: ClaimDailyGMModule = module_info
 
     async def run(self):
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0x9F500d075118272B3564ac6Ef2c70a9067Fd2d3F'
         )
 

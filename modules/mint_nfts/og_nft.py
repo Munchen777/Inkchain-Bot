@@ -1,13 +1,12 @@
 import asyncio
 
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 from curl_cffi.requests import AsyncSession
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import OG_MINT_NFT
 from modules.interfaces import *
 
@@ -68,7 +67,7 @@ class MintNFTOGWorker(Logger):
             f'{self.client.name} mint nft OG on the Ink network. Price: {usd_value} USD'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x777777EDF27Ac61671e3D5718b10bf6a8802f9f1"
         )
 
@@ -77,7 +76,7 @@ class MintNFTOGWorker(Logger):
             abi=OG_MINT_NFT
         )
 
-        erc_20z_address: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        erc_20z_address: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0xEF660b4A13Da8daF66d69602b2270e6633007927"
         )
 

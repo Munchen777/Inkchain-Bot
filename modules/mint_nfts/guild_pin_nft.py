@@ -1,7 +1,6 @@
 import time
 import asyncio
 
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
@@ -9,7 +8,7 @@ from curl_cffi.requests import AsyncSession
 from eth_account.messages import encode_defunct
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import GUILD_MINT_NFT
 from modules.interfaces import *
 
@@ -18,7 +17,7 @@ class MintNFTGuildWorker(Logger):
     def __init__(self, client: Client, module_info: MintNFTGuildModule):
         super().__init__()
         self.client: Client = client
-        self.contract_address = AsyncWeb3.to_checksum_address(
+        self.contract_address = CustomAsyncWeb3.to_checksum_address(
             "0x73d1a63bce3083be47597E2Ef0646BbFd1907f1C"
         )
 
@@ -66,7 +65,7 @@ class MintNFTGuildWorker(Logger):
             f'{self.client.name} mint nft Guild on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x73d1a63bce3083be47597E2Ef0646BbFd1907f1C"
         )
 
@@ -86,12 +85,12 @@ class MintNFTGuildWorker(Logger):
             timestamp
         ]
 
-        admin_treasury: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        admin_treasury: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x0000000000000000000000000000000000000000"
         )
         cid = "QmPHCzk4KAoSsR53WyaeXw3MWYBkQLbGCS51A1Z1y5KU4X"
 
-        message_hash = AsyncWeb3.solidity_keccak(
+        message_hash = CustomAsyncWeb3.solidity_keccak(
             [
                 "address", "uint8", "uint256", "uint256", "string", "uint256",
                 "address", "uint256", "uint256", "string", "uint256", "address"

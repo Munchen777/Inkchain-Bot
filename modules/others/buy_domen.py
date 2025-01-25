@@ -1,10 +1,9 @@
 import re
 
 from faker import Faker
-from web3 import AsyncWeb3
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from modules.interfaces import *
 from data.abi import ZNS_CONNECT
 
@@ -21,7 +20,7 @@ class BuyZNCDomenInkWorker(Logger):
             f'{self.client.name} Buy ZNC domen in the Ink network'
         )
 
-        contract_address = AsyncWeb3.to_checksum_address(
+        contract_address = CustomAsyncWeb3.to_checksum_address(
             '0xFb2Cd41a8aeC89EFBb19575C6c48d872cE97A0A5'
         )
 
@@ -36,7 +35,7 @@ class BuyZNCDomenInkWorker(Logger):
             owners = [self.client.address]
             domain_names = [name]
             expiries = [1]
-            referral = AsyncWeb3.to_checksum_address('0x0000000000000000000000000000000000000000')
+            referral = CustomAsyncWeb3.to_checksum_address('0x0000000000000000000000000000000000000000')
             credits = 0
 
             length_of_domain = len(domain_names[0])

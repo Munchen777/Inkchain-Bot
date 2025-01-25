@@ -1,13 +1,12 @@
 import time
 import random
 
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import DYOR_ABI, WRAPED_ETH_ABI, SWAP_TOKEN_ABI
 from modules.interfaces import *
 from settings import NETWORK_TOKEN_CONTRACTS
@@ -16,7 +15,7 @@ from settings import NETWORK_TOKEN_CONTRACTS
 logger: Logger = Logger().get_logger()
 
 
-address_contract_dyor_swap: ChecksumAddress = AsyncWeb3.to_checksum_address(
+address_contract_dyor_swap: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
     '0x9b17690de96fcfa80a3acaefe11d936629cd7a77'
 )
 
@@ -24,7 +23,7 @@ async def approve(
         client: Client, token_out_name: str, amount_out: int, address_contract: ChecksumAddress = None,
         spender_address: ChecksumAddress = address_contract_dyor_swap
     ):
-    address_contract = AsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, ""))
+    address_contract = CustomAsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, ""))
 
     contract: AsyncContract = client.w3.eth.contract(
         address=address_contract,
@@ -43,7 +42,7 @@ async def approve(
     try:
         tx_params = await client.prepare_transaction()
         transaction = await contract.functions.approve(
-            AsyncWeb3.to_checksum_address(spender_address),
+            CustomAsyncWeb3.to_checksum_address(spender_address),
             115792089237316195423570985008687907853269984665640564039457584007913129639935                           
         ).build_transaction(tx_params)
         await client.send_transaction(transaction, need_hash=True)
@@ -125,8 +124,8 @@ class SwapDyorETHtoUSDCWorker(Logger):
         )
 
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
         ]
         slippage_tolerance = 0.005
 
@@ -178,8 +177,8 @@ class SwapDyorETHtoKrakenWorker(Logger):
         )
 
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.005
 
@@ -231,8 +230,8 @@ class SwapDyorETHtoUSDTWorker(Logger):
         )
 
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
         ]
         slippage_tolerance = 0.005
 
@@ -278,7 +277,7 @@ class SwapDyorETHtoWETHWorker(Logger):
             f'{self.client.name} Swap {balance} ETH to WETH on the Ink network'
         )      
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0x4200000000000000000000000000000000000006'
         )
 
@@ -326,8 +325,8 @@ class SwapDyorETHtoWORMWorker(Logger):
         )
 
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
         ]
         slippage_tolerance = 0.005
 
@@ -371,7 +370,7 @@ class SwapDyorWETHtoETHWorker(Logger):
             f'{self.client.name} Swap {amount_out} WETH to ETH on the Ink network'
         )      
         
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0x4200000000000000000000000000000000000006'
         )
 
@@ -426,8 +425,8 @@ class SwapDyorUSDCtoETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -482,8 +481,8 @@ class SwapDyorUSDTtoETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -538,8 +537,8 @@ class SwapDyorWORMtoETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -594,8 +593,8 @@ class SwapDyorKRAKENtoETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -650,9 +649,9 @@ class SwapDyorKRAKENtoWORMWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
         ]
         slippage_tolerance = 0.005
 
@@ -707,9 +706,9 @@ class SwapDyorWORMtoKRAKENWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.005
 
@@ -764,9 +763,9 @@ class SwapDyorWORMtoUSDTWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
         ]
         slippage_tolerance = 0.005
 
@@ -821,9 +820,9 @@ class SwapDyorWORMtoUSDCWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xf1815bd50389c46847f0bda824ec8da914045d14")
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xf1815bd50389c46847f0bda824ec8da914045d14")
         ]
         slippage_tolerance = 0.005
 
@@ -878,8 +877,8 @@ class SwapDyorWORMtoWETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -934,8 +933,8 @@ class SwapDyorKRAKENtoWETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -990,8 +989,8 @@ class SwapDyorKRAKENtoUSDCWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
         ]
         slippage_tolerance = 0.005
 
@@ -1046,8 +1045,8 @@ class SwapDyorUSDCtoKRAKENWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.005
 
@@ -1102,9 +1101,9 @@ class SwapDyorUSDCtoWORMWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
         ]
         slippage_tolerance = 0.005
 
@@ -1159,9 +1158,9 @@ class SwapDyorUSDCtoUSDTWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
         ]
         slippage_tolerance = 0.005
 
@@ -1216,8 +1215,8 @@ class SwapDyorUSDCtoWETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -1272,8 +1271,8 @@ class SwapDyorWETHtoUSDCWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
         ]
         slippage_tolerance = 0.005
 
@@ -1328,8 +1327,8 @@ class SwapDyorWETHtoUSDTWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
         ]
         slippage_tolerance = 0.005
 
@@ -1384,8 +1383,8 @@ class SwapDyorWETHtoWORMWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
         ]
         slippage_tolerance = 0.005
 
@@ -1440,8 +1439,8 @@ class SwapDyorUSDTtoWETHWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006")
         ]
         slippage_tolerance = 0.005
 
@@ -1496,8 +1495,8 @@ class SwapDyorWETHtoKRAKENWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.005
 
@@ -1552,9 +1551,9 @@ class SwapDyorUSDTtoUSDCWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
         ]
         slippage_tolerance = 0.005
 
@@ -1608,9 +1607,9 @@ class SwapDyorWORMtoUSDCWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
         ]
         slippage_tolerance = 0.005
 
@@ -1665,9 +1664,9 @@ class SwapDyorUSDTtoWORMWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01")
         ]
         slippage_tolerance = 0.005
 
@@ -1722,9 +1721,9 @@ class SwapDyorUSDTtoKRAKENWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05")
         ]
         slippage_tolerance = 0.005
 
@@ -1779,9 +1778,9 @@ class SwapDyorKRAKENtoUSDTWorker(Logger):
 
         amount_out = int(amount_out * 10 ** decimals)
         path = [
-            AsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
-            AsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
+            CustomAsyncWeb3.to_checksum_address("0xCa5f2cCBD9C40b32657dF57c716De44237f80F05"),
+            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
+            CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
         ]
         slippage_tolerance = 0.005
 

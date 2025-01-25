@@ -1,13 +1,12 @@
 import time
 import random
 
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import DYOR_ABI, FACTORY_DYOR_ABI, SWAP_TOKEN_ABI
 from modules.interfaces import *
 from settings import NETWORK_TOKEN_CONTRACTS
@@ -15,11 +14,11 @@ from settings import NETWORK_TOKEN_CONTRACTS
 logger: Logger = Logger().get_logger()
 
 
-address_contract_dyor: ChecksumAddress = AsyncWeb3.to_checksum_address(
+address_contract_dyor: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
     '0x9b17690de96fcfa80a3acaefe11d936629cd7a77'
 )
 
-address_contract_dyor_factory: ChecksumAddress = AsyncWeb3.to_checksum_address(
+address_contract_dyor_factory: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
     '0x6c86ab200661512fDBd27Da4Bb87dF15609A2806'
 )
 
@@ -27,7 +26,7 @@ async def approve(
         client: Client, token_out_name: str, amount_out: int, address_contract: ChecksumAddress = None,
         spender_address: ChecksumAddress = address_contract_dyor
     ):
-    address_contract = AsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, ""))
+    address_contract = CustomAsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_out_name, ""))
 
     contract: AsyncContract = client.w3.eth.contract(
         address=address_contract,
@@ -46,7 +45,7 @@ async def approve(
     try:
         tx_params = await client.prepare_transaction()
         transaction = await contract.functions.approve(
-            AsyncWeb3.to_checksum_address(spender_address),
+            CustomAsyncWeb3.to_checksum_address(spender_address),
             115792089237316195423570985008687907853269984665640564039457584007913129639935                           
         ).build_transaction(tx_params)
         await client.send_transaction(transaction, need_hash=True)
@@ -91,12 +90,12 @@ async def parameter_calculation(
         address=address_contract_dyor_factory,
         abi=FACTORY_DYOR_ABI
     )
-    contract_a: ChecksumAddress = AsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_a_name, ""))
-    contract_b: ChecksumAddress = AsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_b_name, ""))
+    contract_a: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_a_name, ""))
+    contract_b: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(NETWORK_TOKEN_CONTRACTS.get(client.network.name, {}).get(token_b_name, ""))
     pair_address = await contract_factory.functions.getPair(contract_a, contract_b).call()
 
     pair_contract = client.w3.eth.contract(
-        address=AsyncWeb3.to_checksum_address(pair_address),
+        address=CustomAsyncWeb3.to_checksum_address(pair_address),
         abi=FACTORY_DYOR_ABI
     )
     reserves_a, reserves_b, _ = await pair_contract.functions.getReserves().call()
@@ -161,7 +160,7 @@ class AddLiquidityDyorETHtoUSDCWorker(Logger):
             f'{self.client.name} Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} USDC.e on the Ink network'
         )
 
-        address_token: ChecksumAddress = AsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
+        address_token: ChecksumAddress = CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
 
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor,
@@ -226,7 +225,7 @@ class AddLiquidityDyorETHtoUSDTWorker(Logger):
             f'{self.client.name} Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} USDT on the Ink network'
         )
 
-        address_token: ChecksumAddress = AsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
+        address_token: ChecksumAddress = CustomAsyncWeb3.to_checksum_address("0x0200C29006150606B650577BBE7B6248F58470c1")
 
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor,
@@ -291,7 +290,7 @@ class AddLiquidityDyorETHtoKRAKENWorker(Logger):
             f'{self.client.name} Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} KRAKEN on the Ink network'
         )
 
-        address_token: ChecksumAddress = AsyncWeb3.to_checksum_address("")
+        address_token: ChecksumAddress = CustomAsyncWeb3.to_checksum_address("")
 
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor,
@@ -356,7 +355,7 @@ class AddLiquidityDyorETHtoWORMWorker(Logger):
             f'{self.client.name} Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} WORM on the Ink network'
         )
 
-        address_token: ChecksumAddress = AsyncWeb3.to_checksum_address("")
+        address_token: ChecksumAddress = CustomAsyncWeb3.to_checksum_address("")
 
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract_dyor,

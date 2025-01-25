@@ -27,20 +27,27 @@ class CustomAsyncHTTPProvider(AsyncHTTPProvider):
     def __init__(self, endpoint_uri, *args, **kwargs):
         super().__init__(endpoint_uri, *args, **kwargs)
         self._session = None
+
     @property
-    def session(self):
-        if self._session is None:
+    async def session(self):
+        if self._session is None or self._session.closed:
             self._session = aiohttp.ClientSession()
         return self._session
 
     async def make_request(self, method, params):
-        async with self.session.post(self.endpoint_uri, json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1}) as response:
-            return await response.json()
+        async with await self.session as session:
+            async with session.post(self.endpoint_uri, json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1}) as response:
+                return await response.json()
 
     async def close(self):
-        if self._session:
+        if self._session and not self._session.closed:
             await self._session.close()
             self._session = None
+
+    def __del__(self):
+        if self._session and not self._session.closed:
+            import asyncio
+            asyncio.create_task(self.close())
 
 
 class CustomAsyncWeb3(AsyncWeb3):

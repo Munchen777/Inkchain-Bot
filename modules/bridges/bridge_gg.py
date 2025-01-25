@@ -1,10 +1,9 @@
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import BRIDGE_GG_ABI
 from modules.interfaces import BridgGGEthereumtoInkModule
 
@@ -40,7 +39,7 @@ class BridGGEthereumtoInkWorker(Logger):
             f'{self.client.name} Sending {balance} ETH via the official bridge from the Ethereum network to Ink'
         )
 
-        proxy_address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        proxy_address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             '0x88ff1e5b602916615391f55854588efcbb7663f0'
         )
 

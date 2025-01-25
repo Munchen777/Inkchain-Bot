@@ -1,10 +1,9 @@
-from web3 import AsyncWeb3
 from web3.contract import AsyncContract
 from web3.contract.async_contract import AsyncContract
 from web3.eth.async_eth import ChecksumAddress
 
 from modules import *
-from utils.client import Client
+from utils.client import Client, CustomAsyncWeb3
 from data.abi import PARAGRAF_MINT_NFT
 from modules.interfaces import *
 
@@ -19,7 +18,7 @@ class MintNFTParagrafWorker(Logger):
             f'{self.client.name} mint nft Paragraf on the Ink network'
         )
 
-        address_contract: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x69086dDd87cb58709540f784c32740a6f9a49CFF"
         )
 
@@ -28,7 +27,7 @@ class MintNFTParagrafWorker(Logger):
             abi=PARAGRAF_MINT_NFT
         )
 
-        address_mint_referrer: ChecksumAddress = AsyncWeb3.to_checksum_address(
+        address_mint_referrer: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x0000000000000000000000000000000000000000"
         )
 
