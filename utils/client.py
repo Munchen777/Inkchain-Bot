@@ -206,7 +206,7 @@ class Client(Logger):
                 token_balance = await self.w3.eth.get_balance(self.address)
                 return token_balance or None
 
-            contract: AsyncContract = await self.get_contract(NETWORK_TOKEN_CONTRACTS.get(self.network.name, {}).get(token_name, "ETH"))
+            contract: AsyncContract = await self.get_contract(NETWORK_TOKEN_CONTRACTS.get(self.network.name, {}).get(token_name, ""))
             token_balance = await contract.functions.balanceOf(self.address).call()
             return token_balance or None
 
