@@ -13,6 +13,8 @@ MODULE_TYPES = Literal[
     "deploy",
     "buy_domen"
 ]
+BRIDGE_TYPE = Literal["L1", "L2"]
+
 
 class ModuleDependency(BaseModel):
     """ Module for describing dependencies between modules """
@@ -48,6 +50,8 @@ class BaseModuleInfo(BaseModel):
         module_priority: int - приоритет модуля
         module_type: MODULE_TYPES - тип модуля
         count_of_operations: int - количество успешных действий в модуле
+        source_token: Optional[str] - токен, который мы имеем на входе
+        dest_token: Optional[str] - токен, который мы имеем на выходе
     
     """
     module_name: str = "BaseModule"
@@ -55,6 +59,8 @@ class BaseModuleInfo(BaseModel):
     module_priority: int = 0
     module_type: MODULE_TYPES = "base"
     count_of_operations: int = 0
+    source_token: Optional[str | list] = None
+    dest_token: Optional[str | list] = None
 
     required_on_first_run: bool = False
     
@@ -264,8 +270,9 @@ class SwapModuleInfo(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: Optional[str] = None
+    destination_network: Optional[str] = source_network
     module_type: str = "swap"
+    source_token: str = "ETH"
     
     dependencies: ModuleDependency = ModuleDependency(
         required_modules={
@@ -284,6 +291,7 @@ class SwapInkswapETHtoISWAPModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_iswap"
     module_display_name: str = "Swap Inkswap ETH to ISWAP"
+    dest_token: str = "ISWAP"
     
     dependencies: ModuleDependency = ModuleDependency()
 
@@ -294,6 +302,7 @@ class SwapInkswapETHtoSINKModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_sink"
     module_display_name: str = "Swap Inkswap ETH to SINK"
+    dest_token: str = "SINK"
 
 class SwapInkswapETHtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from ETH to KRAKEN """
@@ -302,6 +311,7 @@ class SwapInkswapETHtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_eth_to_kraken"
     module_display_name: str = "Swap Inkswap ETH to KRAKEN"
+    dest_token: str = "KRAKEN"
 
     dependencies: ModuleDependency = ModuleDependency()
 
@@ -312,6 +322,8 @@ class SwapInkswapISWAPtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_iswap_to_eth"
     module_display_name: str = "Swap Inkswap ISWAP to ETH"
+    source_token: str = "ISWAP"
+    dest_token: str = "ETH"
 
     dependencies: ModuleDependency = ModuleDependency()
 
@@ -322,6 +334,8 @@ class SwapInkswapSINKtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_sink_to_eth"
     module_display_name: str = "Swap Inkswap SINK to ETH"
+    source_token: str = "SINK"
+    dest_token: str = "ETH"
 
 class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ETH """
@@ -330,6 +344,8 @@ class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_kraken_to_eth"
     module_display_name: str = "Swap Inkswap KRAKEN to ETH"
+    source_token: str = "KRAKEN"
+    dest_token: str = "ETH"
 
     dependencies: ModuleDependency = ModuleDependency()
 
@@ -340,6 +356,8 @@ class SwapInkswapISWAPtoSINKModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_iswap_to_sink"
     module_display_name: str = "Swap Inkswap ISWAP to SINK"
+    source_token: str = "ISWAP"
+    dest_token: str = "SINK"
 
     dependencies: ModuleDependency = ModuleDependency()
 
@@ -350,6 +368,8 @@ class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_sink_to_iswap"
     module_display_name: str = "Swap Inkswap SINK to ISWAP"
+    source_token: str = "SINK"
+    dest_token: str = "ISWAP"
 
 class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to KRAKEN """
@@ -358,6 +378,8 @@ class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_sink_to_kraken"
     module_display_name: str = "Swap Inkswap SINK to KRAKEN"
+    source_token: str = "SINK"
+    dest_token: str = "KRAKEN"
 
 class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to SINK """
@@ -366,6 +388,8 @@ class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_kraken_to_sink"
     module_display_name: str = "Swap Inkswap KRAKEN to SINK"
+    source_token: str = "KRAKEN"
+    dest_token: str = "SINK"
 
 class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ISWAP """
@@ -373,6 +397,8 @@ class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
     module_name: str = "swap_inkswap_kraken_to_iswap"
+    source_token: str = "KRAKEN"
+    dest_token: str = "ISWAP"
     
 class SwapInkswapISWAPtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to KRAKEN """
@@ -381,6 +407,8 @@ class SwapInkswapISWAPtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_inkswap_iswap_to_kraken"
     module_display_name: str = "Swap Inkswap ISWAP to KRAKEN"
+    source_token: str = "ISWAP"
+    dest_token: str = "KRAKEN"
 
 class SwapDyorETHtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from ETH to USDC.e  """
@@ -391,6 +419,7 @@ class SwapDyorETHtoUSDCModule(SwapModuleInfo):
     module_priority: int = 1
     module_name: str = "swap_dyor_eth_to_usdc"
     module_display_name: str = "Swap Dyor ETH to USDC.e"
+    dest_token: str = "USDC"
 
 class SwapDyorETHtoKrakenModule(SwapModuleInfo):
     """ Swap Dyor module from ETH to Kraken  """
@@ -401,6 +430,7 @@ class SwapDyorETHtoKrakenModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_eth_to_kraken"
     module_display_name: str = "Swap Dyor ETH to Kraken"
+    dest_token: str = "KRAKEN"
 
 class SwapDyorETHtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from ETH to USDT  """
@@ -411,6 +441,7 @@ class SwapDyorETHtoUSDTModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_eth_to_usdt"
     module_display_name: str = "Swap Dyor ETH to USDT"
+    dest_token: str = "USDT"
 
 class SwapDyorETHtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from ETH to WETH  """
@@ -421,6 +452,7 @@ class SwapDyorETHtoWETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_eth_to_weth"
     module_display_name: str = "Swap Dyor ETH to WETH"
+    dest_token: str = "WETH"
 
 class SwapDyorETHtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from ETH to WORM  """
@@ -431,6 +463,7 @@ class SwapDyorETHtoWORMModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_eth_to_worm"
     module_display_name: str = "Swap Dyor ETH to WORM"
+    dest_token: str = "WORM"
 
 class SwapDyorWETHtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from WETH to ETH  """
@@ -439,6 +472,8 @@ class SwapDyorWETHtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_weth_to_eth"
     module_display_name: str = "Swap Dyor WETH to ETH"
+    source_token: str = "WETH"
+    dest_token: str = "ETH"
 
 class SwapDyorUSDCtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDC.e to ETH  """
@@ -447,6 +482,8 @@ class SwapDyorUSDCtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdc_to_eth"
     module_display_name: str = "Swap Dyor USDC.e to ETH"
+    source_token: str = "USDC"
+    dest_token: str = "ETH"
 
 class SwapDyorUSDTtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to ETH  """
@@ -455,6 +492,8 @@ class SwapDyorUSDTtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdt_to_eth"
     module_display_name: str = "Swap Dyor USDT to ETH"
+    source_token: str = "USDT"
+    dest_token: str = "ETH"
 
 class SwapDyorWORMtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to ETH  """
@@ -463,6 +502,8 @@ class SwapDyorWORMtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_worm_to_eth"
     module_display_name: str = "Swap Dyor WORM to ETH"
+    source_token: str = "WORM"
+    dest_token: str = "ETH"
 
 class SwapDyorKRAKENtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to ETH  """
@@ -471,6 +512,8 @@ class SwapDyorKRAKENtoETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_kraken_to_eth"
     module_display_name: str = "Swap Dyor KRAKEN to ETH"
+    source_token: str = "KRAKEN"
+    dest_token: str = "ETH"
 
 class SwapDyorKRAKENtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to WORM  """
@@ -479,6 +522,8 @@ class SwapDyorKRAKENtoWORMModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_kraken_to_worm"
     module_display_name: str = "Swap Dyor KRAKEN to WORM"
+    source_token: str = "KRAKEN"
+    dest_token: str = "WORM"
 
 class SwapDyorWORMtoKRAKENModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to KRAKEN  """
@@ -487,6 +532,8 @@ class SwapDyorWORMtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_worm_to_kraken"
     module_display_name: str = "Swap Dyor WORM to KRAKEN"
+    source_token: str = "WORM"
+    dest_token: str = "KRAKEN"
 
 class SwapDyorWORMtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to USDT  """
@@ -495,6 +542,8 @@ class SwapDyorWORMtoUSDTModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_worm_to_usdt"
     module_display_name: str = "Swap Dyor WORM to USDT"
+    source_token: str = "WORM"
+    dest_token: str = "USDT"
 
 class SwapDyorWORMtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to USDC  """
@@ -503,6 +552,8 @@ class SwapDyorWORMtoUSDCModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_worm_to_usdc"
     module_display_name: str = "Swap Dyor WORM to USDC"
+    source_token: str = "WORM"
+    dest_token: str = "USDC"
 
 class SwapDyorWORMtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to WETH  """
@@ -511,6 +562,8 @@ class SwapDyorWORMtoWETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_worm_to_weth"
     module_display_name: str = "Swap Dyor WORM to WETH"
+    source_token: str = "WORM"
+    dest_token: str = "WETH"
 
 class SwapDyorKRAKENtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to WETH  """
@@ -519,6 +572,8 @@ class SwapDyorKRAKENtoWETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_kraken_to_weth"
     module_display_name: str = "Swap Dyor KRAKEN to WETH"
+    source_token: str = "KRAKEN"
+    dest_token: str = "WETH"
 
 class SwapDyorKRAKENtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to USDC  """
@@ -527,6 +582,8 @@ class SwapDyorKRAKENtoUSDCModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_kraken_to_usdc"
     module_display_name: str = "Swap Dyor KRAKEN to USDC"
+    source_token: str = "KRAKEN"
+    dest_token: str = "USDC"
 
 class SwapDyorUSDCtoKRAKENModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to KRAKEN  """
@@ -535,6 +592,8 @@ class SwapDyorUSDCtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdc_to_kraken"
     module_display_name: str = "Swap Dyor USDC to KRAKEN"
+    source_token: str = "USDC"
+    dest_token: str = "KRAKEN"
 
 class SwapDyorUSDCtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to WORM  """
@@ -543,6 +602,8 @@ class SwapDyorUSDCtoWORMModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdc_to_worm"
     module_display_name: str = "Swap Dyor USDC to WORM"
+    source_token: str = "USDC"
+    dest_token: str = "WORM"
 
 class SwapDyorUSDCtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to USDT  """
@@ -551,6 +612,8 @@ class SwapDyorUSDCtoUSDTModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdc_to_usdt"
     module_display_name: str = "Swap Dyor USDC to USDT"
+    source_token: str = "USDC"
+    dest_token: str = "USDT"
 
 class SwapDyorUSDCtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to WETH  """
@@ -559,6 +622,8 @@ class SwapDyorUSDCtoWETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdc_to_weth"
     module_display_name: str = "Swap Dyor USDC to WETH"
+    source_token: str = "USDC"
+    dest_token: str = "WETH"
 
 class SwapDyorWETHtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from WETH to USDC  """
@@ -567,6 +632,8 @@ class SwapDyorWETHtoUSDCModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_weth_to_usdc"
     module_display_name: str = "Swap Dyor WETH to USDC"
+    source_token: str = "WETH"
+    dest_token: str = "USDC"
 
 class SwapDyorWETHtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from WETH to USDT  """
@@ -575,6 +642,8 @@ class SwapDyorWETHtoUSDTModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_weth_to_usdt"
     module_display_name: str = "Swap Dyor WETH to USDT"
+    source_token: str = "WETH"
+    dest_token: str = "USDT"
 
 class SwapDyorWETHtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from WETH to WORM  """
@@ -583,6 +652,8 @@ class SwapDyorWETHtoWORMModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_weth_to_worm"
     module_display_name: str = "Swap Dyor WETH to WORM"
+    source_token: str = "WETH"
+    dest_token: str = "WORM"
 
 class SwapDyorUSDTtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to WETH  """
@@ -591,6 +662,8 @@ class SwapDyorUSDTtoWETHModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdt_to_weth"
     module_display_name: str = "Swap Dyor USDT to WETH"
+    source_token: str = "USDT"
+    dest_token: str = "WETH"
 
 class SwapDyorWETHtoKRAKENModule(SwapModuleInfo):
     """ Swap Dyor module from WETH to KRAKEN  """
@@ -599,6 +672,8 @@ class SwapDyorWETHtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_weth_to_kraken"
     module_display_name: str = "Swap Dyor WETH to KRAKEN"
+    source_token: str = "WETH"
+    dest_token: str = "KRAKEN"
 
 class SwapDyorUSDTtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to USDC  """
@@ -607,6 +682,8 @@ class SwapDyorUSDTtoUSDCModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdt_to_usdc"
     module_display_name: str = "Swap Dyor USDT to USDC"
+    source_token: str = "USDT"
+    dest_token: str = "USDC"
 
 class SwapDyorUSDTtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to WORM  """
@@ -615,6 +692,8 @@ class SwapDyorUSDTtoWORMModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdt_to_worm"
     module_display_name: str = "Swap Dyor USDT to WORM"
+    source_token: str = "USDT"
+    dest_token: str = "WORM"
 
 class SwapDyorUSDTtoKRAKENModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to KRAKEN  """
@@ -623,6 +702,8 @@ class SwapDyorUSDTtoKRAKENModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_usdt_to_kraken"
     module_display_name: str = "Swap Dyor USDT to KRAKEN"
+    source_token: str = "USDT"
+    dest_token: str = "KRAKEN"
 
 class SwapDyorKRAKENtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to USDT  """
@@ -631,6 +712,8 @@ class SwapDyorKRAKENtoUSDTModule(SwapModuleInfo):
     module_priority: int = 2
     module_name: str = "swap_dyor_kraken_to_usdt"
     module_display_name: str = "Swap Dyor KRAKEN to USDT"
+    source_token: str = "KRAKEN"
+    dest_token: str = "USDT"
 
 
 class AddLiquidityModuleInfo(BaseModuleInfo):
@@ -654,7 +737,7 @@ class AddLiquidityModuleInfo(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: Optional[str] = None
+    destination_network: Optional[str] = source_network
     module_type: str = "add_liquidity"
 
 class AddLiquidityDyorETHtoUSDCModule(AddLiquidityModuleInfo):
@@ -664,6 +747,7 @@ class AddLiquidityDyorETHtoUSDCModule(AddLiquidityModuleInfo):
     module_priority: int = 2
     module_name: str = "add_liquidity_dyor_eth_and_usdc"
     module_display_name: str = "Add Liquidity Dyor ETH and USDC"
+    source_token: list = ["ETH", "USDC"]
 
 class AddLiquidityDyorETHtoUSDTModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and USDT  """
@@ -672,6 +756,7 @@ class AddLiquidityDyorETHtoUSDTModule(AddLiquidityModuleInfo):
     module_priority: int = 2
     module_name: str = "add_liquidity_dyor_eth_and_usdt"
     module_display_name: str = "Add Liquidity Dyor ETH and USDT"
+    source_token: list = ["ETH", "USDT"]
 
 class AddLiquidityDyorETHtoKRAKENModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and KRAKEN  """
@@ -680,6 +765,7 @@ class AddLiquidityDyorETHtoKRAKENModule(AddLiquidityModuleInfo):
     module_priority: int = 2
     module_name: str = "add_liquidity_dyor_eth_and_kraken"
     module_display_name: str = "Add Liquidity Dyor ETH and KRAKEN"
+    source_token: list = ["ETH", "KRAKEN"]
 
 class AddLiquidityDyorETHtoWORMModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and WORM  """
@@ -688,6 +774,7 @@ class AddLiquidityDyorETHtoWORMModule(AddLiquidityModuleInfo):
     module_priority: int = 2
     module_name: str = "add_liquidity_dyor_eth_and_worm"
     module_display_name: str = "Add Liquidity Dyor ETH and WORM"
+    source_token: list = ["ETH", "WORM"]
 
 
 class MintNFTModuleInfo(BaseModuleInfo):
@@ -711,7 +798,7 @@ class MintNFTModuleInfo(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: Optional[str] = None
+    destination_network: Optional[str] = source_network
     module_type: str = "mint_nft"
 
 class MintNFTParagrafModule(MintNFTModuleInfo):
@@ -760,7 +847,7 @@ class DeployContractModule(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: Optional[str] = None
+    destination_network: Optional[str] = source_network
     module_type: str = "deploy"
 
 class DeployContractInkModule(DeployContractModule):
@@ -793,7 +880,7 @@ class BuyZNCDomenModule(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: Optional[str] = None
+    destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
 
 class BuyZNCDomenInkModule(BuyZNCDomenModule):
@@ -826,7 +913,7 @@ class ClaimDailyGMModule(BaseModuleInfo):
     min_amount_out: float = 0.001
     max_amount_out: float = 0.003
     source_network: str = None
-    destination_network: Optional[str] = None
+    destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
 
 class ClaimDailyGMModule(ClaimDailyGMModule):
