@@ -3,12 +3,12 @@ import os
 import json
 import sys
 
-from collections import deque
+from collections import deque, defaultdict
 from pathlib import Path
 from pydantic import ValidationError
-from typing import Any, Dict, Deque, List, Set
+from typing import Any, Dict, Deque, List, Set, Tuple, DefaultDict
 
-from data.config import ACCOUNT_NAMES, MODULES_CLASSES
+from data.config import ACCOUNT_NAMES, MODULES_CLASSES, PRIVATE_KEYS, PROXIES
 from generall_settings import SHUFFLE_ROUTE, USE_L2_TO_DEPOSIT
 from functions import*
 from modules import Logger
@@ -18,6 +18,26 @@ from settings import *
 from utils.networks import NETWORKS
 from utils.client import SoftwareException
 from utils.tools import clean_progress_file
+
+
+def topological_sort(graph: Dict[str, list]) -> List[str] | None:
+    stack: List[str] = []
+    visited: Set[str] = set()
+
+    def dfs(module_name: str):
+        visited.add(module_name)
+
+        for neighbour in graph.get(module_name, []):
+            if neighbour not in visited:
+                dfs(neighbour)
+
+        stack.append(module_name)
+
+    for module_name in graph:
+        if module_name not in visited:
+            dfs(module_name)
+
+    return stack[::-1]
 
 
 def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo | None:
@@ -119,7 +139,6 @@ class RouteGenerator(Logger):
     async def check_first_run_modules(self, account_name: str) -> bool:
         return account_name not in self.history
 
-    @staticmethod
     # def classic_generate_route() -> List[BaseModuleInfo]:
     #     """
     #     Generate and sort list of BaseNoduleInfo by module_priority
@@ -146,25 +165,127 @@ class RouteGenerator(Logger):
 
     #     return route
 
-    def classic_generate_route() -> List[BaseModuleInfo]:
-        route = [
-            module_obj for group in CLASSIC_ROUTES_MODULES_USING
-            if (module_name := random.choice(group)) in MODULES_CLASSES
-            if (module_obj := get_func_by_name(module_name))
-        ]
+    async def classic_generate_route(self) -> List[BaseModuleInfo]:
+        from .modules_runner import Runner
+        
+        # graph: DefaultDict = defaultdict(list)
+        try:
+            # Получаем словарь с названиями и инстансами моделей
+            all_available_modules: Dict[str, BaseModuleInfo] | None = {
+                module_name: module_class()
+                for module_name, module_class in MODULES_CLASSES.items()
+            }
 
-        if not route:
-            raise SoftwareException("No valid modules found in CLASSIC_ROUTES_MODULES_USING")
+        except ValidationError as error:
+            self.logger_msg(account_name, None,
+                            f"Error while creating all available modules.\nError: {error}", "error")
+            raise error
 
-        if (swap_task := random.choice(random.choice(ROUTES_MODULES_GENERALS_SWAP))) in MODULES_CLASSES:
-            if (swap_obj := get_func_by_name(swap_task)):
-                route.append(swap_obj)
-            else:
-                raise SoftwareException(f"Module {swap_task} is invalid")
-        else:
-            raise SoftwareException(f"Invalid swap task {swap_task}")
+        try:
+            runner: Runner = Runner()
+            accounts_data: List[Tuple[str, str]] = runner.get_wallets()
 
-        # return route
+            for index, (account_name, private_key) in enumerate(accounts_data):
+                proxy: str | None = runner.get_proxy_for_account(account_name)
+                client: Client = Client(account_name, private_key, proxy)
+
+                # all_available_wallet_balances: Dict[str, Dict[str, float]] = await client.get_wallet_balance()
+                all_available_wallet_balances = {
+                    "Ethereum Mainnet": {
+                        "ETH": 0.0003,
+                    },
+                    "Ink Mainnet": {
+                        "ETH": 0.008,
+                    },
+                    "Base Mainnet": {
+                        "ETH": 0.00014,
+                    },
+                    "OP Mainnet": {
+                        "ETH": 0.00014,
+                    },
+                }
+                route: List[BaseModuleInfo] | None = deque([])
+
+                # Проходимся по модулям
+                for module_name in CLASSIC_ROUTES_MODULES_USING:
+                    # Берем текущий модуль
+                    module: BaseModuleInfo | None = all_available_modules.get(module_name)
+
+                    if not module:
+                        continue
+
+                    # Строим граф для построения зависимостей модуля по отношению к другим
+                    graph: DefaultDict[list] = defaultdict(list)
+
+                    if module.source_token:
+                        # Берем необходимые токены в сети отправления модуля
+                        required_tokens: List[str] = module.source_token if isinstance(module, list) else [module.source_token]
+
+                        # Ищем, как мы можем получить их из других модулей на выходе
+                        for token in required_tokens:
+                            for dependency_module_name, dependency_module in all_available_modules.items():
+                                if dependency_module.dest_token:
+
+                                    provided_tokens: List[str] = dependency_module.dest_token \
+                                        if isinstance(dependency_module, list) else [dependency_module.dest_token]
+
+                                    if token in provided_tokens:
+                                        graph[dependency_module.module_name].append(module.module_name)
+                        
+                        required_modules_to_execute: List[str] | None = topological_sort(graph)
+
+                        if required_modules_to_execute:
+                            for _module_name in required_modules_to_execute:
+                                dependency_module_class: BaseModuleInfo | None = all_available_modules.get(_module_name)
+                                if not dependency_module_class:
+                                    continue
+                                # Получаем названия токенов зависимых модулей
+                                required_tokens: list[str] | str = dependency_module_class.source_token \
+                                    if isinstance(dependency_module_class.source_token, list) else [dependency_module_class.source_token]
+
+                                for req_token_name in required_tokens:
+                                    # Получаем баланс токена в сети отправления
+                                    source_token_balance: float | None = all_available_wallet_balances.get(
+                                        dependency_module_class.source_network
+                                    ).get(req_token_name, 0)
+                                    # Получаем баланс токена в сети назвачения
+                                    destination_token_balance: float | None = all_available_wallet_balances.get(
+                                        dependency_module_class.source_network or dependency_module_class.destination_network
+                                    ).get(req_token_name, 0)
+                                    
+                                    
+                                    
+                                    
+                                    
+                                    
+                            
+                            
+                    
+                    
+        
+        except Exception as error:
+            pass
+                
+        
+        
+        # route = [
+        #     module_obj for group in CLASSIC_ROUTES_MODULES_USING
+        #     if (module_name := random.choice(group)) in MODULES_CLASSES
+        #     if (module_obj := get_func_by_name(module_name))
+        # ]
+
+        # if not route:
+        #     raise SoftwareException("No valid modules found in CLASSIC_ROUTES_MODULES_USING")
+
+        # if (swap_task := random.choice(random.choice(ROUTES_MODULES_GENERALS_SWAPS))) in MODULES_CLASSES:
+        #     if (swap_obj := get_func_by_name(swap_task)):
+        #         route.append(swap_obj)
+        #     else:
+        #         raise SoftwareException(f"Module {swap_task} is invalid")
+        # else:
+        #     raise SoftwareException(f"Invalid swap task {swap_task}")
+
+        # # return route
 
     @classmethod
     def create_route_from_dict(cls, route_dict: Dict[str, Any]) -> BaseModuleInfo:
@@ -406,7 +527,7 @@ class RouteGenerator(Logger):
                                                 #     source_network.name, {}
                                                 # ).setdefault(source_network.token, 0 - float(deposit_module.min_amount_out))
 
-                            elif required_module_to_execute.module_type != "bridge":
+                            elif required_module_to_execute.module_type == "swap":
                                 available_modules.append(required_module_to_execute)
                             
                             else:
@@ -423,7 +544,7 @@ class RouteGenerator(Logger):
                         if module_class.module_type == "bridge") and \
                              is_first_run:
                 self.logger_msg(client.name, client.address,
-                                f"There is no bridge modules in the route!")
+                                f"There is no bridge modules in the route!", "warning")
                 return
                 raise SoftwareException(f"There is no bridge modules in the route! Check the balance on the wallet {client.address}")
 
@@ -488,7 +609,21 @@ class RouteGenerator(Logger):
                 raise SoftwareException
 
             client: Client = Client(account_name, private_key, proxy)
-            all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()
+            # all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()
+            all_available_wallet_balances = {
+                "Ethereum Mainnet": {
+                    "ETH": 0.0003,
+                },
+                "Ink Mainnet": {
+                    "ETH": 0.008,
+                },
+                "Base Mainnet": {
+                    "ETH": 0.00014,
+                },
+                "OP Mainnet": {
+                    "ETH": 0.00014,
+                },
+            }
 
             if not all_available_wallet_balances:
                 self.logger_msg(account_name, None,
@@ -586,7 +721,7 @@ class RouteGenerator(Logger):
                             f"Error in smart_generate_route function.\nError: {error}", "error")
             raise error
 
-    def classic_routes_json_save(self):
+    async def classic_routes_json_save(self):
         clean_progress_file()
 
         accounts_data: Dict[str, Any] = {}
@@ -594,7 +729,7 @@ class RouteGenerator(Logger):
         with open(file="./data/service/wallets_progress.json", mode="a") as file:
             for account_name in ACCOUNT_NAMES:
                 if isinstance(account_name, (str, int)):
-                    classic_route: List[BaseModuleInfo] = self.classic_generate_route()
+                    classic_route: List[BaseModuleInfo] = await self.classic_generate_route()
 
                     # if SHUFFLE_ROUTE:
                     #     classic_route = self.sort_classic_route(route=classic_route)
@@ -613,3 +748,8 @@ class RouteGenerator(Logger):
         self.logger.info(
             f"Successfully generated {len(accounts_data)} classic routes into /data/services/wallets_progress.json"
         )
+
+
+async def classic_route_generate():
+    generator: RouteGenerator = RouteGenerator()
+    await generator.classic_routes_json_save()
