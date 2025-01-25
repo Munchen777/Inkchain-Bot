@@ -242,11 +242,14 @@ class Runner(Logger):
                         result_list.append(account_progress)
                         break
 
-                await route_generator.add_executed_module(account_name, current_module.module_name)
+                if route_generator:
+                    await route_generator.add_executed_module(account_name, current_module.module_name)
+
                 current_step += 1
                 message_list.append(f'{"✅" if result else "❌"}   {module_display_name}\n')
                 account_progress = (result, current_module.module_name, account_name)
                 result_list.append(account_progress)
+                await self.smart_sleep(account_name, index, accounts_delay=True)
     
             success_count = len([1 for i in result_list if i[0]])
             errors_count = len(result_list) - success_count
@@ -288,7 +291,7 @@ class Runner(Logger):
 
             accounts: List[Tuple[str, str]] = selected_wallets[start_index: end_index]
             proxies: List[str | None] = [
-                self.get_proxy_for_account(account_name) for account_name in accounts
+                self.get_proxy_for_account(account_name[0]) for account_name in accounts
             ]
 
             if smart_route:
@@ -318,8 +321,8 @@ class Runner(Logger):
                 if isinstance(result, Exception):
                     raise result
             
-            if smart_route:
-                clean_progress_file()
+            # if smart_route:
+                # clean_progress_file()
             
             self.logger_msg(None, None, f"Wallets in stream completed their tasks, launching next stream\n", "success")
 
