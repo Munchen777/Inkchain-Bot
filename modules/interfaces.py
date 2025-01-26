@@ -808,6 +808,7 @@ class MintNFTParagrafModule(MintNFTModuleInfo):
     module_priority: int = 2
     module_name: str = "mint_paragraf_nft"
     module_display_name: str = "Mint Paragraf NFT"
+    source_token: str = "ETH"
 
 class MintNFTOGModule(MintNFTModuleInfo):
     """ Mint OG NFT module  """
@@ -816,6 +817,7 @@ class MintNFTOGModule(MintNFTModuleInfo):
     module_priority: int = 2
     module_name: str = "mint_og_nft"
     module_display_name: str = "Mint OG NFT"
+    source_token: str = "ETH"
 
 class MintNFTGuildModule(MintNFTModuleInfo):
     """ Mint Guild NFT module  """
@@ -824,6 +826,7 @@ class MintNFTGuildModule(MintNFTModuleInfo):
     module_priority: int = 2
     module_name: str = "mint_guild_nft"
     module_display_name: str = "Mint Guild NFT"
+    source_token: str = "ETH"
 
 
 class DeployContractModule(BaseModuleInfo):
@@ -849,6 +852,7 @@ class DeployContractModule(BaseModuleInfo):
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "deploy"
+    source_token: str = "ETH"
 
 class DeployContractInkModule(DeployContractModule):
     """ Deployment of the contract in the Ink network """
@@ -882,6 +886,7 @@ class BuyZNCDomenModule(BaseModuleInfo):
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
+    source_token: str = "ETH"
 
 class BuyZNCDomenInkModule(BuyZNCDomenModule):
     """ Buy ZNC domen in the Ink network """
@@ -915,6 +920,7 @@ class ClaimDailyGMModule(BaseModuleInfo):
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
+    source_token: str = "ETH"
 
 class ClaimDailyGMModule(ClaimDailyGMModule):
     """ Claim Daily GM in the Ink network """

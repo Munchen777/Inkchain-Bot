@@ -4,7 +4,7 @@ import subprocess
 
 from questionary import select, Choice
 
-from utils.route_generator import RouteGenerator
+from utils.route_generator import RouteGenerator, classic_route_generate
 from utils.modules_runner import Runner
 from utils.tools import check_progress_file
 from data.config import TITLE
@@ -68,8 +68,8 @@ def main():
                 asyncio.run(runner.run(smart_route=False))
 
             elif answer == "classic_routes_gen":
-                generator = RouteGenerator()
-                are_you_sure(generator.classic_routes_json_save, gen_route=True)
+                # generator = RouteGenerator()
+                asyncio.run(classic_route_generate())
 
             elif answer == "check_proxy":
                 asyncio.run(runner.check_proxies_status())
