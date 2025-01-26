@@ -14,7 +14,7 @@ from generall_settings import (WALLETS_TO_WORK, SHUFFLE_WALLETS, SOFTWARE_MODE, 
 from modules import Logger
 from modules.interfaces import BaseModuleInfo
 from utils.tools import clean_progress_file
-from utils.route_generator import get_func_by_name, RouteGenerator
+from utils.route_generator import RouteGenerator
 from utils.client import SoftwareException, CustomAsyncHTTPProvider, CustomAsyncWeb3
 from utils.networks import Ethereum
 

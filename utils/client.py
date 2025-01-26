@@ -330,7 +330,7 @@ class Client(Logger):
                 self.logger.error(f'Error during transaction processing: {self.get_normalize_error(error)}')
                 return False
 
-    async def get_wallet_balance(self) -> Dict[str, Any]:
+    async def get_wallet_balance(self) -> Dict[str, Dict[str, float]]:
         """ Method to get all wallet balances in all networks """
         result = {}
 
