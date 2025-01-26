@@ -24,12 +24,10 @@ class SoftwareException(Exception):
     pass
 
 
-class CustomAsyncHTTPProvider(AsyncHTTPProvider, Logger):
+class CustomAsyncHTTPProvider(AsyncHTTPProvider):
     def __init__(self, endpoint_uri, *args, **kwargs):
         super().__init__(endpoint_uri, *args, **kwargs)
         self._session = None
-        self._max_retries = 3
-        self._retry_delay = 2
 
     @property
     async def session(self):
@@ -38,30 +36,24 @@ class CustomAsyncHTTPProvider(AsyncHTTPProvider, Logger):
         return self._session
 
     async def make_request(self, method, params):
-        retries = 0
-        while retries < self._max_retries:
-            try:
-                async with await self.session as session:
-                    async with session.post(
-                        self.endpoint_uri,
-                        json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
-                    ) as response:
-                        response.raise_for_status()
-                        return await response.json()
-            except (aiohttp.ClientError, OSError) as e:
-                retries += 1
-                if retries >= self._max_retries:
-                    raise RuntimeError(f"HTTP request failed after {self._max_retries} retries: {e}")
-                self.logger.error(f"HTTP request failed, retrying in {self._retry_delay} seconds: {e}")
-                await asyncio.sleep(self._retry_delay)
-                self._retry_delay *= 2
-            except Exception as e:
-                raise RuntimeError(f"Unexpected error in make_request: {e}")
+        session = await self.session
+        try:
+            async with session.post(
+                self.endpoint_uri,
+                json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
+            ) as response:
+                response.raise_for_status()
+                return await response.json()
+        except aiohttp.ClientError as e:
+            raise RuntimeError(f"HTTP request failed: {e}")
+        except Exception as e:
+            raise RuntimeError(f"Unexpected error in make_request: {e}")
 
     async def close(self):
         if self._session and not self._session.closed:
             await self._session.close()
             self._session = None
+
 
     def __del__(self):
         if self._session and not self._session.closed:
@@ -377,7 +369,10 @@ class Client(Logger):
                                     f"{token_name} token contract address not found for token in {network_name} network", "warning")
                                 continue
 
-                            contract: AsyncContract = await self.get_contract(contract_address)
+                            contract: AsyncContract = w3.eth.contract(
+                                address=CustomAsyncWeb3.to_checksum_address(contract_address), 
+                                abi=ERC20_ABI
+                            )
 
                             balance_token = await contract.functions.balanceOf(self.address).call()
                             decimals = await contract.functions.decimals().call()
