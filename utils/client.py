@@ -35,9 +35,18 @@ class CustomAsyncHTTPProvider(AsyncHTTPProvider):
         return self._session
 
     async def make_request(self, method, params):
-        async with await self.session as session:
-            async with session.post(self.endpoint_uri, json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1}) as response:
+        session = await self.session
+        try:
+            async with session.post(
+                self.endpoint_uri,
+                json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
+            ) as response:
+                response.raise_for_status()
                 return await response.json()
+        except aiohttp.ClientError as e:
+            raise RuntimeError(f"HTTP request failed: {e}")
+        except Exception as e:
+            raise RuntimeError(f"Unexpected error in make_request: {e}")
 
     async def close(self):
         if self._session and not self._session.closed:
@@ -46,7 +55,6 @@ class CustomAsyncHTTPProvider(AsyncHTTPProvider):
 
     def __del__(self):
         if self._session and not self._session.closed:
-            import asyncio
             asyncio.create_task(self.close())
 
 
