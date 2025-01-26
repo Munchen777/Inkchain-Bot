@@ -25,11 +25,10 @@ class Runner(Logger):
         if SLEEP_MODE and account_number:
             if accounts_delay:
                 duration = random.randint(*tuple(sec * account_number for sec in SLEEP_TIME_ACCOUNTS))
-
             else:
                 duration = random.randint(*SLEEP_TIME_MODULES)
 
-            self.logger_msg(account_name, None, f"💤 Sleeping for {duration:2f} seconds\n", "info")
+            self.logger_msg(account_name, None, f"Sleeping for {duration:.2f} seconds", "info")
             await asyncio.sleep(duration)
 
     @staticmethod

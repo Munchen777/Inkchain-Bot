@@ -40,7 +40,7 @@ class ModuleHistory:
         self.history: Dict[str, Set[str]] = {}
         self.load_history()
 
-    async def load_history(self):
+    def load_history(self):
         """ Download history of accounts that have been run """
         if self.file_path.exists():
             try:
@@ -120,32 +120,6 @@ class RouteGenerator(Logger):
         return account_name not in self.history
 
     @staticmethod
-    # def classic_generate_route() -> List[BaseModuleInfo]:
-    #     """
-    #     Generate and sort list of BaseNoduleInfo by module_priority
-    #     The lower priority is the first in the route list
-
-    #     """
-    #     route: List[BaseModuleInfo] = []
-
-    #     for i in CLASSIC_ROUTES_MODULES_USING:
-    #         module_name: str = random.choice(i)
-
-    #         if module_name is None or module_name not in MODULES_CLASSES:
-    #             continue
-
-    #         module_obj: BaseModuleInfo | None = get_func_by_name(module_name)
-
-    #         if module_obj:
-    #             route.append(module_obj)
-    #             continue
-
-    #         raise SoftwareException(f"There is no module with the name {module_name} in the software!")
-
-    #     # route.sort(key=lambda x: x.module_priority, reverse=True)
-
-    #     return route
-
     def classic_generate_route() -> List[BaseModuleInfo]:
         route = [
             module_obj for group in CLASSIC_ROUTES_MODULES_USING
@@ -156,15 +130,17 @@ class RouteGenerator(Logger):
         if not route:
             raise SoftwareException("No valid modules found in CLASSIC_ROUTES_MODULES_USING")
 
-        if (swap_task := random.choice(random.choice(ROUTES_MODULES_GENERALS_SWAP))) in MODULES_CLASSES:
+        if (swap_task := random.choice(random.choice(ROUTES_MODULES_GENERALS_SWAPS))) in MODULES_CLASSES:
             if (swap_obj := get_func_by_name(swap_task)):
                 route.append(swap_obj)
             else:
                 raise SoftwareException(f"Module {swap_task} is invalid")
         else:
             raise SoftwareException(f"Invalid swap task {swap_task}")
+        
+        random.shuffle(route)
 
-        # return route
+        return route
 
     @classmethod
     def create_route_from_dict(cls, route_dict: Dict[str, Any]) -> BaseModuleInfo:
