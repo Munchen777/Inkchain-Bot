@@ -101,7 +101,7 @@ class SwapDyorETHtoUSDCWorker(Logger):
                 self.logger.warning(
                     f"{self.client.name} The balance is over 1 USDC.e which is enough for the job, so I'll swap out"
                 )
-                return
+                return True
 
         result = await self.client.get_value_and_normalized_value(
             normalized_fee=self.module_info.fee,
@@ -110,7 +110,7 @@ class SwapDyorETHtoUSDCWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None: return
+        if result is None: return False
 
         value, balance = result
 

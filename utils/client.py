@@ -49,9 +49,15 @@ class CustomAsyncHTTPProvider(AsyncHTTPProvider):
             raise RuntimeError(f"Unexpected error in make_request: {e}")
 
     async def close(self):
-        if self._session and not self._session.closed:
-            await self._session.close()
-            self._session = None
+        if self._session:
+            try:
+                if not self._session.closed:
+                    await self._session.close()
+            except Exception as e:
+                raise Exception(f"Error while closing session: {e}")
+            finally:
+                self._session = None
+
 
     def __del__(self):
         if self._session and not self._session.closed:
