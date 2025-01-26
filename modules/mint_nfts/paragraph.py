@@ -14,10 +14,6 @@ class MintNFTParagrafWorker(Logger):
         self.client: Client = client
 
     async def run(self):
-        self.logger.info(
-            f'{self.client.name} mint nft Paragraf on the Ink network'
-        )
-
         address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x69086dDd87cb58709540f784c32740a6f9a49CFF"
         )
@@ -27,6 +23,18 @@ class MintNFTParagrafWorker(Logger):
             abi=PARAGRAF_MINT_NFT
         )
 
+        balance = await contract.functions.balanceOf(self.client.address).call()
+
+        if balance > 0:
+            self.logger.info(
+                f'{self.client.name} The address already has nft Paragraf on the Ink network'
+            )
+            return True
+
+        self.logger.info(
+            f'{self.client.name} mint nft Paragraf on the Ink network'
+        )
+        
         address_mint_referrer: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x0000000000000000000000000000000000000000"
         )
