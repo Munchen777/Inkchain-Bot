@@ -60,7 +60,7 @@ class ModuleHistory:
         self.history: Dict[str, Set[str]] = {}
         self.load_history()
 
-    async def load_history(self):
+    def load_history(self):
         """ Download history of accounts that have been run """
         if self.file_path.exists():
             try:
