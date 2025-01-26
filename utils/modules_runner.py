@@ -78,7 +78,7 @@ class Runner(Logger):
             self.logger_msg(account_name, None, f"Telegram | Error API: {error}", 'error')
 
     @staticmethod
-    def get_wallets_batch(account_list: tuple = None):
+    def get_wallets_batch(account_list: tuple):
         range_count = range(account_list[0], account_list[-1])
         return zip(
             [ACCOUNT_NAMES[i - 1] for i in range_count],
