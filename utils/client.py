@@ -2,7 +2,8 @@ import asyncio
 import random
 import aiohttp
 
-from typing import Any, Dict
+from typing import Any, Dict, List
+from web3.eth.async_eth import ChecksumAddress
 from web3.contract import AsyncContract
 from web3.exceptions import TransactionNotFound
 from web3 import AsyncHTTPProvider, AsyncWeb3
@@ -11,7 +12,7 @@ from .networks import NETWORKS
 from utils.networks import *
 from modules import Logger
 from data.abi import ERC20_ABI
-from settings import NETWORK_TOKEN_CONTRACTS
+from settings import NETWORK_TOKEN_CONTRACTS, UNISWAP_V2_ROUTER_CONTRACT_ADDRESS
 from generall_settings import RANDOM_RANGE, ROUNDING_LEVELS
 
 
@@ -330,36 +331,72 @@ class Client(Logger):
                 self.logger.error(f'Error during transaction processing: {self.get_normalize_error(error)}')
                 return False
 
-    async def get_wallet_balance(self) -> Dict[str, Dict[str, float]]:
+    async def get_wallet_balance(self, balance_in_eth: bool = False) -> Dict[str, Dict[str, float]]:
         """ Method to get all wallet balances in all networks """
-        result = {}
+        wallet_balances: Dict[str, Dict[str, float]] = {}
 
-        for network in NETWORKS.values():
-            provider = CustomAsyncHTTPProvider(random.choice(network.rpc), request_kwargs=self.request_kwargs)
-            async with CustomAsyncWeb3(provider) as w3:
+        for network_name, network in NETWORKS.items():
+            try:
+                provider = CustomAsyncHTTPProvider(random.choice(network.rpc), request_kwargs=self.request_kwargs)
 
-                balance_eth_wei = await w3.eth.get_balance(self.address)
-                balance_eth = balance_eth_wei / (10 ** 18)
-                network_balances = {"ETH": balance_eth}
+                async with CustomAsyncWeb3(provider) as w3:
+                    network_token_contracts: Dict[str, str] | None = NETWORK_TOKEN_CONTRACTS.get(network_name)
 
-                for network_name, tokens in NETWORK_TOKEN_CONTRACTS.items():
-                    if network_name == network.name:
-                        for token_name, contract_address in tokens.items():
-                            if not contract_address: continue
-                            
-                            contract = w3.eth.contract(
-                                address=CustomAsyncWeb3.to_checksum_address(contract_address), 
-                                abi=ERC20_ABI
-                            )
-                            
-                            try:
-                                balance_token = await contract.functions.balanceOf(self.address).call()
-                                decimals = await contract.functions.decimals().call()
-                                balance_token_readable = balance_token / (10 ** decimals)
-                                network_balances[token_name] = balance_token_readable
-                            except Exception as error:
-                                self.logger.error(f"Error while getting the balance of token {token_name} in network {network.name}: {error}")
-                
-                result[network.name] = network_balances
+                    if not network_token_contracts:
+                        token_name: str = "ETH"
+                        native_token_balance: float | None = await w3.eth.get_balance(self.address)
 
-        return result
+                        if not native_token_balance:
+                            self.logger_msg(self.name, self.address,
+                                            f"Native balance {token_name} not found in {network_name} network.", "warning")
+                            continue
+
+                        wallet_balances.setdefault(network_name, {})[token_name] = native_token_balance / (10**18)
+
+                    if network_token_contracts:
+                        for token_name, contract_address in network_token_contracts.items():
+                            if not contract_address:
+                                self.logger_msg(self.name, self.address,
+                                    f"{token_name} token contract address not found for token in {network_name} network", "warning")
+                                continue
+
+                            contract: AsyncContract = await self.get_contract(contract_address)
+
+                            balance_token = await contract.functions.balanceOf(self.address).call()
+                            decimals = await contract.functions.decimals().call()
+                            balance_token_readable: float = balance_token / (10 ** decimals)
+
+                            if balance_in_eth:
+                                uniswap_v2_router: AsyncContract = w3.eth.contract(
+                                    address=AsyncWeb3.to_checksum_address(UNISWAP_V2_ROUTER_CONTRACT_ADDRESS),
+                                    abi=ERC20_ABI,
+                                )
+                                path: List[ChecksumAddress] = [
+                                    AsyncWeb3.to_checksum_address(
+                                        contract_address
+                                    ),
+                                    AsyncWeb3.to_checksum_address(
+                                        network_token_contracts.get("WETH") or network_token_contracts.get("ETH")
+                                    ),
+                                ]
+                                try:
+                                    src_token_amount, amountOut = uniswap_v2_router.functions.getAmountsOut(
+                                        balance_token, path
+                                    ).call()
+
+                                except Exception as error:
+                                    self.logger_msg(self.name, self.address,
+                                                    f"Occured an error while getting {token_name} balance it ether\nError: {error}", "warning")
+                                    continue
+
+                                wallet_balances.setdefault(network_name, {})[token_name] = amountOut
+
+                            else:
+                                wallet_balances.setdefault(network_name, {})[token_name] = balance_token_readable
+
+            except Exception as error:
+                self.logger_msg(self.name, self.address,
+                                f"Error while making request to find token balances for {self.name} account", "error")
+                raise error
+
+        return wallet_balances
