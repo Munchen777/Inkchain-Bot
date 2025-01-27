@@ -104,7 +104,7 @@ class SwapInkswapETHtoISWAPWorker(Logger):
             min_available_balance_token=35.0, min_clearance=15.0, from_eth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -138,7 +138,7 @@ class SwapInkswapETHtoISWAPWorker(Logger):
             self.logger.warning(
                 f'{self.client.name} Skip the swap ETH to ISWAP on the Ink network. Insufficient ETH'
             )
-            return
+            return False
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)
@@ -153,6 +153,7 @@ class SwapInkswapETHtoISWAPWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to ISWAP on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapETHtoSINKWorker(Logger):
@@ -168,7 +169,7 @@ class SwapInkswapETHtoSINKWorker(Logger):
             min_available_balance_token=5000.0, min_clearance=750.0, from_eth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -202,7 +203,7 @@ class SwapInkswapETHtoSINKWorker(Logger):
             self.logger.warning(
                 f'{self.client.name} Skip the swap ETH to SINK on the Ink network. Insufficient ETH'
             )
-            return
+            return False
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)
@@ -217,6 +218,7 @@ class SwapInkswapETHtoSINKWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to SINK on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapETHtoKRAKENWorker(Logger):
@@ -232,7 +234,7 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
             min_available_balance_token=100_000.0, min_clearance=20_000.0, from_eth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -266,7 +268,7 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
             self.logger.warning(
                 f'{self.client.name} Skip the swap ETH to KRAKEN on the Ink network. Insufficient ETH'
             )
-            return
+            return False
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)
@@ -281,7 +283,8 @@ class SwapInkswapETHtoKRAKENWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to KRAKEN on the Ink network. Error: {error}'
             )
-
+            return False
+        
 
 class SwapInkswapISWAPtoETHWorker(Logger):
     def __init__(self, client: Client, module_info: SwapInkswapISWAPtoETHModule):
@@ -296,7 +299,7 @@ class SwapInkswapISWAPtoETHWorker(Logger):
             min_available_balance_token=35.0, min_clearance=15.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -340,6 +343,7 @@ class SwapInkswapISWAPtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ISWAP to ETH on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapSINKtoETHWorker(Logger):
@@ -355,7 +359,7 @@ class SwapInkswapSINKtoETHWorker(Logger):
             min_available_balance_token=5000.0, min_clearance=750.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -399,6 +403,7 @@ class SwapInkswapSINKtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap SINK to ETH on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapKRAKENtoETHWorker(Logger):
@@ -414,7 +419,7 @@ class SwapInkswapKRAKENtoETHWorker(Logger):
             min_available_balance_token=100_000.0, min_clearance=20_000.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -458,6 +463,7 @@ class SwapInkswapKRAKENtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to ETH on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapISWAPtoSINKWorker(Logger):
@@ -473,7 +479,7 @@ class SwapInkswapISWAPtoSINKWorker(Logger):
             min_available_balance_token=25.0, min_clearance=10.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
         
@@ -518,6 +524,7 @@ class SwapInkswapISWAPtoSINKWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ISWAP to SINK on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapSINKtoISWAPWorker(Logger):
@@ -533,7 +540,7 @@ class SwapInkswapSINKtoISWAPWorker(Logger):
             min_available_balance_token=5000.0, min_clearance=750.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
         
@@ -578,6 +585,7 @@ class SwapInkswapSINKtoISWAPWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap SINK to ISWAP on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapSINKtoKRAKENWorker(Logger):
@@ -593,7 +601,7 @@ class SwapInkswapSINKtoKRAKENWorker(Logger):
             min_available_balance_token=5000.0, min_clearance=750.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
         
@@ -638,6 +646,7 @@ class SwapInkswapSINKtoKRAKENWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap SINK to KRAKEN on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapKRAKENtoSINKWorker(Logger):
@@ -653,7 +662,7 @@ class SwapInkswapKRAKENtoSINKWorker(Logger):
             min_available_balance_token=50_000.0, min_clearance=10_000.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
         
@@ -698,6 +707,7 @@ class SwapInkswapKRAKENtoSINKWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to SINK on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapKRAKENtoISWAPWorker(Logger):
@@ -713,7 +723,7 @@ class SwapInkswapKRAKENtoISWAPWorker(Logger):
             min_available_balance_token=100_000.0, min_clearance=20_000.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
         
@@ -758,6 +768,7 @@ class SwapInkswapKRAKENtoISWAPWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to ISWAP on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapInkswapISWAPtoKRAKENWorker(Logger):
@@ -773,7 +784,7 @@ class SwapInkswapISWAPtoKRAKENWorker(Logger):
             min_available_balance_token=35.0, min_clearance=15.0, from_eth=False
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
         
@@ -818,3 +829,4 @@ class SwapInkswapISWAPtoKRAKENWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ISWAP to KRAKEN on the Ink network. Error: {error}'
             )
+            return False

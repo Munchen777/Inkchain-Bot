@@ -1,3 +1,5 @@
+from curl_cffi.requests import AsyncSession
+
 from modules import *
 from utils.client import Client
 from modules.interfaces import *
@@ -8,7 +10,51 @@ class DeployContractInkWorker(Logger):
         super().__init__()
         self.client: Client = client
 
+    async def get_availability_contract(self):
+        headers = {
+            'accept': '*/*',
+            'referer': f'https://explorer.inkonchain.com/address/{self.client.address}',
+            'user-agent': self.client.get_user_agent(),
+        }
+
+        try:
+            async with AsyncSession() as session:
+                response = await session.get(
+                    f'https://explorer.inkonchain.com/api/v2/addresses/{self.client.address}/transactions',
+                    headers=headers,
+                    proxy=self.client.proxy_init,
+                )
+
+                if response.status_code == 200:
+                    transactions = response.json()
+
+                    for tx in transactions['items']:
+                        if ('transaction_types' in tx and 
+                            'contract_creation' in tx['transaction_types'] and 
+                            tx.get('status') == 'ok'):
+                            return True
+                    
+                    return False
+                
+                elif response.status_code == 404:
+                    return False
+                    
+                else:
+                    self.logger.error(f"{self.client.name} Request failed with status code: {response.status_code}")
+                    return False
+
+        except Exception as error:
+            self.logger.error(f'{self.client.name} Failed request:  {error}')
+            return False
+
     async def run(self):
+        availability_contract = await self.get_availability_contract()
+        if availability_contract:
+            self.logger.info(
+                f'{self.client.name} Deployment of the contract on the Ink network has previously been accomplished'
+            )
+            return True
+
         self.logger.info(
             f'{self.client.name} Deployment of the contract in the Ink network'
         )

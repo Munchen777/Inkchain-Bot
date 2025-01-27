@@ -5,7 +5,7 @@ Handle installation of classic route.
 You can specify modules that will be used in the classic route.
 
 CLASSIC_ROUTES_MODULES_USING = [
-    ***Bridges from L2 to L2***                                             Brief description of the modules
+    *** Bridges from L2 to L2 ***                                             Brief description of the modules
 
     ["bridge_owlto_op_to_ink"]                          Bridge on the website Owlto from the Optimism Network to the Ink network
     ["bridge_owlto_base_to_ink"]                        Bridge on the website Owlto from the Base Network to the Ink network
@@ -16,7 +16,7 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["bridge_relay_ink_to_op"]                          Bridge on the website Relay from the Ink Network to the Optimism network
     ["bridge_relay_ink_to_base"]                        Bridge on the website Relay from the Ink Network to the Base network
     
-    ***Bridges from L1 to L2***
+    *** Bridges from L1 to L2 ***
 
     ["bridge_gg_ethereum_to_ink"]                       Bridge on the website BridGG from the Ethereum Network to the Ink network
 
@@ -80,6 +80,8 @@ CLASSIC_ROUTES_MODULES_USING = [
     ["mint_paragraf_nft"]                               Mint nft "Paragraf" on the Ink network
     ["mint_og_nft"]                                     Mint nft "OG" on the Ink network
     ["mint_guild_nft"]                                  Mint nft "Guild Pin" on the Ink network    
+
+    *** Other tasks ***
 
     ["deploy_contract_ink_network"]                     Deploy contract on the Ink network
 

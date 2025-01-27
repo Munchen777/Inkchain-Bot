@@ -1,6 +1,7 @@
 import re
 
 from faker import Faker
+from curl_cffi.requests import AsyncSession
 
 from modules import *
 from utils.client import Client, CustomAsyncWeb3
@@ -15,7 +16,47 @@ class BuyZNCDomenInkWorker(Logger):
         super().__init__()
         self.client: Client = client
 
+    async def get_availability_domen(self):
+        headers = {
+            'accept': '*/*',
+            'referer': f'https://explorer.inkonchain.com/address/{self.client.address}',
+            'user-agent': self.client.get_user_agent(),
+        }
+
+        try:
+            async with AsyncSession() as session:
+                response = await session.get(
+                    f'https://explorer.inkonchain.com/api/v2/addresses/{self.client.address}/transactions',
+                    headers=headers,
+                    proxy=self.client.proxy_init,
+                )
+
+                if response.status_code == 200:
+                    transactions = response.json()
+
+                    for tx in transactions['items']:
+                        if (tx.get('status') == 'ok' and 
+                            tx.get('method') == 'registerDomains'):
+                            return True
+                    
+                    return False
+                    
+                else:
+                    self.logger.error(f"{self.client.name} Request failed with status code: {response.status_code}")
+                    return False
+
+        except Exception as error:
+            self.logger.error(f'{self.client.name} Failed request:  {error}')
+            return False
+
     async def run(self):
+        availability_contract = await self.get_availability_domen()
+        if availability_contract:
+            self.logger.info(
+                f'{self.client.name} ZNC domen on the Ink network has previously been acquired'
+            )
+            return True
+        
         self.logger.info(
             f'{self.client.name} Buy ZNC domen in the Ink network'
         )
@@ -29,8 +70,11 @@ class BuyZNCDomenInkWorker(Logger):
         )
 
         while True:
-            domain_name = faker.domain_name()
-            name = re.split(r'\.', domain_name)[0]
+            while True:
+                domain_name = faker.domain_name()
+                name = re.split(r'\.', domain_name)[0]
+                if len(name) > 5:
+                    break
 
             owners = [self.client.address]
             domain_names = [name]
@@ -54,10 +98,10 @@ class BuyZNCDomenInkWorker(Logger):
                 return await self.client.send_transaction(transaction, need_hash=True)
             except Exception as error:
                 if '0x3a81d6fc' in str(error):
-                        logger.warning(f"Domain {domain_names} already registered, skipping...")
-                        continue
+                    self.logger.warning(f"Domain {domain_names} already registered, skipping...")
+                    continue
                 else:
                     self.logger.error(  
                         f'{self.client.name} Buy ZNC domen. Error: {error} '
                     )
-            return
+                    return False

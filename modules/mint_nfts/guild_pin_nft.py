@@ -61,10 +61,6 @@ class MintNFTGuildWorker(Logger):
 
 
     async def run(self):
-        self.logger.info(
-            f'{self.client.name} mint nft Guild on the Ink network'
-        )
-
         address_contract: ChecksumAddress = CustomAsyncWeb3.to_checksum_address(
             "0x73d1a63bce3083be47597E2Ef0646BbFd1907f1C"
         )
@@ -72,6 +68,18 @@ class MintNFTGuildWorker(Logger):
         contract: AsyncContract = self.client.w3.eth.contract(
             address=address_contract,
             abi=GUILD_MINT_NFT
+        )
+
+        balance = await contract.functions.balanceOf(self.client.address).call()
+
+        if balance > 0:
+            self.logger.info(
+                f'{self.client.name} The address already has nft Guild Pin on the Ink network'
+            )
+            return True
+
+        self.logger.info(
+            f'{self.client.name} mint nft Guild on the Ink network'
         )
 
         user_id = await self.get_user_id()
@@ -128,7 +136,9 @@ class MintNFTGuildWorker(Logger):
                 self.logger.info(
                     f'{self.client.name} The NFT has already claimed before'
                 )
+                return True
             else:
                 self.logger.error(
                     f'{self.client.name} Failed the mint nft Guild on the Ink network. Error: {error}'
                 )
+                return False

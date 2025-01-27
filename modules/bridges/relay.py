@@ -74,8 +74,7 @@ class BridgeRelayOPtoInkWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None:
-            return
+        if result is None: return False
 
         value, balance = result
 
@@ -85,7 +84,7 @@ class BridgeRelayOPtoInkWorker(Logger):
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
 
-        if tx_data is None: return
+        if tx_data is None: return False
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)
@@ -98,6 +97,7 @@ class BridgeRelayOPtoInkWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the OP network to Ink. Error: {error} '
             )
+            return False
 
 
 class BridgeRelayBasetoInkWorker(Logger):
@@ -122,8 +122,7 @@ class BridgeRelayBasetoInkWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None:
-            return
+        if result is None: return False
 
         value, balance = result
 
@@ -133,7 +132,7 @@ class BridgeRelayBasetoInkWorker(Logger):
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
 
-        if tx_data is None: return
+        if tx_data is None: return False
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)
@@ -147,6 +146,7 @@ class BridgeRelayBasetoInkWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink. Error: {error} '
             )
+            return False
 
 
 class BridgeRelayInktoOPWorker(Logger):
@@ -171,8 +171,7 @@ class BridgeRelayInktoOPWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None:
-            return
+        if result is None: return False
 
         value, balance = result
 
@@ -182,7 +181,7 @@ class BridgeRelayInktoOPWorker(Logger):
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
 
-        if tx_data is None: return
+        if tx_data is None: return False
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)
@@ -196,7 +195,8 @@ class BridgeRelayInktoOPWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP. Error: {error} '
             )
-
+            return False
+        
 
 class BridgeRelayInktoBaseWorker(Logger):
     def __init__(self, client: Client, module_info: BridgeRelayInktoBaseModule):
@@ -220,8 +220,7 @@ class BridgeRelayInktoBaseWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None:
-            return
+        if result is None: return False
 
         value, balance = result
 
@@ -231,7 +230,7 @@ class BridgeRelayInktoBaseWorker(Logger):
 
         tx_data = await get_data(client=self.client, value=value, module_info=self.module_info)
 
-        if tx_data is None: return
+        if tx_data is None: return False
 
         try:
             tx_params = await self.client.prepare_transaction(value=value)
@@ -245,3 +244,4 @@ class BridgeRelayInktoBaseWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to Base. Error: {error} '
             )
+            return False

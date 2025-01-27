@@ -146,6 +146,7 @@ class SwapDyorETHtoUSDCWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to USDC.e on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorETHtoKrakenWorker(Logger):
@@ -163,7 +164,7 @@ class SwapDyorETHtoKrakenWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None: return
+        if result is None: return False
 
         value, balance = result
 
@@ -199,6 +200,7 @@ class SwapDyorETHtoKrakenWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to Kraken on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorETHtoUSDTWorker(Logger):
@@ -216,7 +218,7 @@ class SwapDyorETHtoUSDTWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None: return
+        if result is None: return False
 
         value, balance = result
 
@@ -250,8 +252,9 @@ class SwapDyorETHtoUSDTWorker(Logger):
             return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap ETH to USDT on the Ink network. Error: {error} '
+                f'{self.client.name} Failed the swap ETH to USDT on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapDyorETHtoWETHWorker(Logger):
@@ -269,7 +272,7 @@ class SwapDyorETHtoWETHWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None: return
+        if result is None: return False
 
         value, balance = result
 
@@ -294,6 +297,7 @@ class SwapDyorETHtoWETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to WETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorETHtoWORMWorker(Logger):
@@ -311,7 +315,7 @@ class SwapDyorETHtoWORMWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None: return
+        if result is None: return False
 
         value, balance = result
 
@@ -347,6 +351,7 @@ class SwapDyorETHtoWORMWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap ETH to WORM on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWETHtoETHWorker(Logger):
@@ -362,7 +367,7 @@ class SwapDyorWETHtoETHWorker(Logger):
             min_available_balance_out_token=0.0003, min_clearance=0.00001, from_weth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -391,6 +396,7 @@ class SwapDyorWETHtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to ETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorUSDCtoETHWorker(Logger):
@@ -406,7 +412,7 @@ class SwapDyorUSDCtoETHWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -447,6 +453,7 @@ class SwapDyorUSDCtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC.e to ETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorUSDTtoETHWorker(Logger):
@@ -462,7 +469,7 @@ class SwapDyorUSDTtoETHWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -503,6 +510,7 @@ class SwapDyorUSDTtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap USDT to ETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWORMtoETHWorker(Logger):
@@ -518,7 +526,7 @@ class SwapDyorWORMtoETHWorker(Logger):
             min_available_balance_out_token=350_000.0, min_clearance=100_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -559,6 +567,7 @@ class SwapDyorWORMtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to ETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorKRAKENtoETHWorker(Logger):
@@ -574,7 +583,7 @@ class SwapDyorKRAKENtoETHWorker(Logger):
             min_available_balance_out_token=100_000.0, min_clearance=20_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -615,6 +624,7 @@ class SwapDyorKRAKENtoETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to ETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorKRAKENtoWORMWorker(Logger):
@@ -630,7 +640,7 @@ class SwapDyorKRAKENtoWORMWorker(Logger):
             min_available_balance_out_token=100_000.0, min_clearance=20_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -672,6 +682,7 @@ class SwapDyorKRAKENtoWORMWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to WORM on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWORMtoKRAKENWorker(Logger):
@@ -687,7 +698,7 @@ class SwapDyorWORMtoKRAKENWorker(Logger):
             min_available_balance_out_token=350_000.0, min_clearance=100_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -729,6 +740,7 @@ class SwapDyorWORMtoKRAKENWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to KRAKEN on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWORMtoUSDTWorker(Logger):
@@ -744,7 +756,7 @@ class SwapDyorWORMtoUSDTWorker(Logger):
             min_available_balance_out_token=350_000.0, min_clearance=100_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -786,6 +798,7 @@ class SwapDyorWORMtoUSDTWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to USDT on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWORMtoUSDCWorker(Logger):
@@ -801,7 +814,7 @@ class SwapDyorWORMtoUSDCWorker(Logger):
             min_available_balance_out_token=350_000.0, min_clearance=100_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -843,6 +856,7 @@ class SwapDyorWORMtoUSDCWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to USDC on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWORMtoWETHWorker(Logger):
@@ -858,7 +872,7 @@ class SwapDyorWORMtoWETHWorker(Logger):
             min_available_balance_out_token=350_000.0, min_clearance=100_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -899,6 +913,7 @@ class SwapDyorWORMtoWETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WORM to WETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorKRAKENtoWETHWorker(Logger):
@@ -914,7 +929,7 @@ class SwapDyorKRAKENtoWETHWorker(Logger):
             min_available_balance_out_token=100_000.0, min_clearance=20_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -955,6 +970,7 @@ class SwapDyorKRAKENtoWETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to WETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorKRAKENtoUSDCWorker(Logger):
@@ -970,7 +986,7 @@ class SwapDyorKRAKENtoUSDCWorker(Logger):
             min_available_balance_out_token=100_000.0, min_clearance=20_000.0
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1011,6 +1027,7 @@ class SwapDyorKRAKENtoUSDCWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap KRAKEN to USDC on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorUSDCtoKRAKENWorker(Logger):
@@ -1026,7 +1043,7 @@ class SwapDyorUSDCtoKRAKENWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1067,6 +1084,7 @@ class SwapDyorUSDCtoKRAKENWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to KRAKEN on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorUSDCtoWORMWorker(Logger):
@@ -1082,7 +1100,7 @@ class SwapDyorUSDCtoWORMWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1124,6 +1142,7 @@ class SwapDyorUSDCtoWORMWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to WORM on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorUSDCtoUSDTWorker(Logger):
@@ -1139,7 +1158,7 @@ class SwapDyorUSDCtoUSDTWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1181,6 +1200,7 @@ class SwapDyorUSDCtoUSDTWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to USDT on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorUSDCtoWETHWorker(Logger):
@@ -1196,7 +1216,7 @@ class SwapDyorUSDCtoWETHWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1237,6 +1257,7 @@ class SwapDyorUSDCtoWETHWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap USDC to WETH on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWETHtoUSDCWorker(Logger):
@@ -1252,7 +1273,7 @@ class SwapDyorWETHtoUSDCWorker(Logger):
             min_available_balance_out_token=0.0003, min_clearance=0.00001, from_weth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1293,6 +1314,7 @@ class SwapDyorWETHtoUSDCWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to USDC on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWETHtoUSDTWorker(Logger):
@@ -1308,7 +1330,7 @@ class SwapDyorWETHtoUSDTWorker(Logger):
             min_available_balance_out_token=0.0003, min_clearance=0.00001, from_weth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1349,6 +1371,7 @@ class SwapDyorWETHtoUSDTWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to USDT on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorWETHtoWORMWorker(Logger):
@@ -1364,7 +1387,7 @@ class SwapDyorWETHtoWORMWorker(Logger):
             min_available_balance_out_token=0.0003, min_clearance=0.00001, from_weth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1405,6 +1428,7 @@ class SwapDyorWETHtoWORMWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap WETH to WORM on the Ink network. Error: {error} '
             )
+            return False
 
 
 class SwapDyorUSDTtoWETHWorker(Logger):
@@ -1420,7 +1444,7 @@ class SwapDyorUSDTtoWETHWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1459,8 +1483,9 @@ class SwapDyorUSDTtoWETHWorker(Logger):
             return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap USDT to WETH on the Ink network. Error: {error} '
+                f'{self.client.name} Failed the swap USDT to WETH on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapDyorWETHtoKRAKENWorker(Logger):
@@ -1476,7 +1501,7 @@ class SwapDyorWETHtoKRAKENWorker(Logger):
             min_available_balance_out_token=0.0003, min_clearance=0.00001, from_weth=True
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1515,8 +1540,9 @@ class SwapDyorWETHtoKRAKENWorker(Logger):
             return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap WETH to KRAKEN on the Ink network. Error: {error} '
+                f'{self.client.name} Failed the swap WETH to KRAKEN on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapDyorUSDTtoUSDCWorker(Logger):
@@ -1532,7 +1558,7 @@ class SwapDyorUSDTtoUSDCWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1574,62 +1600,7 @@ class SwapDyorUSDTtoUSDCWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the swap USDT to USDC on the Ink network. Error: {error} '
             )
-
-
-class SwapDyorWORMtoUSDCWorker(Logger):
-    def __init__(self, client: Client, module_info: SwapDyorWORMtoUSDCModule):
-        super().__init__()
-        self.client: Client = client
-        self.deadline = int(time.time()) + 20 * 60
-
-    async def run(self):            
-        result = await canculate_amount_out_swaps(
-            client=self.client, token_out_name='WORM', token_get_name='USDC',
-            min_available_balance_out_token=350_000.0, min_clearance=100_000.0
-        )
-        
-        if result is None: return
-
-        amount_out, decimals = result
-
-        await approve(
-            client=self.client, token_out_name='WORM', amount_out=int(amount_out * 10 ** decimals)
-        )
-
-        self.logger.info(
-            f'{self.client.name} Swap {amount_out} WORM to USDC on the Ink network'
-        )
-        
-        contract: AsyncContract = self.client.w3.eth.contract(
-            address=address_contract_dyor_swap,
-            abi=DYOR_ABI
-        )
-
-        amount_out = int(amount_out * 10 ** decimals)
-        path = [
-            CustomAsyncWeb3.to_checksum_address("0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"),
-            CustomAsyncWeb3.to_checksum_address("0x4200000000000000000000000000000000000006"),
-            CustomAsyncWeb3.to_checksum_address("0xF1815bd50389c46847f0Bda824eC8da914045D14")
-        ]
-        slippage_tolerance = 0.005
-
-        amounts_in = await contract.functions.getAmountsOut(amount_out, path).call()
-        amount_out_min = int(amounts_in[-1] * (1 - slippage_tolerance))
-        
-        try:
-            tx_params = await self.client.prepare_transaction()
-            transaction = await contract.functions.swapExactTokensForTokensSupportingFeeOnTransferTokens(
-                amount_out,
-                amount_out_min,
-                path,
-                self.client.address,
-                self.deadline
-            ).build_transaction(tx_params)
-            return await self.client.send_transaction(transaction, need_hash=True)
-        except Exception as error:
-            self.logger.error(
-                f'{self.client.name} Failed the swap WORM to USDC on the Ink network. Error: {error} '
-            )
+            return False
 
 
 class SwapDyorUSDTtoWORMWorker(Logger):
@@ -1645,7 +1616,7 @@ class SwapDyorUSDTtoWORMWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1685,8 +1656,9 @@ class SwapDyorUSDTtoWORMWorker(Logger):
             return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap USDT to WORM on the Ink network. Error: {error} '
+                f'{self.client.name} Failed the swap USDT to WORM on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapDyorUSDTtoKRAKENWorker(Logger):
@@ -1702,7 +1674,7 @@ class SwapDyorUSDTtoKRAKENWorker(Logger):
             min_available_balance_out_token=1.0, min_clearance=0.5
         )
         
-        if result is None: return
+        if result is None: return False
 
         amount_out, decimals = result
 
@@ -1742,8 +1714,9 @@ class SwapDyorUSDTtoKRAKENWorker(Logger):
             return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap USDT to KRAKEN on the Ink network. Error: {error} '
+                f'{self.client.name} Failed the swap USDT to KRAKEN on the Ink network. Error: {error}'
             )
+            return False
 
 
 class SwapDyorKRAKENtoUSDTWorker(Logger):
@@ -1799,5 +1772,5 @@ class SwapDyorKRAKENtoUSDTWorker(Logger):
             return await self.client.send_transaction(transaction, need_hash=True)
         except Exception as error:
             self.logger.error(
-                f'{self.client.name} Failed the swap KRAKEN to USDT on the Ink network. Error: {error} '
+                f'{self.client.name} Failed the swap KRAKEN to USDT on the Ink network. Error: {error}'
             )

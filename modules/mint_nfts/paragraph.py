@@ -50,3 +50,4 @@ class MintNFTParagrafWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the mint nft Paragraf on the Ink network. Error: {error} '
             )
+            return False

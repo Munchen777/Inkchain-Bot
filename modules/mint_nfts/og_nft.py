@@ -16,6 +16,50 @@ class MintNFTOGWorker(Logger):
         super().__init__()
         self.client: Client = client
 
+    async def get_balance_nft(self):
+        headers = {
+            'accept': '*/*',
+            'referer': 'https://zora.co/collect/oeth:0x5d1e1a5cdd95f68ff18d78242c252f6ceaa4538b/2',
+            'user-agent': self.client.get_user_agent(),
+        }
+
+        params = {
+            'user': self.client.address,
+            'tokenId': '2',
+        }
+
+        i = 0
+        while i < 3:
+            try:
+                async with AsyncSession() as session:
+                    response = await session.get(
+                        'https://zora.co/api/personalize/collection/oeth:0x5d1e1a5cdd95f68ff18d78242c252f6ceaa4538b/balance',
+                        headers=headers,
+                        params=params,
+                        proxy=self.client.proxy_init,
+                    )
+
+                    if response.status_code == 200:
+                        data = response.json()
+
+                        balance = data["balance"]
+                        if balance > 0: return True 
+                        else: return False
+
+                    else:
+                        self.logger.error(f"{self.client.name} Failed request: {response.status_code}")
+                        await asyncio.sleep(5)
+                        balance = False
+                        i += 1
+
+            except Exception as error:
+                self.logger.error(f'{self.client.name} Failed request:  {error}')
+                await asyncio.sleep(5)
+                balance = False
+                i += 1
+        
+        return balance
+
     async def get_price(self):
         headers = {
             'accept': '*/*',
@@ -61,6 +105,13 @@ class MintNFTOGWorker(Logger):
         return wei_value, usd_value
 
     async def run(self):
+        balance = await self.get_balance_nft()
+        if balance:
+            self.logger.info(
+                f'{self.client.name} The address already has nft OG on the Ink network'
+            )
+            return True
+
         wei_value, usd_value = await self.get_price()
 
         self.logger.info(
@@ -97,3 +148,4 @@ class MintNFTOGWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the mint nft OG on the Ink network. Error: {error} '
             )
+            return False

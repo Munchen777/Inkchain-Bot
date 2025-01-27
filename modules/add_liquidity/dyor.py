@@ -139,7 +139,7 @@ class AddLiquidityDyorETHtoUSDCWorker(Logger):
             client=self.client, token_desired_name="USDC", min_available_balance_out_token=1.0, min_clearance=0.5
         )
 
-        if result is None: return 
+        if result is None: return False 
 
         amount_token_desired_float, decimals = result
 
@@ -181,6 +181,7 @@ class AddLiquidityDyorETHtoUSDCWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} USDC.e on the Ink network. Error: {error} '
             )
+            return False
 
 
 class AddLiquidityDyorETHtoUSDTWorker(Logger):
@@ -204,7 +205,7 @@ class AddLiquidityDyorETHtoUSDTWorker(Logger):
             client=self.client, token_desired_name="USDT", min_available_balance_out_token=1.0, min_clearance=0.5
         )
 
-        if result is None: return 
+        if result is None: return False 
 
         amount_token_desired_float, decimals = result
 
@@ -246,6 +247,7 @@ class AddLiquidityDyorETHtoUSDTWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} USDT on the Ink network. Error: {error} '
             )
+            return False
 
 
 class AddLiquidityDyorETHtoKRAKENWorker(Logger):
@@ -269,7 +271,7 @@ class AddLiquidityDyorETHtoKRAKENWorker(Logger):
             client=self.client, token_desired_name="KRAKEN", min_available_balance_out_token=100_000.0, min_clearance=20_000.0
         )
 
-        if result is None: return 
+        if result is None: return False 
 
         amount_token_desired_float, decimals = result
 
@@ -311,6 +313,7 @@ class AddLiquidityDyorETHtoKRAKENWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} KRAKEN on the Ink network. Error: {error} '
             )
+            return False
 
 
 class AddLiquidityDyorETHtoWORMWorker(Logger):
@@ -334,7 +337,7 @@ class AddLiquidityDyorETHtoWORMWorker(Logger):
             client=self.client, token_desired_name="WORM", min_available_balance_out_token=350_000.0, min_clearance=100_000.0
         )
 
-        if result is None: return 
+        if result is None: return False 
 
         amount_token_desired_float, decimals = result
 
@@ -376,3 +379,4 @@ class AddLiquidityDyorETHtoWORMWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed the Add Liquidity {amount_eth_min_float} ETH and {amount_token_desired_float} WORM on the Ink network. Error: {error} '
             )
+            return False

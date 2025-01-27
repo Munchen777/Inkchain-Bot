@@ -30,8 +30,7 @@ class BridGGEthereumtoInkWorker(Logger):
             normalized_min_amount_residue=self.module_info.min_amount_residue
         )
 
-        if result is None:
-            return
+        if result is None: return False
 
         value, balance = result
 
@@ -60,3 +59,4 @@ class BridGGEthereumtoInkWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH via the official bridge from the Ethereum network to Ink. Error: {error} '
             )
+            return False

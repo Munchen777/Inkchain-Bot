@@ -30,7 +30,7 @@ class BridgeOwltoOPtoInkWorker(Logger):
         )
 
         if result is None:
-            return
+            return False
 
         value, balance = result
 
@@ -62,6 +62,7 @@ class BridgeOwltoOPtoInkWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the OP network to Ink. Error: {error} '
             )
+            return False
 
 
 class BridgeOwltoBasetoInkWorker(Logger):
@@ -87,7 +88,7 @@ class BridgeOwltoBasetoInkWorker(Logger):
         )
 
         if result is None:
-            return
+            return False
 
         value, balance = result
 
@@ -119,6 +120,7 @@ class BridgeOwltoBasetoInkWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Base network to Ink. Error: {error} '
             )
+            return False
 
 
 class BridgeOwltoInktoOPWorker(Logger):
@@ -144,7 +146,7 @@ class BridgeOwltoInktoOPWorker(Logger):
         )
 
         if result is None:
-            return
+            return False
 
         value, balance = result
 
@@ -176,6 +178,7 @@ class BridgeOwltoInktoOPWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to OP. Error: {error} '
             )
+            return False
 
 
 class BridgeOwltoInktoBaseWorker(Logger):
@@ -201,7 +204,7 @@ class BridgeOwltoInktoBaseWorker(Logger):
         )
 
         if result is None:
-            return
+            return False
 
         value, balance = result
 
@@ -233,3 +236,4 @@ class BridgeOwltoInktoBaseWorker(Logger):
             self.logger.error(
                 f'{self.client.name} Failed to send {balance} ETH from the Ink network to Base. Error: {error} '
             )
+            return False
