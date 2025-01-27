@@ -29,31 +29,33 @@ class CustomAsyncHTTPProvider(AsyncHTTPProvider):
         super().__init__(endpoint_uri, *args, **kwargs)
         self._session = None
 
-    @property
-    async def session(self):
+    async def __aenter__(self):
         if self._session is None or self._session.closed:
             self._session = aiohttp.ClientSession()
-        return self._session
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        if self._session and not self._session.closed:
+            await self._session.close()
 
     async def make_request(self, method, params):
-        session = await self.session
-        try:
-            async with session.post(
-                self.endpoint_uri,
-                json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
-            ) as response:
-                response.raise_for_status()
-                return await response.json()
-        except aiohttp.ClientError as e:
-            raise RuntimeError(f"HTTP request failed: {e}")
-        except Exception as e:
-            raise RuntimeError(f"Unexpected error in make_request: {e}")
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.post(
+                    self.endpoint_uri,
+                    json={"jsonrpc": "2.0", "method": method, "params": params, "id": 1},
+                ) as response:
+                    response.raise_for_status()
+                    return await response.json()
+            except aiohttp.ClientError as e:
+                raise RuntimeError(f"HTTP request failed: {e}")
+            except Exception as e:
+                raise RuntimeError(f"Unexpected error in make_request: {e}")
 
     async def close(self):
         if self._session and not self._session.closed:
             await self._session.close()
             self._session = None
-
 
     def __del__(self):
         if self._session and not self._session.closed:
@@ -70,11 +72,15 @@ class CustomAsyncWeb3(AsyncWeb3):
 
 
 class Client(Logger):
-    def __init__(self, account_name: str, private_key: str, proxy: str = None, source_network: str = None):
+    def __init__(
+            self, account_name: str, private_key: str, proxy: str = None, 
+            source_network: str = None, name_znc_domen: str | None = None
+        ):
         super().__init__()
         self.name: str = account_name
         self.private_key: str = private_key
         self.proxy_init: str = proxy
+        self.name_znc_domen = name_znc_domen
         self.request_kwargs = {"proxy": f'{self.proxy_init}', "verify_ssl": False} if self.proxy_init else {"verify_ssl": False}
         self.w3 = CustomAsyncWeb3(CustomAsyncHTTPProvider(None, request_kwargs=self.request_kwargs))
         self.address = CustomAsyncWeb3.to_checksum_address(self.w3.eth.account.from_key(private_key).address)
