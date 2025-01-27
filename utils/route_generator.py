@@ -17,27 +17,7 @@ from utils.networks import Network
 from settings import *
 from utils.networks import NETWORKS
 from utils.client import SoftwareException
-from utils.tools import clean_progress_file
-
-
-def topological_sort(graph: Dict[str, list]) -> List[str] | None:
-    stack: List[str] = []
-    visited: Set[str] = set()
-
-    def dfs(module_name: str):
-        visited.add(module_name)
-
-        for neighbour in graph.get(module_name, []):
-            if neighbour not in visited:
-                dfs(neighbour)
-
-        stack.append(module_name)
-
-    for module_name in graph:
-        if module_name not in visited:
-            dfs(module_name)
-
-    return stack[::-1]
+from utils.tools import clean_progress_file, topological_sort
 
 
 def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo | None:
@@ -139,36 +119,30 @@ class RouteGenerator(Logger):
     async def check_first_run_modules(self, account_name: str) -> bool:
         return account_name not in self.history
 
-    # def classic_generate_route() -> List[BaseModuleInfo]:
-    #     """
-    #     Generate and sort list of BaseNoduleInfo by module_priority
-    #     The lower priority is the first in the route list
+    async def build_dependency_graph(self, modules: List[BaseModuleInfo]) -> Dict[str, List[str]]:
+        graph: DefaultDict[str, List[str]] = defaultdict(list)
 
-    #     """
-    #     route: List[BaseModuleInfo] = []
+        try:
+            for module in modules:
+                module: BaseModuleInfo = MODULES_CLASSES.get(module)()
+                for other_module in modules:
+                    other_module: BaseModuleInfo = MODULES_CLASSES.get(other_module)()
+                    if module.dest_token == other_module.source_token and \
+                        module.destination_network == other_module.source_network and module is not other_module:
+                        graph[module.module_name].append(other_module.module_name)
+        
+        except Exception as error:
+            self.logger_msg(None, None,
+                            f"Error while building modules with dependencies.\nError: {error}", "error")
+            return None
 
-    #     for i in CLASSIC_ROUTES_MODULES_USING:
-    #         module_name: str = random.choice(i)
-
-    #         if module_name is None or module_name not in MODULES_CLASSES:
-    #             continue
-
-    #         module_obj: BaseModuleInfo | None = get_func_by_name(module_name)
-
-    #         if module_obj:
-    #             route.append(module_obj)
-    #             continue
-
-    #         raise SoftwareException(f"There is no module with the name {module_name} in the software!")
-
-    #     # route.sort(key=lambda x: x.module_priority, reverse=True)
-
-    #     return route
+        return graph
 
     async def classic_generate_route(self) -> List[BaseModuleInfo]:
         from .modules_runner import Runner
-        
-        # graph: DefaultDict = defaultdict(list)
+
+        modules_data: Dict[str, Any] = {}
+
         try:
             # Получаем словарь с названиями и инстансами моделей
             all_available_modules: Dict[str, BaseModuleInfo] | None = {
@@ -181,6 +155,15 @@ class RouteGenerator(Logger):
                             f"Error while creating all available modules.\nError: {error}", "error")
             raise error
 
+        modules_to_execute = CLASSIC_ROUTES_MODULES_USING
+        # Пробуем строить зависимости между модулями
+        dependency_graph: Dict[str, List[str]] = await self.build_dependency_graph(CLASSIC_ROUTES_MODULES_USING)
+        if dependency_graph:
+            # Выполняем топологическую сортировку
+            ordered_modules: List[str] | None = topological_sort(dependency_graph)
+            if ordered_modules:
+                modules_to_execute = ordered_modules
+
         try:
             runner: Runner = Runner()
             accounts_data: List[Tuple[str, str]] = runner.get_wallets()
@@ -189,103 +172,149 @@ class RouteGenerator(Logger):
                 proxy: str | None = runner.get_proxy_for_account(account_name)
                 client: Client = Client(account_name, private_key, proxy)
 
-                # all_available_wallet_balances: Dict[str, Dict[str, float]] = await client.get_wallet_balance()
-                all_available_wallet_balances = {
-                    "Ethereum Mainnet": {
-                        "ETH": 0.0003,
-                    },
-                    "Ink Mainnet": {
-                        "ETH": 0.008,
-                    },
-                    "Base Mainnet": {
-                        "ETH": 0.00014,
-                    },
-                    "OP Mainnet": {
-                        "ETH": 0.00014,
-                    },
-                }
-                route: List[BaseModuleInfo] | None = deque([])
+                all_available_wallet_balances: Dict[str, Dict[str, float]] = await client.get_wallet_balance(balance_in_eth=True)
+                
+                if not all_available_wallet_balances:
+                    self.logger_msg(client.name, client.address,
+                                    f"We can't get token balances on {client.name} account.", "warning")
+                    return
+       
+                classic_route: Deque[list] | None = deque([])
 
                 # Проходимся по модулям
-                for module_name in CLASSIC_ROUTES_MODULES_USING:
+                for module_name in modules_to_execute:
                     # Берем текущий модуль
                     module: BaseModuleInfo | None = all_available_modules.get(module_name)
 
                     if not module:
+                        self.logger_msg(client.name, client.address,
+                                        f"We can't find the module in available modules\nGo to the next module", "error")
+                        continue
+                    # Берем сети отправления и получения текущего модуля
+                    source_network: Network | None = NETWORKS.get(module.source_network)
+                    dest_network: Network | None = NETWORKS.get(module.destination_network)
+                    # Если сеть отправления отсутствует, пропускаем
+                    if not source_network:
+                        self.logger_msg(client.name, client.address,
+                                        f"Error while getting source network for accounting balance", "error")
                         continue
 
-                    # Строим граф для построения зависимостей модуля по отношению к другим
-                    graph: DefaultDict[list] = defaultdict(list)
+                    # Если отсутствует сеть назвачения, то она может быть равна сети отправления
+                    if not dest_network:
+                        dest_network = source_network
+                    # Получаем названия токенов в сети отправления
+                    current_tokens: list[str] = module.source_token if isinstance(module.source_token, list) else [module.source_token]
 
-                    if module.source_token:
-                        # Берем необходимые токены в сети отправления модуля
-                        required_tokens: List[str] = module.source_token if isinstance(module, list) else [module.source_token]
+                    if any([curr_token is None for curr_token in current_tokens]):
+                        self.logger_msg(client.name, client.address,
+                                        f"Check source token in {module.module_name}. Perhaps, it contains None value.", "error")
+                        raise SoftwareException
 
-                        # Ищем, как мы можем получить их из других модулей на выходе
-                        for token in required_tokens:
-                            for dependency_module_name, dependency_module in all_available_modules.items():
-                                if dependency_module.dest_token:
-
-                                    provided_tokens: List[str] = dependency_module.dest_token \
-                                        if isinstance(dependency_module, list) else [dependency_module.dest_token]
-
-                                    if token in provided_tokens:
-                                        graph[dependency_module.module_name].append(module.module_name)
+                    for curr_token in current_tokens:
+                        source_curr_balance: float | None = all_available_wallet_balances.get(
+                            source_network.name, {}).get(curr_token, 0)
                         
-                        required_modules_to_execute: List[str] | None = topological_sort(graph)
+                        dest_curr_token: float | None = all_available_wallet_balances.get(
+                            dest_network.name, {}).get(curr_token, 0)
+                        
+                        # Если не хватает баланса токена в сети отправления
+                        if float(source_curr_balance) <= module.min_available_balance:
+                            self.logger_msg(client.name, client.address,
+                                            f"We need to top up {source_network.name} network to execute {module.module_name}")
 
-                        if required_modules_to_execute:
-                            for _module_name in required_modules_to_execute:
-                                dependency_module_class: BaseModuleInfo | None = all_available_modules.get(_module_name)
-                                if not dependency_module_class:
-                                    continue
-                                # Получаем названия токенов зависимых модулей
-                                required_tokens: list[str] | str = dependency_module_class.source_token \
-                                    if isinstance(dependency_module_class.source_token, list) else [dependency_module_class.source_token]
+                            # Строим граф для построения зависимостей модуля по отношению к другим
+                            graph: DefaultDict[str, list] = defaultdict(list)
 
-                                for req_token_name in required_tokens:
-                                    # Получаем баланс токена в сети отправления
-                                    source_token_balance: float | None = all_available_wallet_balances.get(
-                                        dependency_module_class.source_network
-                                    ).get(req_token_name, 0)
-                                    # Получаем баланс токена в сети назвачения
-                                    destination_token_balance: float | None = all_available_wallet_balances.get(
-                                        dependency_module_class.source_network or dependency_module_class.destination_network
-                                    ).get(req_token_name, 0)
+                    # # Если у модуля есть source_token, тогда ищем зависимости
+                    # if module.source_token:
+                            # Берем необходимые токены в сети отправления модуля
+                            required_tokens: List[str] = module.source_token if isinstance(module, list) else [module.source_token]
+
+                            # Ищем, как мы можем получить их из других модулей на выходе
+                            for token in required_tokens:
+                                for dependency_module_name, dependency_module in all_available_modules.items():
+                                    if dependency_module.dest_token:
+
+                                        provided_tokens: List[str] = dependency_module.dest_token \
+                                            if isinstance(dependency_module, list) else [dependency_module.dest_token]
+
+                                        if token in provided_tokens:
+                                            graph[dependency_module.module_name].append(module.module_name)
+
+                            # Получаем модули, которые нужно выполнить перед текущим
+                            required_modules_to_execute: List[str] | None = topological_sort(graph)
+
+                            # Если нашли такие модули
+                            if required_modules_to_execute:
+                                if required_modules_to_execute:
+                                    for _module_name in required_modules_to_execute:
+                                        dependency_module_class: BaseModuleInfo | None = all_available_modules.get(_module_name)
+                                        if not dependency_module_class:
+                                            continue
+
+                                        source_network_dependency: Network | None = NETWORKS.get(dependency_module_class.source_network)
+                                        dest_network_dependency: Network | None = NETWORKS.get(dependency_module_class.destination_network)
                                     
-                                    
-                                    
-                                    
-                                    
-                                    
-                            
-                            
-                    
-                    
-        
-        except Exception as error:
-            pass
+                                        if not source_network_dependency:
+                                            self.logger_msg(client.name, client.address,
+                                                            f"Error while getting source network for accounting balance", "error")
+                                            continue
+
+                                        # Если отсутствует сеть назвачения, то она может быть равна сети отправления
+                                        if not dest_network_dependency:
+                                            dest_network_dependency = source_network_dependency
+
+                                        # Получаем названия токенов зависимых модулей
+                                        required_tokens: list[str] = dependency_module_class.source_token \
+                                            if isinstance(dependency_module_class.source_token, list) else [dependency_module_class.source_token]
+
+                                        # Проверяем балансы токенов в сетях зависимый модулей
+                                        for req_token_name in required_tokens:
+                                            # Получаем баланс токена в сети отправления
+                                            source_token_balance: float | None = all_available_wallet_balances.get(
+                                                dependency_module_class.source_network
+                                            ).get(req_token_name, 0)
+                                            # Получаем баланс токена в сети назвачения
+                                            destination_token_balance: float | None = all_available_wallet_balances.get(
+                                                dependency_module_class.source_network or dependency_module_class.destination_network
+                                            ).get(dependency_module_class.dest_token, 0)
+                                        
+                                            # Если баланс токена > мин.доступное количество, то считаем балансы и добавляем в начало
+                                            if float(source_token_balance) > dependency_module_class.min_available_balance:
+                                                # if source_network is not dest_network:
+                                                all_available_wallet_balances[source_network.name][req_token_name] = (
+                                                    source_token_balance - dependency_module_class.min_amount_out
+                                                )
+                                                all_available_wallet_balances[dest_network.name][dependency_module_class.dest_token] = (
+                                                    destination_token_balance + dependency_module_class.min_amount_out
+                                                )
+                                                classic_route.appendleft(dependency_module_class)
+                                
+                    classic_route.append(module)
                 
-        
-        
-        # route = [
-        #     module_obj for group in CLASSIC_ROUTES_MODULES_USING
-        #     if (module_name := random.choice(group)) in MODULES_CLASSES
-        #     if (module_obj := get_func_by_name(module_name))
-        # ]
+                account_data = {
+                    "current_step": 0,
+                    "route": [module_obj.model_dump() for module_obj in classic_route]
+                }
+                modules_data[int(account_name)] = account_data
 
-        # if not route:
-        #     raise SoftwareException("No valid modules found in CLASSIC_ROUTES_MODULES_USING")
+            # Записываем в файл
+            try:
+                with open(file="./data/service/wallets_progress.json", mode="a") as file:
+                    json.dump(modules_data, file, indent=4)
 
-        # if (swap_task := random.choice(random.choice(ROUTES_MODULES_GENERALS_SWAPS))) in MODULES_CLASSES:
-        #     if (swap_obj := get_func_by_name(swap_task)):
-        #         route.append(swap_obj)
-        #     else:
-        #         raise SoftwareException(f"Module {swap_task} is invalid")
-        # else:
-        #     raise SoftwareException(f"Invalid swap task {swap_task}")
+            except Exception as error:
+                self.logger_msg(None, None,
+                                f"Error while saving classic generated route in file", "error")
 
-        # # return route
+            self.logger.info(
+                f"Successfully generated {len(accounts_data)} classic routes into /data/services/wallets_progress.json"
+            )
+
+        except Exception as error:
+            self.logger_msg(None, None,
+                            f"Error in classic_generate_route method!\nError: {error}", "error")
+            return
 
     @classmethod
     def create_route_from_dict(cls, route_dict: Dict[str, Any]) -> BaseModuleInfo:
@@ -303,63 +332,63 @@ class RouteGenerator(Logger):
         except ValidationError as error:
             raise ValidationError(f"Error while validating module {module_name}.\nError: {error}")
 
-    def sort_classic_route(self, route: list[str], landing_mode: bool) -> List[str]:
-        """
-        Create classic route
+    # def sort_classic_route(self, route: list[str], landing_mode: bool) -> List[str]:
+    #     """
+    #     Create classic route
 
-        Atributes:
-            route - list of module names
+    #     Atributes:
+    #         route - list of module names
 
-        """
-        if not landing_mode:
-            modules_dependents: Dict[str, int] = {
-                # TODO: в случае, если понадобится пополнение с биржи, то расскоментировать и написать модули
+    #     """
+    #     if not landing_mode:
+    #         modules_dependents: Dict[str, int] = {
+    #             # TODO: в случае, если понадобится пополнение с биржи, то расскоментировать и написать модули
 
-                # "okx_withdraw": 0,
-                # "binance_withdraw": 0,
-                # "bybit_withdraw": 0,
-                # "bingx_withdraw": 0,
-                # "bitget_withdraw": 0,
-                # "bridge_native": 1,
-            }
+    #             # "okx_withdraw": 0,
+    #             # "binance_withdraw": 0,
+    #             # "bybit_withdraw": 0,
+    #             # "bingx_withdraw": 0,
+    #             # "bitget_withdraw": 0,
+    #             # "bridge_native": 1,
+    #         }
 
-            classic_route = []
+    #         classic_route = []
 
-            for module_name in route:
-                if module_name in modules_dependents:
-                    classic_route.append((module_name), modules_dependents[module_name])
-                else:
-                    classic_route.append((module_name, 2))
+    #         for module_name in route:
+    #             if module_name in modules_dependents:
+    #                 classic_route.append((module_name), modules_dependents[module_name])
+    #             else:
+    #                 classic_route.append((module_name, 2))
 
-            random.shuffle(classic_route)
+    #         random.shuffle(classic_route)
 
-            route_with_priority: List[str] = [
-                module_name[0]
-                for module_name in sorted(classic_route, key=lambda x: x[1])
-            ]
+    #         route_with_priority: List[str] = [
+    #             module_name[0]
+    #             for module_name in sorted(classic_route, key=lambda x: x[1])
+    #         ]
 
-        else:
-            route_with_priority = route
+    #     else:
+    #         route_with_priority = route
 
-        if CLASSIC_WITHDRAW_DEPENDENCIES:
-            deposit_modules: Set = set([
-                "deposit_module",
-            ])
-            new_route_with_dep = []
+    #     if CLASSIC_WITHDRAW_DEPENDENCIES:
+    #         deposit_modules: Set = set([
+    #             "deposit_module",
+    #         ])
+    #         new_route_with_dep = []
 
-            for module_info in route_with_priority:
-                module_name, rpc = module_info.split()
-                new_route_with_dep.append(module_info)
+    #         for module_info in route_with_priority:
+    #             module_name, rpc = module_info.split()
+    #             new_route_with_dep.append(module_info)
 
-                if module_name in deposit_modules:
-                    withdraw_module_name = module_name.replace("deposit", "withdraw")
-                    withdraw_module = get_func_by_name(withdraw_module_name)
-                    new_route_with_dep.append(f"{withdraw_module.__name__} {rpc}")
+    #             if module_name in deposit_modules:
+    #                 withdraw_module_name = module_name.replace("deposit", "withdraw")
+    #                 withdraw_module = get_func_by_name(withdraw_module_name)
+    #                 new_route_with_dep.append(f"{withdraw_module.__name__} {rpc}")
 
-        else:
-            new_route_with_dep = route_with_priority
+    #     else:
+    #         new_route_with_dep = route_with_priority
 
-        return new_route_with_dep
+    #     return new_route_with_dep
     
     async def get_available_modules(self,
                                     all_available_modules: Dict[str, BaseModuleInfo],
@@ -721,35 +750,8 @@ class RouteGenerator(Logger):
                             f"Error in smart_generate_route function.\nError: {error}", "error")
             raise error
 
-    async def classic_routes_json_save(self):
-        clean_progress_file()
-
-        accounts_data: Dict[str, Any] = {}
-
-        with open(file="./data/service/wallets_progress.json", mode="a") as file:
-            for account_name in ACCOUNT_NAMES:
-                if isinstance(account_name, (str, int)):
-                    classic_route: List[BaseModuleInfo] = await self.classic_generate_route()
-
-                    # if SHUFFLE_ROUTE:
-                    #     classic_route = self.sort_classic_route(route=classic_route)
-
-                    # if CLASSIC_WITHDRAW_DEPENDENCIES:
-                    #     classic_route = self.sort_classic_route(route=classic_route, landing_mode=True)
-
-                    account_data = {
-                        "current_step": 0,
-                        "route": [module_obj.model_dump() for module_obj in classic_route],
-                    }
-                    accounts_data[str(account_name)] = account_data
-
-            json.dump(accounts_data, file, indent=4)
-
-        self.logger.info(
-            f"Successfully generated {len(accounts_data)} classic routes into /data/services/wallets_progress.json"
-        )
-
 
 async def classic_route_generate():
+    clean_progress_file()
     generator: RouteGenerator = RouteGenerator()
-    await generator.classic_routes_json_save()
+    await generator.classic_generate_route()

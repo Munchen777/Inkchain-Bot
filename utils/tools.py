@@ -3,6 +3,7 @@ import os
 import sys
 
 from better_proxy import Proxy
+from typing import Dict, List, Set
 
 from generall_settings import EXCEL_FILE_PATH
 from modules import Logger
@@ -76,3 +77,23 @@ def check_progress_file() -> bool:
         return True
     else:
         return False
+
+
+def topological_sort(graph: Dict[str, List[str]]) -> List[str]:
+    visited: Set[str] = set()
+    stack: List[str] = []
+
+    def dfs(module_name: str):
+        visited.add(module_name)
+
+        for neighbour in graph.get(module_name, []):
+            if neighbour not in visited:
+                dfs(neighbour)
+
+        stack.append(module_name)
+
+    for module_name in graph:
+        if module_name not in visited:
+            dfs(module_name)
+
+    return stack[::-1]

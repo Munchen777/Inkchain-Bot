@@ -93,10 +93,7 @@ CLASSIC_ROUTES_MODULES_USING = [
 
 """
 
-CLASSIC_WITHDRAW_DEPENDENCIES = True # if True, then it would be possible to withdraw from the bridge where we made adding liquidity
-
-
-CLASSIC_ROUTES_MODULES_USING: List[List[str]] = [
+CLASSIC_ROUTES_MODULES_USING: List[str] = [
     "swap_dyor_eth_to_usdc",
     "mint_paragraf_nft",
     "mint_og_nft",
@@ -106,7 +103,7 @@ CLASSIC_ROUTES_MODULES_USING: List[List[str]] = [
     "claim_daily_gm",
 ]
 
-ROUTES_MODULES_GENERALS_SWAPS: List[List[str]] = [
+ROUTES_MODULES_GENERALS_SWAPS: List[str] = [
     "swap_dyor_eth_to_kraken",
     "swap_dyor_eth_to_usdt",
     "swap_dyor_eth_to_weth",

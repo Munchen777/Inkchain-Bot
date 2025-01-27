@@ -11,7 +11,7 @@ from web3 import AsyncHTTPProvider, AsyncWeb3
 from .networks import NETWORKS
 from utils.networks import *
 from modules import Logger
-from data.abi import ERC20_ABI
+from data.abi import ERC20_ABI, SWAP_INKSWAP_ABI
 from settings import NETWORK_TOKEN_CONTRACTS, UNISWAP_V2_ROUTER_CONTRACT_ADDRESS
 from generall_settings import RANDOM_RANGE, ROUNDING_LEVELS
 
@@ -355,14 +355,20 @@ class Client(Logger):
                         token_name: str = "ETH"
                         native_token_balance: float | None = await w3.eth.get_balance(self.address)
 
-                        if not native_token_balance:
+                        if native_token_balance == 0:
                             self.logger_msg(self.name, self.address,
                                             f"Native balance {token_name} not found in {network_name} network.", "warning")
+                            wallet_balances.setdefault(network_name, {})[token_name] = native_token_balance
+                            
                             continue
 
                         wallet_balances.setdefault(network_name, {})[token_name] = native_token_balance / (10**18)
 
                     if network_token_contracts:
+                        network_token_contracts = {
+                            k: v for k, v in network_token_contracts.items()
+                            if k not in {"WETH", "ETH"}
+                        }
                         for token_name, contract_address in network_token_contracts.items():
                             if not contract_address:
                                 self.logger_msg(self.name, self.address,
@@ -378,30 +384,32 @@ class Client(Logger):
                             decimals = await contract.functions.decimals().call()
                             balance_token_readable: float = balance_token / (10 ** decimals)
 
-                            if balance_in_eth:
+                            if balance_in_eth and balance_token > 0:
                                 uniswap_v2_router: AsyncContract = w3.eth.contract(
                                     address=CustomAsyncWeb3.to_checksum_address(UNISWAP_V2_ROUTER_CONTRACT_ADDRESS),
-                                    abi=ERC20_ABI,
+                                    abi=SWAP_INKSWAP_ABI,
                                 )
                                 path: List[ChecksumAddress] = [
                                     CustomAsyncWeb3.to_checksum_address(
                                         contract_address
                                     ),
-                                    CustomAsyncWeb3.to_checksum_address(
-                                        network_token_contracts.get("WETH") or network_token_contracts.get("ETH")
+                                    AsyncWeb3.to_checksum_address(
+                                        network_token_contracts.get("WETH") or network_token_contracts.get("ETH") or \
+                                            "0x4200000000000000000000000000000000000006"
                                     ),
                                 ]
                                 try:
-                                    src_token_amount, amountOut = uniswap_v2_router.functions.getAmountsOut(
+                                    src_token_amount, amountOut = await uniswap_v2_router.functions.getAmountsOut(
                                         balance_token, path
                                     ).call()
+                                    await asyncio.sleep(3)
 
                                 except Exception as error:
                                     self.logger_msg(self.name, self.address,
                                                     f"Occured an error while getting {token_name} balance it ether\nError: {error}", "warning")
                                     continue
 
-                                wallet_balances.setdefault(network_name, {})[token_name] = amountOut
+                                wallet_balances.setdefault(network_name, {})[token_name] = amountOut / (10**decimals)
 
                             else:
                                 wallet_balances.setdefault(network_name, {})[token_name] = balance_token_readable
