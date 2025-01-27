@@ -35,13 +35,16 @@ class ClaimDailyGMWorker(Logger):
                     transactions = response.json()
 
                     last_tx_timestamp = None
-                    for tx in transactions['items']:
-                        if all([
-                            tx.get('to', {}).get('name') == 'DailyGM', 
-                            tx.get('status') == 'ok', 
-                            'contract_call' in tx.get('transaction_types', [])
-                        ]):
-                            last_tx_timestamp = tx.get('timestamp')
+                    for tx in transactions.get('items', []):
+                        if isinstance(tx, dict):
+                            to_field = tx.get('to', {})
+                            if isinstance(to_field, dict):
+                                if all([
+                                    to_field.get('name') == 'DailyGM', 
+                                    tx.get('status') == 'ok', 
+                                    'contract_call' in tx.get('transaction_types', [])
+                                ]):
+                                    last_tx_timestamp = tx.get('timestamp')
 
                         if last_tx_timestamp:
                             tx_time = datetime.strptime(last_tx_timestamp, '%Y-%m-%dT%H:%M:%S.%fZ')
@@ -49,17 +52,17 @@ class ClaimDailyGMWorker(Logger):
                             time_diff = current_time - tx_time
                             remaining_time = timedelta(hours=24) - time_diff
                             if time_diff < timedelta(hours=24): return True, remaining_time
-                            else: return False
+                            else: return False, 0
                     
-                    return False
+                    return False, 0
                 
                 else:
                     self.logger.error(f"{self.client.name} Request failed with status code: {response.status_code}")
-                    return False
+                    return False, 0
 
         except Exception as error:
             self.logger.error(f'{self.client.name} Failed request:  {error}')
-            return False
+            return False, 0
 
     async def run(self):
         availability_contract, remaining_time = await self.get_last_claim()

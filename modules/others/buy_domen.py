@@ -69,12 +69,17 @@ class BuyZNCDomenInkWorker(Logger):
             address=contract_address, abi=ZNS_CONNECT
         )
 
+        faker_name = False
+
         while True:
-            while True:
-                domain_name = faker.domain_name()
-                name = re.split(r'\.', domain_name)[0]
-                if len(name) > 5:
-                    break
+            if faker_name:
+                while True:
+                    domain_name = faker.domain_name()
+                    name = re.split(r'\.', domain_name)[0]
+                    if len(name) > 5:
+                        break
+            else:
+                domain_name = self.client.name_znc_domen
 
             owners = [self.client.address]
             domain_names = [name]
@@ -99,6 +104,7 @@ class BuyZNCDomenInkWorker(Logger):
             except Exception as error:
                 if '0x3a81d6fc' in str(error):
                     self.logger.warning(f"Domain {domain_names} already registered, skipping...")
+                    faker_name = True
                     continue
                 else:
                     self.logger.error(  
