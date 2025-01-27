@@ -748,6 +748,7 @@ class AddLiquidityDyorETHtoUSDCModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_usdc"
     module_display_name: str = "Add Liquidity Dyor ETH and USDC"
     source_token: list = ["ETH", "USDC"]
+    destination_network: str = Ink.name
 
 class AddLiquidityDyorETHtoUSDTModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and USDT  """
@@ -757,6 +758,7 @@ class AddLiquidityDyorETHtoUSDTModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_usdt"
     module_display_name: str = "Add Liquidity Dyor ETH and USDT"
     source_token: list = ["ETH", "USDT"]
+    destination_network: str = Ink.name
 
 class AddLiquidityDyorETHtoKRAKENModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and KRAKEN  """
@@ -766,6 +768,7 @@ class AddLiquidityDyorETHtoKRAKENModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_kraken"
     module_display_name: str = "Add Liquidity Dyor ETH and KRAKEN"
     source_token: list = ["ETH", "KRAKEN"]
+    destination_network: str = Ink.name
 
 class AddLiquidityDyorETHtoWORMModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and WORM  """
@@ -775,6 +778,7 @@ class AddLiquidityDyorETHtoWORMModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_worm"
     module_display_name: str = "Add Liquidity Dyor ETH and WORM"
     source_token: list = ["ETH", "WORM"]
+    destination_network: str = Ink.name
 
 
 class MintNFTModuleInfo(BaseModuleInfo):
@@ -861,6 +865,7 @@ class DeployContractInkModule(DeployContractModule):
     module_priority: int = 2
     module_name: str = "deploy_contract_ink_network"
     module_display_name: str = "Deployment of the contract in the Ink network"
+    destination_network: str = Ink.name
 
 
 class BuyZNCDomenModule(BaseModuleInfo):
@@ -895,6 +900,7 @@ class BuyZNCDomenInkModule(BuyZNCDomenModule):
     module_priority: int = 2
     module_name: str = "buy_znc_domen_ink_network"
     module_display_name: str = "Buy ZNC domen in the Ink network"
+    destination_network: str = Ink.name
 
 
 class ClaimDailyGMModule(BaseModuleInfo):
@@ -929,3 +935,4 @@ class ClaimDailyGMModule(ClaimDailyGMModule):
     module_priority: int = 2
     module_name: str = "claim_daily_gm"
     module_display_name: str = "Claim Daily GM in the Ink network"
+    destination_network: str = Ink.name
