@@ -31,12 +31,13 @@ def get_accounts_data():
             logger.critical("Are you sure about excel file? Please, pass an excel file")
             sys.exit(1)
 
-        account_names, private_keys, proxies = [], [], []
+        account_names, private_keys, proxies, name_znc_domen = [], [], [], []
 
-        for row in sheet.iter_rows():
+        for row in sheet.iter_rows(min_row=2):
             account_name = row[0].value
             private_key = row[1].value
             proxy = row[2].value
+            name_znc_domen_value = row[3].value
 
             if not all([account_name, private_key, proxy]):
                 continue
@@ -49,8 +50,9 @@ def get_accounts_data():
                 ).as_url
                 if isinstance(proxy, str) else None
             )
+            name_znc_domen.append(name_znc_domen_value if name_znc_domen_value else None)
 
-        return account_names, private_keys, proxies
+        return account_names, private_keys, proxies, name_znc_domen
 
     except Exception as error:
         logger.error(f"Error in get_accounts_data function! Error: {error}")
