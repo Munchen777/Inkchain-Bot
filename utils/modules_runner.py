@@ -7,19 +7,22 @@ import telebot
 from random import shuffle
 from typing import Any, Callable, Dict, List, Tuple
 
-from data.config import (ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, CHAIN_NAMES, MODULE_RUNNERS)
+from data.config import (ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, NAME_ZNC_DOMEN, MODULE_RUNNERS)
 from generall_settings import (WALLETS_TO_WORK, SHUFFLE_WALLETS, SOFTWARE_MODE, USE_PROXY,
                                ACCOUNTS_IN_STREAM, GLOBAL_NETWORK, SAVE_PROGRESS, TELEGRAM_NOTIFICATIONS, BREAK_ROUTE,
                                SLEEP_MODE, SLEEP_TIME_ACCOUNTS, SLEEP_TIME_MODULES, TG_ID, TG_TOKEN)
 from modules import Logger
 from modules.interfaces import BaseModuleInfo
 from utils.tools import clean_progress_file
-from utils.route_generator import RouteGenerator
+from utils.route_generator import RouteGenerator, ModuleHistory
 from utils.client import SoftwareException, CustomAsyncHTTPProvider, CustomAsyncWeb3
 from utils.networks import Ethereum
 
 
 class Runner(Logger):
+    def __init__(self):
+        super().__init__()
+        self.module_history = ModuleHistory()
 
     async def smart_sleep(self, account_name: str, account_number: int, accounts_delay: bool):
         if SLEEP_MODE and account_number:
@@ -99,6 +102,19 @@ class Runner(Logger):
         with open("./data/service/bad_wallets.json", "w") as file:
             json.dump(data, file, indent=4)
 
+    def get_name_znc_domen_for_account(self, account_name: str) -> str | None:
+        if not NAME_ZNC_DOMEN:  # Если список пустой
+            return None
+        
+        # Получаем индекс аккаунта в списке ACCOUNT_NAMES
+        account_number = ACCOUNT_NAMES.index(account_name)
+        
+        # Находим длину списка NAME_ZNC_DOMEN
+        num_name_znc_domen = len(NAME_ZNC_DOMEN)
+        
+        # Возвращаем имя домена для данного аккаунта
+        return NAME_ZNC_DOMEN[account_number % num_name_znc_domen]
+        
     def get_proxy_for_account(self, account_name: str) -> str | None:
         if USE_PROXY:
             try:
@@ -170,7 +186,11 @@ class Runner(Logger):
         with open("./data/service/wallets_progress.json", "w") as file:
             json.dump(wallets, file, indent=4)
 
-    async def run_account_modules(self, account_name: str, private_key: str, proxy: str | None, smart_route: bool, index: int, route_generator: RouteGenerator | None, parallel_mode: bool = False):
+    async def run_account_modules(
+            self, account_name: str, private_key: str, proxy: str | None, smart_route: bool, 
+            index: int, route_generator: RouteGenerator | None, parallel_mode: bool = False,
+            name_znc_domen: str | None = None
+        ):
         message_list, result_list, route_paths, break_flag, module_counter = [], [], [], False, 0
 
         try:
@@ -241,8 +261,7 @@ class Runner(Logger):
                         result_list.append(account_progress)
                         break
 
-                if route_generator:
-                    await route_generator.add_executed_module(account_name, current_module.module_name)
+                await self.module_history.add_executed_module(account_name, current_module.module_name, result)
 
                 current_step += 1
                 message_list.append(f'{"✅" if result else "❌"}   {module_display_name}\n')
@@ -292,11 +311,14 @@ class Runner(Logger):
             proxies: List[str | None] = [
                 self.get_proxy_for_account(account_name[0]) for account_name in accounts
             ]
+            name_znc_domen: List[str | None] = [
+                self.get_name_znc_domen_for_account(account_name[0]) for account_name in accounts
+            ]
 
             if smart_route:
                 for (account_name, private_key), proxy in zip(accounts, proxies):
                     try:
-                        await route_generator.smart_generate_route(account_name, private_key, proxy)
+                        await route_generator.smart_generate_route(account_name, private_key, proxy, name_znc_domen)
 
                     except Exception as error:
                         self.logger_msg(account_name, None,
@@ -309,6 +331,7 @@ class Runner(Logger):
                     self.run_account_modules(
                         account_name, private_key, self.get_proxy_for_account(account_name),
                         smart_route, index, route_generator, parallel_mode=True,
+                        name_znc_domen=name_znc_domen[index]
                     )
                 )
                 for index, (account_name, private_key) in enumerate(accounts)
@@ -332,12 +355,13 @@ class Runner(Logger):
 
         for index, (account_name, private_key) in enumerate(accounts_data):
             proxy: str | None = self.get_proxy_for_account(account_name)
+            name_znc_domen = self.get_name_znc_domen_for_account(account_name)
             if smart_route:
-                await route_generator.smart_generate_route(account_name, private_key, proxy)
+                await route_generator.smart_generate_route(account_name, private_key, proxy, name_znc_domen)
 
             result = await self.run_account_modules(
-                account_name, private_key, proxy,
-                smart_route, index, route_generator
+                account_name, private_key, proxy, smart_route, index, route_generator, 
+                parallel_mode=True, name_znc_domen=name_znc_domen
             )
 
     async def run(self, smart_route: bool):

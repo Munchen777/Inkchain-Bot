@@ -41,29 +41,29 @@ class ModuleHistory:
         self.load_history()
 
     def load_history(self):
-        """ Download history of accounts that have been run """
         if self.file_path.exists():
-            try:
-                with open(self.file_path, "r") as file:
-                    data: Dict[str, Set[str]] = json.load(file)
-            
-            except Exception as error:
-                self.history: Dict[str, Set[str]] = {}
-                return
-
-            self.history: Dict[str, Set[str]] = {
-                account_name: set(modules)
-                for account_name, modules in data.items()
-            }
+            with open(self.file_path, "r") as file:
+                try:
+                    data = json.load(file)
+                    self.history = {
+                        account_name: set(modules)
+                        for account_name, modules in data.items()
+                    }
+                except json.JSONDecodeError:
+                    self.history = {}
         else:
-            self.history: Dict[str, Set[str]] = {}
-    
-    async def add_executed_module(self, account_name: str, module_name: str) -> None:
-        self.history.setdefault(account_name, set()).add(module_name)
-        await self.save_history()
+            self.history = {}
+            self.file_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.file_path, "w") as file:
+                json.dump({}, file)
+
+    async def add_executed_module(self, account_name: str, module_name: str, module_success: bool) -> None:
+        if module_success:
+            self.history.setdefault(account_name, set()).add(module_name)
+            await self.save_history()
 
     async def save_history(self) -> None:
-        data: Dict[str, List[str]] = {
+        data = {
             account_name: list(modules)
             for account_name, modules in self.history.items()
         }
@@ -85,29 +85,30 @@ class RouteGenerator(Logger):
         self.load_history()
 
     def load_history(self):
-        """ Download history of accounts that have been run """
         if self.file_path.exists():
-            try:
-                with open(self.file_path, "r") as file:
-                    data: Dict[str, Set[str]] = json.load(file)
-            
-            except Exception as error:
-                self.history: Dict[str, Set[str]] = {}
-                return
-
-            self.history: Dict[str, Set[str]] = {
-                account_name: set(modules)
-                for account_name, modules in data.items()
-            }
+            with open(self.file_path, "r") as file:
+                try:
+                    data = json.load(file)
+                    self.history = {
+                        account_name: set(modules)
+                        for account_name, modules in data.items()
+                    }
+                except json.JSONDecodeError:
+                    self.history = {}
         else:
-            self.history: Dict[str, Set[str]] = {}
+            self.history = {}
+            self.file_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.file_path, "w") as file:
+                json.dump({}, file)
 
-    async def add_executed_module(self, account_name: str, module_name: str) -> None:
-        self.history.setdefault(account_name, set()).add(module_name)
-        await self.save_history()
+
+    async def add_executed_module(self, account_name: str, module_name: str, module_success: bool) -> None:
+        if module_success:
+            self.history.setdefault(account_name, set()).add(module_name)
+            await self.save_history()
 
     async def save_history(self) -> None:
-        data: Dict[str, List[str]] = {
+        data = {
             account_name: list(modules)
             for account_name, modules in self.history.items()
         }
@@ -115,6 +116,9 @@ class RouteGenerator(Logger):
 
         with open(self.file_path, "w") as file:
             json.dump(data, file, indent=4)
+
+    async def check_first_run_modules(self, account_name: str) -> bool:
+        return account_name not in self.history
 
     async def check_first_run_modules(self, account_name: str) -> bool:
         return account_name not in self.history
@@ -170,7 +174,8 @@ class RouteGenerator(Logger):
 
             for index, (account_name, private_key) in enumerate(accounts_data):
                 proxy: str | None = runner.get_proxy_for_account(account_name)
-                client: Client = Client(account_name, private_key, proxy)
+                name_znc_domen: str | None = runner.get_name_znc_domen_for_account(account_name)
+                client: Client = Client(account_name, private_key, proxy, name_znc_domen=name_znc_domen)
 
                 all_available_wallet_balances: Dict[str, Dict[str, float]] = await client.get_wallet_balance(balance_in_eth=True)
                 
@@ -296,7 +301,7 @@ class RouteGenerator(Logger):
                     "current_step": 0,
                     "route": [module_obj.model_dump() for module_obj in classic_route]
                 }
-                modules_data[int(account_name)] = account_data
+                modules_data[account_name] = account_data
 
             # Записываем в файл
             try:
@@ -617,7 +622,10 @@ class RouteGenerator(Logger):
 
         # return available_modules
 
-    async def smart_generate_route(self, account_name: str, private_key: str, proxy: str | None) -> None:
+    async def smart_generate_route(
+            self, account_name: str, private_key: str, proxy: str | None, 
+            name_znc_domen: str | None = None
+        ) -> None:
         route_modules_dict: Dict[str, BaseModuleInfo] = {}
 
         try:
@@ -637,22 +645,22 @@ class RouteGenerator(Logger):
                                 f"There is no any module for account {account_name}", "warning")
                 raise SoftwareException
 
-            client: Client = Client(account_name, private_key, proxy)
-            # all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()
-            all_available_wallet_balances = {
-                "Ethereum Mainnet": {
-                    "ETH": 0.0003,
-                },
-                "Ink Mainnet": {
-                    "ETH": 0.008,
-                },
-                "Base Mainnet": {
-                    "ETH": 0.00014,
-                },
-                "OP Mainnet": {
-                    "ETH": 0.00014,
-                },
-            }
+            client: Client = Client(account_name, private_key, proxy, name_znc_domen=name_znc_domen)
+            all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()
+            # all_available_wallet_balances = {
+            #     "Ethereum Mainnet": {
+            #         "ETH": 0.0003,
+            #     },
+            #     "Ink Mainnet": {
+            #         "ETH": 0.008,
+            #     },
+            #     "Base Mainnet": {
+            #         "ETH": 0.00014,
+            #     },
+            #     "OP Mainnet": {
+            #         "ETH": 0.00014,
+            #     },
+            # }
 
             if not all_available_wallet_balances:
                 self.logger_msg(account_name, None,
