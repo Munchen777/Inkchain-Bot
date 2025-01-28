@@ -77,7 +77,7 @@ class ModuleHistory:
 
 
 class RouteGenerator(Logger):
-    def __init__(self, file_path: str = "./data/service/history.json"):
+    def __init__(self, file_path="../data/service/history.json"):
         super().__init__()
         self.module_history: ModuleHistory = ModuleHistory()
         self.file_path: Path = Path(file_path)
@@ -120,20 +120,52 @@ class RouteGenerator(Logger):
     async def check_first_run_modules(self, account_name: str) -> bool:
         return account_name not in self.history
 
-    async def check_first_run_modules(self, account_name: str) -> bool:
-        return account_name not in self.history
-
-    async def build_dependency_graph(self, modules: List[BaseModuleInfo]) -> Dict[str, List[str]]:
+    async def build_dependency_graph(self,
+                                     modules: List[BaseModuleInfo],
+                                     all_available_wallet_balances: Dict[str, Dict[str, float]]
+                                     ) -> DefaultDict[str, list]:
         graph: DefaultDict[str, List[str]] = defaultdict(list)
 
         try:
-            for module in modules:
-                module: BaseModuleInfo = MODULES_CLASSES.get(module)()
-                for other_module in modules:
-                    other_module: BaseModuleInfo = MODULES_CLASSES.get(other_module)()
-                    if module.dest_token == other_module.source_token and \
-                        module.destination_network == other_module.source_network and module is not other_module:
-                        graph[module.module_name].append(other_module.module_name)
+            # Иду по всем модулям
+            for module_name in modules:
+                module: BaseModuleInfo = MODULES_CLASSES.get(module_name)()
+                source_tokens: List[str] | None = module.source_token if isinstance(module.source_token, list) else [module.source_token]
+                source_network: str | None = module.source_network
+                
+                if not all(all_available_wallet_balances.get(source_network, {}).get(token, 0) >= module.min_amount_residue
+                    for token in source_tokens if token
+                ):
+                    continue
+
+                for dep_modul_name in modules:
+                    # Если равны, то пропускаем
+                    if module_name == dep_modul_name:
+                        continue
+
+                    dep_module: BaseModuleInfo = MODULES_CLASSES.get(dep_modul_name)()
+                    dep_tokens: List[str] | None = module.dest_token if isinstance(dep_module.dest_token, list) else [dep_module.dest_token]
+                    dep_module_dest_network: str | None = dep_module.destination_network
+                    
+                    # Проверяю равняется ли сеть отправления сети получения и есть ли на выходе какой-нибудь токен,
+                    # который нужен на входе другого модуля
+                    if source_network == dep_module_dest_network and any(token in dep_tokens for token in source_tokens):
+                        if all(all_available_wallet_balances.get(dep_module_dest_network, {}).get(token, 0) > dep_module.min_amount_residue
+                               for token in dep_tokens if token
+                        ):
+                            # Если в сети назначения и отправления есть токены
+                            if all(all_available_wallet_balances.get(source_network, {}).get(token, 0) > 0 for token in source_tokens) and \
+                                all(all_available_wallet_balances.get(dep_module_dest_network, {}).get(token, 0) > 0 for token in dep_tokens):
+                                # Отнимаю балансы в source (сети отправления)
+                                for token in source_tokens:
+                                    if token:
+                                        all_available_wallet_balances[source_network][token] += module.min_amount_out
+                                # Отнимаю балансы в destination (сети назначения)
+                                for token in dep_tokens:
+                                    if token:
+                                        all_available_wallet_balances[dep_module_dest_network][token] -= dep_module.min_amount_out
+
+                                graph[dep_modul_name].append(module_name)
         
         except Exception as error:
             self.logger_msg(None, None,
@@ -159,14 +191,24 @@ class RouteGenerator(Logger):
                             f"Error while creating all available modules.\nError: {error}", "error")
             raise error
 
-        modules_to_execute = CLASSIC_ROUTES_MODULES_USING
-        # Пробуем строить зависимости между модулями
-        dependency_graph: Dict[str, List[str]] = await self.build_dependency_graph(CLASSIC_ROUTES_MODULES_USING)
-        if dependency_graph:
-            # Выполняем топологическую сортировку
-            ordered_modules: List[str] | None = topological_sort(dependency_graph)
-            if ordered_modules:
-                modules_to_execute = ordered_modules
+        if CLASSIC_ROUTES_MODULES_USING:
+            modules_to_execute: List[str] = CLASSIC_ROUTES_MODULES_USING
+            # Пробуем строить зависимости между модулями
+            dependency_graph: Dict[str, List[str]] = await self.build_dependency_graph(CLASSIC_ROUTES_MODULES_USING)
+            if dependency_graph:
+                # Выполняем топологическую сортировку
+                ordered_modules: List[str] | None = topological_sort(dependency_graph)
+                if ordered_modules:
+                    modules_to_execute = ordered_modules
+        
+        else:
+            modules_to_execute = list(all_available_modules.keys())
+            # modules_to_execute: List[str] = list(all_available_modules.keys())
+            # dependency_graph: Dict[str, List[str]] = await self.build_dependency_graph(modules_to_execute)
+            # if dependency_graph:
+            #     ordered_modules: List[str] | None = topological_sort(dependency_graph)
+            #     if ordered_modules:
+            #         modules_to_execute = ordered_modules
 
         try:
             runner: Runner = Runner()
@@ -185,6 +227,20 @@ class RouteGenerator(Logger):
                     return
        
                 classic_route: Deque[list] | None = deque([])
+                
+                graph = await self.build_dependency_graph(modules_to_execute, all_available_wallet_balances)
+                # Если не получилось сформировать зависимости
+                if not graph:
+                    # соберем классический маршрут
+                    route = CLASSIC_ROUTES_MODULES_USING
+                
+                # TODO: остановился на этапе формирования пути
+                # нужно выполнить топологическую сортировку
+                # но она невозможна, если в графе есть циклы
+                # я пробую удалить циклы, но все равно какая-то связанность присутствует
+                ordered_route = topological_sort(graph)
+                
+                
 
                 # Проходимся по модулям
                 for module_name in modules_to_execute:
@@ -224,14 +280,14 @@ class RouteGenerator(Logger):
                         
                         # Если не хватает баланса токена в сети отправления
                         if float(source_curr_balance) <= module.min_available_balance:
-                            self.logger_msg(client.name, client.address,
-                                            f"We need to top up {source_network.name} network to execute {module.module_name}")
+                            # self.logger_msg(client.name, client.address,
+                            #                 f"We need to top up {source_network.name} network to execute {module.module_name}")
 
                             # Строим граф для построения зависимостей модуля по отношению к другим
                             graph: DefaultDict[str, list] = defaultdict(list)
 
                     # # Если у модуля есть source_token, тогда ищем зависимости
-                    # if module.source_token:
+                        if module.source_token:
                             # Берем необходимые токены в сети отправления модуля
                             required_tokens: List[str] = module.source_token if isinstance(module, list) else [module.source_token]
 
@@ -243,7 +299,7 @@ class RouteGenerator(Logger):
                                         provided_tokens: List[str] = dependency_module.dest_token \
                                             if isinstance(dependency_module, list) else [dependency_module.dest_token]
 
-                                        if token in provided_tokens:
+                                        if token in provided_tokens and module.source_network == dependency_module.destination_network:
                                             graph[dependency_module.module_name].append(module.module_name)
 
                             # Получаем модули, которые нужно выполнить перед текущим
@@ -294,6 +350,10 @@ class RouteGenerator(Logger):
                                                     destination_token_balance + dependency_module_class.min_amount_out
                                                 )
                                                 classic_route.appendleft(dependency_module_class)
+                        
+                        else:
+                            self.logger_msg(client.name, client.address,
+                                            f"There is no any other dependency module for {module_name}", "warning")
                                 
                     classic_route.append(module)
                 
