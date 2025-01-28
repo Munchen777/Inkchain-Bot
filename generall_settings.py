@@ -1,5 +1,9 @@
 import os
 
+'--------------------------------------------------- AMOUNT CONTROL ---------------------------------------------------'
+AMOUNT_PERCENT = (0.001, 0.01) # Минимальная / максимальная сумма для выполнения всех действий
+MIN_BALANCE = 0.0001           # Сумма, которую должны оставить в сети отправления
+
 
 GLOBAL_NETWORK = 1
 SOFTWARE_MODE = 1                                    # 0 - consistently / 1 - parallel
@@ -24,14 +28,12 @@ WALLETS_TO_WORK: int | tuple | list = 0              # 0 - all accounts
                                                      # [5, 25] - accounts 5 through 25 inclusive
 
 '------------------------------------------------SLEEP CONTROL---------------------------------------------------------'
-SLEEP_MODE = False               # True or False | Enables sleep after each account is used up
+SLEEP_MODE = True               # True or False | Enables sleep after each account is used up
 SLEEP_TIME_MODULES = (60, 80)    # (minimum, maximum) seconds | Sleep time between modules
 SLEEP_TIME_ACCOUNTS = (40, 60)   # (minimum, maximum) seconds | Sleep time between accounts
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # Settings for Web3 activities (advanced users only)
-
-MIN_AVAILABLE_BALANCE = int(100000000000000)                        # Minimum balance
 
 RANDOM_RANGE = (0.01, 0.1)                                          # Range of random values
 
