@@ -94,7 +94,8 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "mint_guild_nft": MintNFTGuildModule,
     "deploy_contract_ink_network": DeployContractInkModule,
     "buy_znc_domen_ink_network": BuyZNCDomenInkModule,
-    "claim_daily_gm": ClaimDailyGMModule
+    "claim_daily_gm": ClaimDailyGMModule,
+    "add_liquidity_dinero_eth_and_ieth": AddLiquidityDineroETHandiETHModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -164,10 +165,11 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "mint_guild_nft": mint_guild_nft,
     "deploy_contract_ink_network": deploy_contract_ink_network,
     "buy_znc_domen_ink_network": buy_znc_domen_ink_network,
-    "claim_daily_gm": claim_daily_gm
+    "claim_daily_gm": claim_daily_gm,
+    "add_liquidity_dinero_eth_and_ieth": add_liquidity_dinero_eth_and_ieth
 }
 
-ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES = get_accounts_data()
+ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, NAME_ZNC_DOMEN = get_accounts_data()
 
 TITLE = """\033[33m
  /$$$$$$           /$$                           /$$                 /$$                 /$$$$$$$              /$$    

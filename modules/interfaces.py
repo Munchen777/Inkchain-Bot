@@ -740,6 +740,16 @@ class AddLiquidityModuleInfo(BaseModuleInfo):
     destination_network: Optional[str] = source_network
     module_type: str = "add_liquidity"
 
+class AddLiquidityDineroETHandiETHModule(AddLiquidityModuleInfo):
+    """ Add Liquidity Dinero module ETH on the Ethereum network and ETH on the Ink network  """
+    source_network: str = Ethereum.name
+    source_network_chain_id: int = Ethereum.chain_id
+    module_priority: int = 2
+    module_name: str = "add_liquidity_dinero_eth_and_ieth"
+    module_display_name: str = "Add Liquidity Dinero ETH on the Ethereum network and ETH on the Ink network"
+    source_token: list = ["ETH", "ETH"]
+    destination_network: str = Ink.name
+
 class AddLiquidityDyorETHtoUSDCModule(AddLiquidityModuleInfo):
     """ Add Liquidity Dyor module from ETH and USDC  """
     source_network: str = Ink.name
