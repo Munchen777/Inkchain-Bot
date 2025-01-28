@@ -2,8 +2,9 @@ import openpyxl
 import os
 import sys
 
+from collections import defaultdict, deque
 from better_proxy import Proxy
-from typing import Dict, List, Set
+from typing import DefaultDict, Dict, Deque, List, Set
 
 from generall_settings import EXCEL_FILE_PATH
 from modules import Logger
@@ -37,7 +38,7 @@ def get_accounts_data():
             account_name = row[0].value
             private_key = row[1].value
             proxy = row[2].value
-            name_znc_domen_value = row[3].value
+            name_znc_domen_value = row[3].value if len(row) == 4 else None
 
             if not all([account_name, private_key, proxy]):
                 continue
@@ -81,21 +82,106 @@ def check_progress_file() -> bool:
         return False
 
 
-def topological_sort(graph: Dict[str, List[str]]) -> List[str]:
+# def topological_sort(graph: Dict[str, List[str]]) -> List[str]:
+#     visited: Set[str] = set()
+#     stack: List[str] = []
+
+#     def dfs(module_name: str):
+#         visited.add(module_name)
+
+#         for neighbour in graph.get(module_name, []):
+#             if neighbour not in visited:
+#                 dfs(neighbour)
+
+#         stack.append(module_name)
+
+#     for module_name in graph:
+#         if module_name not in visited:
+#             dfs(module_name)
+
+#     return stack[::-1]
+
+# def remove_cycle(graph: DefaultDict[str, list[str]]):
+#     for key, value in graph.items():
+#         for neighbour in graph.get(key, []):
+#             remove_edge()
+
+
+def find_cycle(graph: DefaultDict[str, List[str]]) -> List[str] | None:
     visited: Set[str] = set()
-    stack: List[str] = []
+    stack: Set[str] = set()
 
-    def dfs(module_name: str):
-        visited.add(module_name)
+    def dfs(node: str, path: List) -> List[str] | None:
+        if node in stack:
+            return path[path.index(node):]
 
-        for neighbour in graph.get(module_name, []):
-            if neighbour not in visited:
-                dfs(neighbour)
+        if node in visited:
+            return None
 
-        stack.append(module_name)
+        visited.add(node)
+        stack.add(node)
 
-    for module_name in graph:
-        if module_name not in visited:
-            dfs(module_name)
+        for neighbour in graph.get(node, []):
+            cycle: List[str] | None = dfs(neighbour, path + [node])
+            if cycle:
+                return cycle
 
-    return stack[::-1]
+        stack.remove(node)
+        return None
+
+    for node in graph:
+        cycle: List[str] | None = dfs(node, [])
+        if cycle:
+            return cycle
+
+    return None
+
+
+def remove_cycle(graph: Dict[str, List[str]], cycle: List[str]) -> Dict[str, List[str]]:
+    # Удаляем первое ребро в цикле
+    from_node: str = cycle[0]
+    to_node: str = cycle[1]
+    graph[from_node].remove(to_node)
+    print(f"Removed edge: {from_node} -> {to_node}")
+    return graph
+
+
+def topological_sort(graph: DefaultDict[str, List[str]]) -> List[str]:
+    graph: DefaultDict[str, List[str]] = {
+        node: list(set(deps))
+        for node, deps in graph.items()
+    }
+    # Подсчёт входящих рёбер для каждой вершины
+    in_degree: DefaultDict[str, int] = defaultdict(int)
+    for node, dependencies in graph.items():
+        for dependency in dependencies:
+            in_degree[dependency] += 1
+
+    # Очередь для вершин с 0 входящими рёбрами
+    zero_in_degree = deque(node for node in graph if in_degree[node] == 0)
+    sorted_order: List[str] = []
+
+    while zero_in_degree:
+        current = zero_in_degree.popleft()
+        sorted_order.append(current)
+
+        # Уменьшаем степень входа для соседей
+        for neighbor in graph.get(current, []):
+            in_degree[neighbor] -= 1
+            if in_degree[neighbor] == 0:
+                zero_in_degree.append(neighbor)
+
+    # Проверка на наличие цикла
+    if len(sorted_order) != len(graph):
+        while True:#find_cycle(graph):
+            cycle: List[str] | None = find_cycle(graph)
+            if cycle:
+                graph: DefaultDict[str, list[str]] = remove_cycle(graph, cycle)
+                continue
+            break
+
+        return topological_sort(graph)
+        
+        # raise ValueError("Graph contains a cycle. Topological sort is not possible.")
+
+    return sorted_order
