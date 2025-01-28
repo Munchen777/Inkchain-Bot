@@ -73,7 +73,7 @@ class Logger(ABC):
                 os.mkdir(LOGS_FILE_PATH)
 
             formatter: ColoredFormatter = ColoredFormatter(
-                fmt="[%(asctime)s] [%(name)s] [%(filename)s:%(lineno)d] [%(levelname)s] [%(message)s]",
+                fmt="[%(asctime)s] [%(name)s] [%(filename)s:%(lineno)d] [%(levelname)s] %(message)s",
                 datefmt="%H:%M:%S"
             )
 
