@@ -9,7 +9,7 @@ from typing import Any, Callable, Dict, List, Tuple
 
 from data.config import (ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, NAME_ZNC_DOMEN, MODULE_RUNNERS)
 from generall_settings import (WALLETS_TO_WORK, SHUFFLE_WALLETS, SOFTWARE_MODE, USE_PROXY,
-                               ACCOUNTS_IN_STREAM, GLOBAL_NETWORK, SAVE_PROGRESS, TELEGRAM_NOTIFICATIONS, BREAK_ROUTE,
+                               ACCOUNTS_IN_STREAM, SAVE_PROGRESS, TELEGRAM_NOTIFICATIONS, BREAK_ROUTE,
                                SLEEP_MODE, SLEEP_TIME_ACCOUNTS, SLEEP_TIME_MODULES, TG_ID, TG_TOKEN)
 from modules import Logger
 from modules.interfaces import BaseModuleInfo
@@ -377,6 +377,7 @@ class Runner(Logger):
                 await self.run_consistently(smart_route, route_generator)
 
         except SoftwareException as error:
-            self.logger.error(
-                f"Error: {error}"
-            )
+            self.logger.error(None, None,msg=error)
+
+        except Exception as error:
+            self.logger.error(None, None, msg=error)
