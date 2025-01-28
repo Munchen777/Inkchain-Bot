@@ -367,8 +367,8 @@ async def swap_dyor_kraken_to_usdt(account_name: str, private_key: str, proxy: s
     )
     return await worker.run()
 
-async def add_liquidity_dinero_eth_and_ieth(account_name: str, private_key: str, proxy: str | None, module_info: AddLiquidityDineroETHandiETHModule):
-    worker = AddLiquidityDineroETHandiETHWorker(
+async def add_liquidity_dinero_ieth_and_eth(account_name: str, private_key: str, proxy: str | None, module_info: AddLiquidityDineroiETHandETHModule):
+    worker = AddLiquidityDineroiETHandETHWorker(
         client=get_client(account_name, private_key, proxy, module_info.source_network),
         module_info=module_info
     )

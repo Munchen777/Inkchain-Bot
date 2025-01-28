@@ -95,7 +95,7 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "deploy_contract_ink_network": DeployContractInkModule,
     "buy_znc_domen_ink_network": BuyZNCDomenInkModule,
     "claim_daily_gm": ClaimDailyGMModule,
-    "add_liquidity_dinero_eth_and_ieth": AddLiquidityDineroETHandiETHModule
+    "add_liquidity_dinero_ieth_and_eth": AddLiquidityDineroiETHandETHModule
 }
 
 CHAIN_NAMES: Dict[int, str] = {
@@ -166,7 +166,7 @@ MODULE_RUNNERS: Dict[str, Callable] = {
     "deploy_contract_ink_network": deploy_contract_ink_network,
     "buy_znc_domen_ink_network": buy_znc_domen_ink_network,
     "claim_daily_gm": claim_daily_gm,
-    "add_liquidity_dinero_eth_and_ieth": add_liquidity_dinero_eth_and_ieth
+    "add_liquidity_dinero_ieth_and_eth": add_liquidity_dinero_ieth_and_eth
 }
 
 ACCOUNT_NAMES, PRIVATE_KEYS, PROXIES, NAME_ZNC_DOMEN = get_accounts_data()

@@ -89,7 +89,7 @@ CLASSIC_ROUTES_MODULES_USING = [
     
     ["claim_daily_gm"]                                  Claim Daily GM on the Ink network
 
-    ["add_liquidity_dinero_eth_and_ieth"]               Add Liquidity on the website Dinero ETH on the Ethereum network and ETH on the Ink networkk
+    ["add_liquidity_dinero_ieth_and_eth"]               Add Liquidity on the website Dinero iETH on the Ink network and ETH on the Ethereum network
 
 ]
 
@@ -100,7 +100,7 @@ CLASSIC_ROUTES_MODULES_USING: List[str] = [
     # "mint_paragraf_nft",
     # "mint_og_nft",
     # "mint_guild_nft",
-    "deploy_contract_ink_network",
+    "add_liquidity_dinero_ieth_and_eth",
     # "buy_znc_domen_ink_network",
     # "claim_daily_gm",
 ]
