@@ -371,6 +371,14 @@ class Client(Logger):
                         wallet_balances.setdefault(network_name, {})[token_name] = native_token_balance / (10**18)
 
                     if network_token_contracts:
+                        native_token_balance: float | None = await w3.eth.get_balance(self.address)
+
+                        if not native_token_balance:
+                            self.logger_msg(self.name, self.address,
+                                f"Native balance {token_name} not found in {network_name} network.", "warning")
+
+                        wallet_balances.setdefault(network_name, {})["ETH"] = native_token_balance / (10**18)
+
                         network_token_contracts = {
                             k: v for k, v in network_token_contracts.items()
                             if k not in {"WETH", "ETH"}

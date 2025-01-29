@@ -90,11 +90,3 @@ NETWORKS: Dict[str, Network] = {
     "Base Mainnet": Base,
     "OP Mainnet": OP,
 }
-
-# Mapping of rabby networks to networks names
-NETWORKS_IN_RABBY: Dict[str, Network] = {
-    "eth": Ethereum,
-    "ink": Ink,
-    "base": Base,
-    "op": OP,
-}

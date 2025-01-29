@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Any, Dict, Optional, List, Literal, Set
 
+from generall_settings import AMOUNT_PERCENT, MIN_BALANCE
 from utils.networks import *
 
 
@@ -85,12 +86,14 @@ class BridgeModuleInfo(BaseModuleInfo):
     """
     fee: float = 0.0
     min_available_balance: float = 0.005
-    min_amount_residue: float = 0.003
-    min_amount_out: float = 0.001
-    max_amount_out: float = 0.003
+    min_amount_residue: float = MIN_BALANCE
+    min_amount_out: float = AMOUNT_PERCENT[0]
+    max_amount_out: float = AMOUNT_PERCENT[-1]
     source_network: str = None
     destination_network: Optional[str] = None
     module_type: str = "bridge"
+    source_token: str = "ETH"
+    dest_token: str = "ETH"
 
 class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
     """ Bridge Owlto module from OP to Ink  """
@@ -231,7 +234,7 @@ class BridgeRelayInktoBaseModule(BridgeModuleInfo):
 class BridgGGEthereumtoInkModule(BridgeModuleInfo):
     """ Bridge GG module from Ethereum to Ink  """
     min_available_balance: float = 0.01
-    min_amount_residue: float = 0.005
+    min_amount_residue: float = MIN_BALANCE
     min_amount_out: float = 0.003
     max_amount_out: float = 0.005
     source_network: str = Ethereum.name
@@ -241,6 +244,7 @@ class BridgGGEthereumtoInkModule(BridgeModuleInfo):
     module_priority: int = 2
     module_name: str = "bridge_gg_ethereum_to_ink"
     module_display_name: str = "Bridge GG Ethereum to Ink"
+    source_token: str = "ETH"
 
     required_on_first_run: bool = True
 
@@ -266,9 +270,9 @@ class SwapModuleInfo(BaseModuleInfo):
     """
     fee: float = 0.0
     min_available_balance: float = 0.005
-    min_amount_residue: float = 0.003
-    min_amount_out: float = 0.001
-    max_amount_out: float = 0.003
+    min_amount_residue: float = MIN_BALANCE
+    min_amount_out: float = AMOUNT_PERCENT[0]
+    max_amount_out: float = AMOUNT_PERCENT[-1]
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "swap"
@@ -733,9 +737,9 @@ class AddLiquidityModuleInfo(BaseModuleInfo):
     """
     fee: float = 0.0
     min_available_balance: float = 0.005
-    min_amount_residue: float = 0.003
-    min_amount_out: float = 0.001
-    max_amount_out: float = 0.003
+    min_amount_residue: float = MIN_BALANCE
+    min_amount_out: float = AMOUNT_PERCENT[0]
+    max_amount_out: float = AMOUNT_PERCENT[-1]
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "add_liquidity"
@@ -758,6 +762,7 @@ class AddLiquidityDyorETHtoUSDCModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_usdc"
     module_display_name: str = "Add Liquidity Dyor ETH and USDC"
     source_token: list = ["ETH", "USDC"]
+    dest_token: str = "ETH"
     destination_network: str = Ink.name
 
 class AddLiquidityDyorETHtoUSDTModule(AddLiquidityModuleInfo):
@@ -768,6 +773,7 @@ class AddLiquidityDyorETHtoUSDTModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_usdt"
     module_display_name: str = "Add Liquidity Dyor ETH and USDT"
     source_token: list = ["ETH", "USDT"]
+    dest_token: str = "ETH"
     destination_network: str = Ink.name
 
 class AddLiquidityDyorETHtoKRAKENModule(AddLiquidityModuleInfo):
@@ -778,6 +784,7 @@ class AddLiquidityDyorETHtoKRAKENModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_kraken"
     module_display_name: str = "Add Liquidity Dyor ETH and KRAKEN"
     source_token: list = ["ETH", "KRAKEN"]
+    dest_token: str = "ETH"
     destination_network: str = Ink.name
 
 class AddLiquidityDyorETHtoWORMModule(AddLiquidityModuleInfo):
@@ -788,6 +795,7 @@ class AddLiquidityDyorETHtoWORMModule(AddLiquidityModuleInfo):
     module_name: str = "add_liquidity_dyor_eth_and_worm"
     module_display_name: str = "Add Liquidity Dyor ETH and WORM"
     source_token: list = ["ETH", "WORM"]
+    dest_token: str = "ETH"
     destination_network: str = Ink.name
 
 
@@ -808,12 +816,13 @@ class MintNFTModuleInfo(BaseModuleInfo):
     """
     fee: float = 0.0
     min_available_balance: float = 0.005
-    min_amount_residue: float = 0.003
-    min_amount_out: float = 0.001
-    max_amount_out: float = 0.003
+    min_amount_residue: float = MIN_BALANCE
+    min_amount_out: float = AMOUNT_PERCENT[0]
+    max_amount_out: float = AMOUNT_PERCENT[-1]
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "mint_nft"
+    dest_token: str = "ETH"
 
 class MintNFTParagrafModule(MintNFTModuleInfo):
     """ Mint Paragraf NFT module  """
@@ -823,6 +832,7 @@ class MintNFTParagrafModule(MintNFTModuleInfo):
     module_name: str = "mint_paragraf_nft"
     module_display_name: str = "Mint Paragraf NFT"
     source_token: str = "ETH"
+    dest_token: str = "ETH"
 
 class MintNFTOGModule(MintNFTModuleInfo):
     """ Mint OG NFT module  """
@@ -832,6 +842,7 @@ class MintNFTOGModule(MintNFTModuleInfo):
     module_name: str = "mint_og_nft"
     module_display_name: str = "Mint OG NFT"
     source_token: str = "ETH"
+    dest_token: str = "ETH"
 
 class MintNFTGuildModule(MintNFTModuleInfo):
     """ Mint Guild NFT module  """
@@ -841,6 +852,7 @@ class MintNFTGuildModule(MintNFTModuleInfo):
     module_name: str = "mint_guild_nft"
     module_display_name: str = "Mint Guild NFT"
     source_token: str = "ETH"
+    dest_token: str = "ETH"
 
 
 class DeployContractModule(BaseModuleInfo):
@@ -860,9 +872,9 @@ class DeployContractModule(BaseModuleInfo):
     """
     fee: float = 0.0
     min_available_balance: float = 0.005
-    min_amount_residue: float = 0.003
-    min_amount_out: float = 0.001
-    max_amount_out: float = 0.003
+    min_amount_residue: float = MIN_BALANCE
+    min_amount_out: float = AMOUNT_PERCENT[0]
+    max_amount_out: float = AMOUNT_PERCENT[-1]
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "deploy"
@@ -876,6 +888,7 @@ class DeployContractInkModule(DeployContractModule):
     module_name: str = "deploy_contract_ink_network"
     module_display_name: str = "Deployment of the contract in the Ink network"
     destination_network: str = Ink.name
+    dest_token: str = "ETH"
 
 
 class BuyZNCDomenModule(BaseModuleInfo):
@@ -895,13 +908,14 @@ class BuyZNCDomenModule(BaseModuleInfo):
     """
     fee: float = 0.0
     min_available_balance: float = 0.005
-    min_amount_residue: float = 0.003
-    min_amount_out: float = 0.001
-    max_amount_out: float = 0.003
+    min_amount_residue: float = MIN_BALANCE
+    min_amount_out: float = AMOUNT_PERCENT[0]
+    max_amount_out: float = AMOUNT_PERCENT[-1]
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
     source_token: str = "ETH"
+    dest_token: str = "ETH"
 
 class BuyZNCDomenInkModule(BuyZNCDomenModule):
     """ Buy ZNC domen in the Ink network """
@@ -930,13 +944,14 @@ class ClaimDailyGMModule(BaseModuleInfo):
     """
     fee: float = 0.0
     min_available_balance: float = 0.005
-    min_amount_residue: float = 0.003
-    min_amount_out: float = 0.001
-    max_amount_out: float = 0.003
+    min_amount_residue: float = MIN_BALANCE
+    min_amount_out: float = AMOUNT_PERCENT[0]
+    max_amount_out: float = AMOUNT_PERCENT[-1]
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
     source_token: str = "ETH"
+    dest_token: str = "ETH"
 
 class ClaimDailyGMModule(ClaimDailyGMModule):
     """ Claim Daily GM in the Ink network """
