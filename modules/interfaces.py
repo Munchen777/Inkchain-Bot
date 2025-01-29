@@ -94,6 +94,7 @@ class BridgeModuleInfo(BaseModuleInfo):
     module_type: str = "bridge"
     source_token: str = "ETH"
     dest_token: str = "ETH"
+    bridge_type: BRIDGE_TYPE = "L2"
 
 class BridgeOwltoOPtoInkModule(BridgeModuleInfo):
     """ Bridge Owlto module from OP to Ink  """
@@ -245,8 +246,8 @@ class BridgGGEthereumtoInkModule(BridgeModuleInfo):
     module_name: str = "bridge_gg_ethereum_to_ink"
     module_display_name: str = "Bridge GG Ethereum to Ink"
     source_token: str = "ETH"
+    bridge_type: BRIDGE_TYPE = "L1"
 
-    required_on_first_run: bool = True
 
     dependencies: ModuleDependency = ModuleDependency(
         required_modules=set(),
@@ -822,7 +823,7 @@ class MintNFTModuleInfo(BaseModuleInfo):
     source_network: str = None
     destination_network: Optional[str] = source_network
     module_type: str = "mint_nft"
-    dest_token: str = "ETH"
+    # dest_token: str = "ETH"
 
 class MintNFTParagrafModule(MintNFTModuleInfo):
     """ Mint Paragraf NFT module  """
@@ -832,7 +833,7 @@ class MintNFTParagrafModule(MintNFTModuleInfo):
     module_name: str = "mint_paragraf_nft"
     module_display_name: str = "Mint Paragraf NFT"
     source_token: str = "ETH"
-    dest_token: str = "ETH"
+    # dest_token: str = "ETH"
 
 class MintNFTOGModule(MintNFTModuleInfo):
     """ Mint OG NFT module  """
@@ -842,7 +843,7 @@ class MintNFTOGModule(MintNFTModuleInfo):
     module_name: str = "mint_og_nft"
     module_display_name: str = "Mint OG NFT"
     source_token: str = "ETH"
-    dest_token: str = "ETH"
+    # dest_token: str = "ETH"
 
 class MintNFTGuildModule(MintNFTModuleInfo):
     """ Mint Guild NFT module  """
@@ -852,7 +853,7 @@ class MintNFTGuildModule(MintNFTModuleInfo):
     module_name: str = "mint_guild_nft"
     module_display_name: str = "Mint Guild NFT"
     source_token: str = "ETH"
-    dest_token: str = "ETH"
+    # dest_token: str = "ETH"
 
 
 class DeployContractModule(BaseModuleInfo):
@@ -888,7 +889,7 @@ class DeployContractInkModule(DeployContractModule):
     module_name: str = "deploy_contract_ink_network"
     module_display_name: str = "Deployment of the contract in the Ink network"
     destination_network: str = Ink.name
-    dest_token: str = "ETH"
+    # dest_token: str = "ETH"
 
 
 class BuyZNCDomenModule(BaseModuleInfo):
@@ -915,7 +916,7 @@ class BuyZNCDomenModule(BaseModuleInfo):
     destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
     source_token: str = "ETH"
-    dest_token: str = "ETH"
+    # dest_token: str = "ETH"
 
 class BuyZNCDomenInkModule(BuyZNCDomenModule):
     """ Buy ZNC domen in the Ink network """
@@ -951,7 +952,7 @@ class ClaimDailyGMModule(BaseModuleInfo):
     destination_network: Optional[str] = source_network
     module_type: str = "buy_domen"
     source_token: str = "ETH"
-    dest_token: str = "ETH"
+    # dest_token: str = "ETH"
 
 class ClaimDailyGMModule(ClaimDailyGMModule):
     """ Claim Daily GM in the Ink network """
