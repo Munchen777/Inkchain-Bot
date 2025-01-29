@@ -6,7 +6,7 @@ import sys
 from collections import deque, defaultdict
 from pathlib import Path
 from pydantic import ValidationError
-from typing import Any, Dict, Deque, List, Set, Tuple, DefaultDict
+from typing import Any, Dict, Deque, list, Set, Tuple, DefaultDict
 
 from data.config import ACCOUNT_NAMES, MODULES_CLASSES, PRIVATE_KEYS, PROXIES
 from generall_settings import SHUFFLE_ROUTE, USE_L2_TO_DEPOSIT
@@ -121,16 +121,16 @@ class RouteGenerator(Logger):
         return account_name not in self.history
 
     async def build_dependency_graph(self,
-                                     modules: List[BaseModuleInfo],
+                                     modules: list[BaseModuleInfo],
                                      all_available_wallet_balances: Dict[str, Dict[str, float]]
                                      ) -> DefaultDict[str, list]:
-        graph: DefaultDict[str, List[str]] = defaultdict(list)
+        graph: DefaultDict[str, list[str]] = defaultdict(list)
 
         try:
             # Иду по всем модулям
             for module_name in modules:
                 module: BaseModuleInfo = MODULES_CLASSES.get(module_name)()
-                source_tokens: List[str] | None = module.source_token if isinstance(module.source_token, list) else [module.source_token]
+                source_tokens: list[str] | None = module.source_token if isinstance(module.source_token, list) else [module.source_token]
                 source_network: str | None = module.source_network
                 
                 if not all(all_available_wallet_balances.get(source_network, {}).get(token, 0) >= module.min_amount_residue
@@ -144,7 +144,7 @@ class RouteGenerator(Logger):
                         continue
 
                     dep_module: BaseModuleInfo = MODULES_CLASSES.get(dep_modul_name)()
-                    dep_tokens: List[str] | None = module.dest_token if isinstance(dep_module.dest_token, list) else [dep_module.dest_token]
+                    dep_tokens: list[str] | None = module.dest_token if isinstance(dep_module.dest_token, list) else [dep_module.dest_token]
                     dep_module_dest_network: str | None = dep_module.destination_network
                     
                     # Проверяю равняется ли сеть отправления сети получения и есть ли на выходе какой-нибудь токен,
@@ -174,7 +174,7 @@ class RouteGenerator(Logger):
 
         return graph
 
-    async def classic_generate_route(self) -> List[BaseModuleInfo]:
+    async def classic_generate_route(self) -> list[BaseModuleInfo]:
         from .modules_runner import Runner
 
         modules_data: Dict[str, Any] = {}
@@ -192,27 +192,27 @@ class RouteGenerator(Logger):
             raise error
 
         if CLASSIC_ROUTES_MODULES_USING:
-            modules_to_execute: List[str] = CLASSIC_ROUTES_MODULES_USING
+            modules_to_execute: list[str] = CLASSIC_ROUTES_MODULES_USING
             # Пробуем строить зависимости между модулями
-            dependency_graph: Dict[str, List[str]] = await self.build_dependency_graph(CLASSIC_ROUTES_MODULES_USING)
+            dependency_graph: Dict[str, list[str]] = await self.build_dependency_graph(CLASSIC_ROUTES_MODULES_USING)
             if dependency_graph:
                 # Выполняем топологическую сортировку
-                ordered_modules: List[str] | None = topological_sort(dependency_graph)
+                ordered_modules: list[str] | None = topological_sort(dependency_graph)
                 if ordered_modules:
                     modules_to_execute = ordered_modules
         
         else:
             modules_to_execute = list(all_available_modules.keys())
-            # modules_to_execute: List[str] = list(all_available_modules.keys())
-            # dependency_graph: Dict[str, List[str]] = await self.build_dependency_graph(modules_to_execute)
+            # modules_to_execute: list[str] = list(all_available_modules.keys())
+            # dependency_graph: Dict[str, list[str]] = await self.build_dependency_graph(modules_to_execute)
             # if dependency_graph:
-            #     ordered_modules: List[str] | None = topological_sort(dependency_graph)
+            #     ordered_modules: list[str] | None = topological_sort(dependency_graph)
             #     if ordered_modules:
             #         modules_to_execute = ordered_modules
 
         try:
             runner: Runner = Runner()
-            accounts_data: List[Tuple[str, str]] = runner.get_wallets()
+            accounts_data: list[Tuple[str, str]] = runner.get_wallets()
 
             for index, (account_name, private_key) in enumerate(accounts_data):
                 proxy: str | None = runner.get_proxy_for_account(account_name)
@@ -289,21 +289,21 @@ class RouteGenerator(Logger):
                     # # Если у модуля есть source_token, тогда ищем зависимости
                         if module.source_token:
                             # Берем необходимые токены в сети отправления модуля
-                            required_tokens: List[str] = module.source_token if isinstance(module, list) else [module.source_token]
+                            required_tokens: list[str] = module.source_token if isinstance(module, list) else [module.source_token]
 
                             # Ищем, как мы можем получить их из других модулей на выходе
                             for token in required_tokens:
                                 for dependency_module_name, dependency_module in all_available_modules.items():
                                     if dependency_module.dest_token:
 
-                                        provided_tokens: List[str] = dependency_module.dest_token \
+                                        provided_tokens: list[str] = dependency_module.dest_token \
                                             if isinstance(dependency_module, list) else [dependency_module.dest_token]
 
                                         if token in provided_tokens and module.source_network == dependency_module.destination_network:
                                             graph[dependency_module.module_name].append(module.module_name)
 
                             # Получаем модули, которые нужно выполнить перед текущим
-                            required_modules_to_execute: List[str] | None = topological_sort(graph)
+                            required_modules_to_execute: list[str] | None = topological_sort(graph)
 
                             # Если нашли такие модули
                             if required_modules_to_execute:
@@ -397,7 +397,7 @@ class RouteGenerator(Logger):
         except ValidationError as error:
             raise ValidationError(f"Error while validating module {module_name}.\nError: {error}")
 
-    # def sort_classic_route(self, route: list[str], landing_mode: bool) -> List[str]:
+    # def sort_classic_route(self, route: list[str], landing_mode: bool) -> list[str]:
     #     """
     #     Create classic route
 
@@ -427,7 +427,7 @@ class RouteGenerator(Logger):
 
     #         random.shuffle(classic_route)
 
-    #         route_with_priority: List[str] = [
+    #         route_with_priority: list[str] = [
     #             module_name[0]
     #             for module_name in sorted(classic_route, key=lambda x: x[1])
     #         ]
@@ -455,35 +455,30 @@ class RouteGenerator(Logger):
 
     #     return new_route_with_dep
     
-    async def get_available_modules(self,
-                                    all_available_modules: Dict[str, BaseModuleInfo],
-                                    executed_modules: Set[str],
-                                    all_available_wallet_balances: Dict[str, Dict[str, float]],
-                                    required_modules_to_execute: Set[str],
-                                    client: Client,
-                                    is_first_run: bool = False,
-                                    ) -> List[BaseModuleInfo] | None:
+    async def get_available_modules(
+            self,
+            all_available_modules: dict[str, BaseModuleInfo],
+            executed_modules: set[str],
+            all_available_wallet_balances: dict[str, dict[str, float]],
+            required_modules_to_execute: set[str],
+            client: Client,
+            is_first_run: bool = False,
+        ) -> list[BaseModuleInfo] | None: 
+
         available_modules: Deque[BaseModuleInfo] | None = deque([])
 
-        # Если первый запуск и есть модули, которые должны быть обязательно выполнены
-        # if is_first_run and required_modules_to_execute:
-            # networks_being_deposited: Set[str] = set()
-
-        # Если не первый запуск, то добавляем все названия модулей в множество
         if not is_first_run:
-            required_modules_to_execute: Set[str] = all_available_modules.keys()
+            required_modules_to_execute: set[str] = all_available_modules.keys()
 
         try:
-        # Идем по модулям, которые должны быть обязательно выполнены
             for module_name in required_modules_to_execute:
                 required_module_to_execute: BaseModuleInfo | None = all_available_modules.get(module_name)
+
                 if not required_module_to_execute:
                     self.logger_msg(client.name, client.address,
                                     f"There is no network for required module {module_name}")
                     continue
 
-                # Проверяем на наличие баланса в сети назначения (destination_network)
-                # и наличие названия сети в множестве PRIORITY_NETWORK_NAMES
                 if required_module_to_execute.module_type == "bridge":
                     if required_module_to_execute.destination_network and \
                         required_module_to_execute.destination_network in PRIORITY_NETWORK_NAMES:
@@ -496,26 +491,17 @@ class RouteGenerator(Logger):
                                         f"There is no destination network {required_module_to_execute.destination_network}")
                                 continue
 
-                            # token_balances_in_source_network: Dict[str, float] | None = all_available_wallet_balances.get(
-                            #     source_network.name, {}
-                            # )
-
                             token_balances_in_destination_network: float = all_available_wallet_balances.get(
                                 destination_network.name, {}).get(destination_network.token, 0
                             )
-                            # Проверяем на наличие баланса в сети назначения (destination_network)
+
                             if token_balances_in_destination_network == 0 or \
                                 float(token_balances_in_destination_network) <= required_module_to_execute.min_available_balance:
-                                # for token_name, token_balance in token_balances_in_destination_network.items():
-                                #if (float(token_balances_in_destination_network) <= required_module_to_execute.min_available_balance):# and \
-                                    # token_name == destination_network.token and \
-                                        # destination_network.name not in networks_being_deposited):
-
-                                    # Используем ли бриджи, у которых required_on_first_run = False
-                                    deposit_modules: List[BridgeModuleInfo] | None = []
+                                    
+                                    deposit_modules: list[BridgeModuleInfo] | None = []
 
                                     if USE_L2_TO_DEPOSIT:
-                                        deposit_modules: List[BridgeModuleInfo] | None = [
+                                        deposit_modules: list[BridgeModuleInfo] | None = [
                                             module_class
                                             for module_class in all_available_modules.values()
                                             if module_class.module_type == "bridge" and \
@@ -523,7 +509,7 @@ class RouteGenerator(Logger):
                                                     module_class.required_on_first_run is False
                                         ]
                                     elif not USE_L2_TO_DEPOSIT:
-                                        deposit_modules: List[BridgeModuleInfo] | None = [
+                                        deposit_modules: list[BridgeModuleInfo] | None = [
                                             module_class
                                             for module_class in all_available_modules.values()
                                             if module_class.module_type == "bridge" and \
@@ -532,7 +518,7 @@ class RouteGenerator(Logger):
                                         ]
 
                                     # Все модули бриджей, которые могут пополнить баланс в сети назначения
-                                    all_deposit_modules: List[BridgeModuleInfo] | None = [
+                                    all_deposit_modules: list[BridgeModuleInfo] | None = [
                                         module_class
                                         for module_class in all_available_modules.values()
                                         if module_class.module_type == "bridge" and \
@@ -652,48 +638,22 @@ class RouteGenerator(Logger):
         
         return available_modules
 
-        # for module_name, module_class in all_available_modules.items():
-        #     # если такой модуль уже был добавлен или был выполнен, то пропускаем его
-        #     if module_name in executed_modules:
-        #         continue
-
-        #     if is_first_run and not module_class.required_on_first_run:
-        #         continue
-
-        #     # if not is_first_run and module_class.required_on_first_run:
-        #     #     continue
-
-        #     if not module_class.dependencies.required_modules.issubset(executed_modules):
-        #         continue
-
-        #     network_balances: Dict[str, int] = all_available_wallet_balances.get(
-        #             module_class.source_network, {}
-        #     )
-        #     # Проверяем на наличие баланса в сети
-        #     for token_name, token_balance in network_balances.items():
-        #         bridge_modules: List[BridgeModuleInfo] | None = [
-        #             module_class
-        #             for module_class in all_available_modules.values()
-        #             if module_class.module_type == "bridge" and \
-        #                 module_class.source_network == module_class.source_network
-        #         ]
-        #         if float(token_balance) > module_class.min_available_balance:
-        #             available_modules.append(module_class)
-
-        # return available_modules
-
-    async def smart_generate_route(
-            self, account_name: str, private_key: str, proxy: str | None, 
-            name_znc_domen: str | None = None
+    async def smart_generate_route( # генерация умного маршрута
+            self,
+            account_name: str,  # имя аккаунта
+            private_key: str,  # приватный ключ
+            proxy: str | None,   # прокси
+            name_znc_domen: str | None = None  # доменное имя
         ) -> None:
-        route_modules_dict: Dict[str, BaseModuleInfo] = {}
+
+        route_modules_dict: Dict[str, BaseModuleInfo] = {}   # Определяем модули для маршрута, пока пустой словарь
 
         try:
             try:
                 all_available_modules: Dict[str, BaseModuleInfo] | None = {
                     module_name: module_class()
                     for module_name, module_class in MODULES_CLASSES.items()
-                }
+                }   # Тут мы получили абсолютно все доступные модули которые имеются
 
             except ValidationError as error:
                 self.logger_msg(account_name, None,
@@ -705,24 +665,10 @@ class RouteGenerator(Logger):
                                 f"There is no any module for account {account_name}", "warning")
                 raise SoftwareException
 
-            client: Client = Client(account_name, private_key, proxy, name_znc_domen=name_znc_domen)
-            all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()
-            # all_available_wallet_balances = {
-            #     "Ethereum Mainnet": {
-            #         "ETH": 0.0003,
-            #     },
-            #     "Ink Mainnet": {
-            #         "ETH": 0.008,
-            #     },
-            #     "Base Mainnet": {
-            #         "ETH": 0.00014,
-            #     },
-            #     "OP Mainnet": {
-            #         "ETH": 0.00014,
-            #     },
-            # }
+            client: Client = Client(account_name, private_key, proxy, name_znc_domen=name_znc_domen)   # Создаём клиента
+            all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()    # Возвращаем балансы всех токенов 
 
-            if not all_available_wallet_balances:
+            if not all_available_wallet_balances:   # Если нет балансов выкидываем исключение
                 self.logger_msg(account_name, None,
                                 f"There is no any wallet balance for acccount {account_name}", "error")
                 return
@@ -730,22 +676,22 @@ class RouteGenerator(Logger):
             # 1. Проверяем, запускаем ли мы софт впервые
             is_first_run: bool = await self.check_first_run_modules(account_name)
 
-            suitable_modules: List[BaseModuleInfo] = []
-            executed_modules: Dict[str, Set[str]] = self.history.get(account_name, set())
+            suitable_modules: list[BaseModuleInfo] = []
+            executed_modules: Dict[str, Set[str]] = self.history.get(account_name, set())   # Список уже выполненных модулей
 
-            try:
-                required_modules_to_execute: List[str] = RequiredModulesToExecute().required_modules
+            try:  # Получаем список обязательных модулей для выполнения:
+                required_modules_to_execute: list[str] = RequiredModulesToExecute().required_modules
 
             except Exception as error:
                 self.logger_msg(account_name, None,
                                 f"Error while getting required modules to execute.\nError: {error}", "error")
-                # return
 
             if required_modules_to_execute:
-                required_modules_to_execute: Set[str] = set(required_modules_to_execute)
-                required_modules_to_execute: Set[str] = required_modules_to_execute - executed_modules
+                required_modules_to_execute: Set[str] = set(required_modules_to_execute)   # Создаём множество для вычитания
+                required_modules_to_execute: Set[str] = required_modules_to_execute - executed_modules  # Отнимаем выполненые от обязательных и получаем обязательные невыполненные
 
-            available_modules: List[BaseModuleInfo] | None = await self.get_available_modules(
+            # Самая важная часть кода
+            available_modules: list[BaseModuleInfo] | None = await self.get_available_modules(
                 all_available_modules,
                 executed_modules,
                 all_available_wallet_balances,
