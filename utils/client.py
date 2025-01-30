@@ -407,7 +407,7 @@ class Client(Logger):
                                     CustomAsyncWeb3.to_checksum_address(
                                         contract_address
                                     ),
-                                    AsyncWeb3.to_checksum_address(
+                                    CustomAsyncWeb3.to_checksum_address(
                                         network_token_contracts.get("WETH") or network_token_contracts.get("ETH") or \
                                             "0x4200000000000000000000000000000000000006"
                                     ),
