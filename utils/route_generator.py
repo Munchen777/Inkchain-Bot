@@ -678,24 +678,14 @@ class RouteGenerator(Logger):
                         all_available_wallet_balances[source_network.name][token] -= best_module.min_amount_out
 
                 elif execute_modules_go:
-                    required_modules_to_execute_list = list(required_modules_to_execute)
-                    random.shuffle(required_modules_to_execute_list)
-
-                    for module_name in required_modules_to_execute_list:
-                        required_module_to_execute = all_available_modules.get(module_name)
-
-                    if not required_module_to_execute: continue
-
-                    if required_module_to_execute.module_type in ["swap", "bridge", "add_liquidity"]:
-                        continue
-
+             
                     available_modules.append(required_module_to_execute)
 
             if not any(module_class for module_class in available_modules
                         if module_class.module_type == "bridge") and \
                              is_first_run:
                 self.logger_msg(client.name, client.address,
-                                f"There is no bridge modules in the route!", "warning")
+                                f"There is no bridge modules in the route in the first run of route!", "warning")
                 return
 
         except SoftwareException as error:
