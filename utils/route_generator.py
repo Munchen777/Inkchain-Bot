@@ -149,7 +149,7 @@ class RouteGenerator(Logger):
                     
                     # Проверяю равняется ли сеть отправления сети получения и есть ли на выходе какой-нибудь токен,
                     # который нужен на входе другого модуля
-                    if source_network == dep_module_dest_network and any(token in dep_tokens for token in source_tokens):
+                    if source_network == dep_module_dest_network and any(token in dep_tokens for token in source_tokens) and dep_tokens:
                         if all(all_available_wallet_balances.get(dep_module_dest_network, {}).get(token, 0) > dep_module.min_amount_residue
                                for token in dep_tokens if token
                         ):
@@ -220,11 +220,11 @@ class RouteGenerator(Logger):
                 client: Client = Client(account_name, private_key, proxy, name_znc_domen=name_znc_domen)
 
                 all_available_wallet_balances: Dict[str, Dict[str, float]] = await client.get_wallet_balance(balance_in_eth=True)
-                
+
                 if not all_available_wallet_balances:
                     self.logger_msg(client.name, client.address,
                                     f"We can't get token balances on {client.name} account.", "warning")
-                    return
+                    raise SoftwareException(f"The software can't find balances on {client.name} account!")
        
                 classic_route: Deque[list] | None = deque([])
                 
