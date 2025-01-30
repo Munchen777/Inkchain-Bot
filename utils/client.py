@@ -416,7 +416,6 @@ class Client(Logger):
                                     src_token_amount, amountOut = await uniswap_v2_router.functions.getAmountsOut(
                                         balance_token, path
                                     ).call()
-                                    await asyncio.sleep(3)
 
                                 except Exception as error:
                                     self.logger_msg(self.name, self.address,
