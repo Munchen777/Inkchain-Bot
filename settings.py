@@ -96,13 +96,13 @@ CLASSIC_ROUTES_MODULES_USING = [
 """
 
 CLASSIC_ROUTES_MODULES_USING: List[str] = [
-    # "swap_dyor_eth_to_usdc",
-    # "mint_paragraf_nft",
-    # "mint_og_nft",
-    # "mint_guild_nft",
-    "add_liquidity_dinero_ieth_and_eth",
-    # "buy_znc_domen_ink_network",
-    # "claim_daily_gm",
+    "swap_dyor_eth_to_usdc",
+    "mint_paragraf_nft",
+    "mint_og_nft",
+    "mint_guild_nft",
+    # "add_liquidity_dinero_ieth_and_eth",
+    "buy_znc_domen_ink_network",
+    "claim_daily_gm",
 ]
 
 ROUTES_MODULES_GENERALS_SWAPS: List[str] = [
