@@ -6,10 +6,10 @@ import sys
 from collections import deque, defaultdict
 from pathlib import Path
 from pydantic import ValidationError
-from typing import Any, Dict, Deque, list, Set, Tuple, DefaultDict
+from typing import Any, Dict, Deque, Tuple, DefaultDict
 
 from data.config import ACCOUNT_NAMES, MODULES_CLASSES, PRIVATE_KEYS, PROXIES
-from generall_settings import SHUFFLE_ROUTE, USE_L2_TO_DEPOSIT
+from generall_settings import SHUFFLE_ROUTE, USE_L1_TO_DEPOSIT
 from functions import*
 from modules import Logger
 from modules.interfaces import BaseModuleInfo
@@ -37,7 +37,7 @@ def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo 
 class ModuleHistory:
     def __init__(self, file_path: str = "./data/service/history.json"):
         self.file_path: Path = Path(file_path)
-        self.history: Dict[str, Set[str]] = {}
+        self.history: Dict[str, set[str]] = {}
         self.load_history()
 
     def load_history(self):
@@ -81,7 +81,7 @@ class RouteGenerator(Logger):
         super().__init__()
         self.module_history: ModuleHistory = ModuleHistory()
         self.file_path: Path = Path(file_path)
-        self.history: Dict[str, Set[str]] = {}
+        self.history: Dict[str, set[str]] = {}
         self.load_history()
 
     def load_history(self):
@@ -436,7 +436,7 @@ class RouteGenerator(Logger):
     #         route_with_priority = route
 
     #     if CLASSIC_WITHDRAW_DEPENDENCIES:
-    #         deposit_modules: Set = set([
+    #         deposit_modules: set = set([
     #             "deposit_module",
     #         ])
     #         new_route_with_dep = []
@@ -458,17 +458,22 @@ class RouteGenerator(Logger):
     async def get_available_modules(
             self,
             all_available_modules: dict[str, BaseModuleInfo],
-            executed_modules: set[str],
+            executed_available_modules: set[str],
             all_available_wallet_balances: dict[str, dict[str, float]],
             required_modules_to_execute: set[str],
             client: Client,
             is_first_run: bool = False,
         ) -> list[BaseModuleInfo] | None: 
 
+        execute_modules_go = True
+
         available_modules: Deque[BaseModuleInfo] | None = deque([])
 
-        if not is_first_run:
-            required_modules_to_execute: set[str] = all_available_modules.keys()
+        if not required_modules_to_execute:  
+            execute_modules_go = False
+            required_modules_to_execute = set(all_available_modules.keys())
+        
+        required_modules_to_execute = set(all_available_modules.keys()) - set(executed_available_modules)
 
         try:
             for module_name in required_modules_to_execute:
@@ -500,24 +505,23 @@ class RouteGenerator(Logger):
                                     
                                     deposit_modules: list[BridgeModuleInfo] | None = []
 
-                                    if USE_L2_TO_DEPOSIT:
+                                    if USE_L1_TO_DEPOSIT:
                                         deposit_modules: list[BridgeModuleInfo] | None = [
                                             module_class
                                             for module_class in all_available_modules.values()
                                             if module_class.module_type == "bridge" and \
                                                 module_class.destination_network == required_module_to_execute.destination_network and \
-                                                    module_class.required_on_first_run is False
+                                                    module_class.bridge_type == "L1"
                                         ]
-                                    elif not USE_L2_TO_DEPOSIT:
+                                    elif not USE_L1_TO_DEPOSIT:
                                         deposit_modules: list[BridgeModuleInfo] | None = [
                                             module_class
                                             for module_class in all_available_modules.values()
                                             if module_class.module_type == "bridge" and \
                                                 module_class.destination_network == required_module_to_execute.destination_network and \
-                                                    module_class.required_on_first_run is True
+                                                    module_class.bridge_type == "L2"
                                         ]
 
-                                    # Все модули бриджей, которые могут пополнить баланс в сети назначения
                                     all_deposit_modules: list[BridgeModuleInfo] | None = [
                                         module_class
                                         for module_class in all_available_modules.values()
@@ -525,18 +529,14 @@ class RouteGenerator(Logger):
                                             module_class.destination_network == required_module_to_execute.destination_network
                                     ]
 
-                                    # Получаем баланс в сети назначения до пополнения
                                     destination_token_balance_before_deposit: float = all_available_wallet_balances.get(
                                         destination_network.name, {}).get(destination_network.token, 0)
                                     
-                                    # Получаем баланс в сети отправки до пополнения
                                     source_balance_before_deposit: float = all_available_wallet_balances.get(
                                         source_network.name, {}).get(source_network.token, 0)
                                     
-                                    # Для сравнения баланса в сети назначения после пополнения
                                     token_balance_after_deposit: float = destination_token_balance_before_deposit
 
-                                    # Проверяем баланс в сети отправления
                                     for deposit_module in deposit_modules:
                                         source_network: Network | None = NETWORKS.get(deposit_module.source_network)
 
@@ -546,87 +546,157 @@ class RouteGenerator(Logger):
                                         expected_balance_after_deposit_source: float = float(
                                             source_network_token_balance - deposit_module.min_amount_out
                                         )
-                                        # Если баланс в сети отправки больше минимального баланса, то добавляем модуль в список
-                                        if float(source_network_token_balance) > required_module_to_execute.min_available_balance:
-                                            available_modules.appendleft(deposit_module)
+                                        
+                                        if float(source_network_token_balance) > required_module_to_execute.min_available_balance + \
+                                            required_module_to_execute.min_amount_out:
 
-                                            # if required_module_to_execute.module_type != "bridge":
-                                            # Обновляем баланс в сети назначения
+                                            available_modules.appendleft(deposit_module)
                                             available_modules.append(required_module_to_execute)
+
                                             all_available_wallet_balances[destination_network.name][source_network.token] = (
                                                 destination_token_balance_before_deposit + float(deposit_module.min_amount_out)
                                             )
-                                            
-                                            # all_available_wallet_balances.setdefault(
-                                            #     destination_network.name, {}
-                                            #     ).setdefault(source_network.token, 0 + float(deposit_module.min_amount_out))
-                                            
-                                            # Обновляем баланс в сети отправки
+                                                                                  
                                             all_available_wallet_balances[source_network.name][source_network.token] = (
                                                 source_balance_before_deposit - float(deposit_module.min_amount_out)
                                             )
                                             
-                                            # all_available_wallet_balances.setdefault(
-                                            #     source_network.name, {}
-                                            # ).setdefault(source_network.token, 0 - float(deposit_module.min_amount_out))
-
                                             token_balance_after_deposit += float(deposit_module.min_amount_out)
-
-                                            # networks_being_deposited.add(destination_network.name)
-                                            # required_module_to_execute.dependencies.required_modules.add(deposit_module.module_name) #
                                     
-                                    # Если не нашли мост, который бы пополнил, то тогда проверяем все мосты
-                                    if all_deposit_modules and destination_token_balance_before_deposit == token_balance_after_deposit and \
-                                        is_first_run:
+                                    if all_deposit_modules and destination_token_balance_before_deposit == token_balance_after_deposit:
                                         for deposit_module in all_deposit_modules:
                                             source_network: Network | None = NETWORKS.get(deposit_module.source_network)
 
                                             source_network_token_balance: float | None = all_available_wallet_balances.get(
                                                 source_network.name, {}).get(source_network.token, 0
                                             )
-                                            # Если баланс в сети отправки больше минимального баланса, то добавляем модуль в список
-                                            if float(source_network_token_balance) > required_module_to_execute.min_available_balance and \
-                                                deposit_module.module_name not in executed_modules:
-                                                available_modules.appendleft(deposit_module)
+                                            
+                                            if float(source_network_token_balance) > required_module_to_execute.min_available_balance + \
+                                                required_module_to_execute.min_amount_out and deposit_module.module_name not in executed_available_modules:
 
-                                                # if required_module_to_execute.module_type != "bridge":
-                                                # Обновляем баланс в сети назначения
+                                                available_modules.appendleft(deposit_module)
                                                 available_modules.append(required_module_to_execute)
+
                                                 all_available_wallet_balances[destination_network.name][source_network.token] = (
                                                     destination_token_balance_before_deposit + float(deposit_module.min_amount_out)
                                                 )
-                                                # available_modules.append(required_module_to_execute)
-                                                # all_available_wallet_balances.setdefault(
-                                                #     destination_network.name, {}
-                                                #     ).setdefault(source_network.token, 0 + float(deposit_module.min_amount_out))
-                                                # Обновляем баланс в сети отправки
+                                                
                                                 all_available_wallet_balances[source_network.name][source_network.token] = (
                                                     source_balance_before_deposit - float(deposit_module.min_amount_out)
                                                 )
-                                                # all_available_wallet_balances.setdefault(
-                                                #     source_network.name, {}
-                                                # ).setdefault(source_network.token, 0 - float(deposit_module.min_amount_out))
 
-                            elif required_module_to_execute.module_type == "swap":
-                                available_modules.append(required_module_to_execute)
-                            
-                            else:
-                                continue
+                elif required_module_to_execute.module_type == "swap":
+                    source_network: Network | None = NETWORKS.get(required_module_to_execute.source_network)
 
-                            # else:
-                            #     self.logger_msg(client.name, client.address,
-                            #                     f"Can't find balance in destination network for module {required_module_to_execute.module_name}\nGo to next required module")
-                            #     continue
-                else:
+                    source_token_balance: float = all_available_wallet_balances.get(
+                        source_network.name, {}).get(required_module_to_execute.source_token, 0
+                    )
+
+                    if source_token_balance <= required_module_to_execute.min_available_balance+ \
+                        required_module_to_execute.min_amount_out:
+                        continue
+
+                    swap_modules: list[SwapModuleInfo] = [
+                        module for module in all_available_modules.values()
+                        if module.module_type == "swap" and 
+                        module.source_token == required_module_to_execute.source_token and
+                        module.dest_token == required_module_to_execute.dest_token and
+                        module.source_network == required_module_to_execute.source_network
+                    ]
+
+                    swap_modules = sorted(swap_modules, key=lambda m: m.module_priority, reverse=True)
+
+                    max_swaps = random.randint(2, 5)  # Максимальное количество свапов
+                    swap_path = []  # Храним путь свапов
+
+                    current_token = required_module_to_execute.source_token
+                    current_balance = source_token_balance
+
+                    for _ in range(max_swaps):
+                        # Находим все свапы, которые могут превратить current_token в что-то еще
+                        possible_swaps = [
+                            module for module in swap_modules
+                            if module.source_token == current_token
+                        ]
+
+                        if not possible_swaps: break  # Если нет доступных свапов, прекращаем поиск
+
+                        # Выбираем свап, который приближает нас к dest_token
+                        best_swap = None
+                        for swap_module in possible_swaps:
+                            if swap_module.dest_token == required_module_to_execute.dest_token:
+                                best_swap = swap_module
+                                break  # Если нашли идеальный свап, сразу берем его
+
+                        # Если нет прямого пути к dest_token, берем любой доступный
+                        if not best_swap:
+                            best_swap = possible_swaps[0]
+
+                        expected_balance_after_swap = current_balance - best_swap.min_amount_out
+
+                        if expected_balance_after_swap >= required_module_to_execute.min_available_balance:
+                            swap_path.append(best_swap)
+                            current_token = best_swap.dest_token  # Обновляем текущий токен
+                            current_balance -= best_swap.min_amount_out  # Обновляем баланс
+                        else:
+                            break  # Если баланс не позволяет сделать свап, прекращаем
+
+                    # Добавляем свапы в очередь
+                    for swap_module in swap_path:
+                        available_modules.append(swap_module)
+                        all_available_wallet_balances[source_network.name][swap_module.source_token] -= swap_module.min_amount_out
+                        all_available_wallet_balances[source_network.name][swap_module.dest_token] += swap_module.min_amount_out
+
+                elif required_module_to_execute.module_type == "add_liquidity":
+                    if random.choice([0, 1]) == 0: continue  
+
+                    source_network: Network | None = NETWORKS.get(required_module_to_execute.source_network)
+
+                    source_token_balances = [
+                        all_available_wallet_balances.get(source_network.name, {}).get(token, 0)
+                        for token in required_module_to_execute.source_token
+                    ]
+
+                    if any(balance < required_module_to_execute.min_available_balance for balance in source_token_balances):
+                        continue
+
+                    liquidity_modules: list[AddLiquidityModuleInfo] = [
+                        module for module in all_available_modules.values()
+                        if module.module_type == "add_liquidity" and
+                        module.source_token == required_module_to_execute.source_token and
+                        module.source_network == required_module_to_execute.source_network and
+                        module.destination_network == required_module_to_execute.destination_network
+                    ]
+
+                    if not liquidity_modules: continue
+
+                    best_module = max(liquidity_modules, key=lambda m: m.module_priority)
+
+                    available_modules.append(best_module)
+
+                    for token in best_module.source_token:
+                        all_available_wallet_balances[source_network.name][token] -= best_module.min_amount_out
+
+                elif execute_modules_go:
+                    required_modules_to_execute_list = list(required_modules_to_execute)
+                    random.shuffle(required_modules_to_execute_list)
+
+                    for module_name in required_modules_to_execute_list:
+                        required_module_to_execute = all_available_modules.get(module_name)
+
+                    if not required_module_to_execute: continue
+
+                    if required_module_to_execute.module_type in ["swap", "bridge", "add_liquidity"]:
+                        continue
+
                     available_modules.append(required_module_to_execute)
-            # Если нет модулей бриджей и это у нас первый запуск, то выводим ошибку
+
             if not any(module_class for module_class in available_modules
                         if module_class.module_type == "bridge") and \
                              is_first_run:
                 self.logger_msg(client.name, client.address,
                                 f"There is no bridge modules in the route!", "warning")
                 return
-                raise SoftwareException(f"There is no bridge modules in the route! Check the balance on the wallet {client.address}")
 
         except SoftwareException as error:
             sys.exit(1)
@@ -638,12 +708,12 @@ class RouteGenerator(Logger):
         
         return available_modules
 
-    async def smart_generate_route( # генерация умного маршрута
+    async def smart_generate_route(
             self,
-            account_name: str,  # имя аккаунта
-            private_key: str,  # приватный ключ
-            proxy: str | None,   # прокси
-            name_znc_domen: str | None = None  # доменное имя
+            account_name: str,
+            private_key: str,
+            proxy: str | None,
+            name_znc_domen: str | None = None
         ) -> None:
 
         route_modules_dict: Dict[str, BaseModuleInfo] = {}   # Определяем модули для маршрута, пока пустой словарь
@@ -658,7 +728,7 @@ class RouteGenerator(Logger):
             except ValidationError as error:
                 self.logger_msg(account_name, None,
                                 f"Error while creating all available modules.\nError: {error}", "error")
-                raise error
+                return
 
             if not all_available_modules:
                 self.logger_msg(account_name, None,
@@ -666,7 +736,7 @@ class RouteGenerator(Logger):
                 raise SoftwareException
 
             client: Client = Client(account_name, private_key, proxy, name_znc_domen=name_znc_domen)   # Создаём клиента
-            all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance()    # Возвращаем балансы всех токенов 
+            all_available_wallet_balances: Dict[str, Dict[str, int]] = await client.get_wallet_balance(balance_in_eth=True) 
 
             if not all_available_wallet_balances:   # Если нет балансов выкидываем исключение
                 self.logger_msg(account_name, None,
@@ -677,28 +747,28 @@ class RouteGenerator(Logger):
             is_first_run: bool = await self.check_first_run_modules(account_name)
 
             suitable_modules: list[BaseModuleInfo] = []
-            executed_modules: Dict[str, Set[str]] = self.history.get(account_name, set())   # Список уже выполненных модулей
+            executed_modules: set[str] = self.history.get(account_name, set())
 
             try:  # Получаем список обязательных модулей для выполнения:
-                required_modules_to_execute: list[str] = RequiredModulesToExecute().required_modules
+                required_modules_to_execute: set[str] = set(RequiredModulesToExecute().required_modules)
 
             except Exception as error:
                 self.logger_msg(account_name, None,
                                 f"Error while getting required modules to execute.\nError: {error}", "error")
+                return None
 
-            if required_modules_to_execute:
-                required_modules_to_execute: Set[str] = set(required_modules_to_execute)   # Создаём множество для вычитания
-                required_modules_to_execute: Set[str] = required_modules_to_execute - executed_modules  # Отнимаем выполненые от обязательных и получаем обязательные невыполненные
+            required_modules_to_execute -= executed_modules
+            executed_available_modules = required_modules_to_execute
 
-            # Самая важная часть кода
             available_modules: list[BaseModuleInfo] | None = await self.get_available_modules(
                 all_available_modules,
-                executed_modules,
+                executed_available_modules,
                 all_available_wallet_balances,
                 required_modules_to_execute,
                 client,
                 is_first_run,
             )
+
             if not available_modules:
                 self.logger_msg(client.name, client.address,
                                 f"No available modules for account {account_name}", "warning")
