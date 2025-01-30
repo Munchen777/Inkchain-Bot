@@ -29,13 +29,13 @@ class ModuleDependency(BaseModel):
 class RequiredModulesToExecute(BaseModel):
     required_modules: List[str] = Field(
         default=[
-            "swap_inkswap_eth_to_sink",
             "bridge_gg_ethereum_to_ink",
-            "swap_inkswap_sink_to_eth",
-            "bridge_relay_op_to_ink",
-            "bridge_relay_base_to_ink",
-            "bridge_owlto_op_to_ink",
-            "bridge_owlto_base_to_ink",
+            "swap_dyor_eth_to_usdc",
+            "mint_paragraf_nft",
+            "mint_og_nft",
+            "mint_guild_nft",
+            "add_liquidity_dinero_ieth_and_eth",
+            "buy_znc_domen_ink_network"   
         ],
         description="Список модулей, которые должны быть обязательно выполнены",
     )
@@ -322,6 +322,9 @@ class SwapInkswapETHtoKRAKENModule(SwapModuleInfo):
 
 class SwapInkswapISWAPtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to ETH """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -334,6 +337,9 @@ class SwapInkswapISWAPtoETHModule(SwapModuleInfo):
 
 class SwapInkswapSINKtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to ETH """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -344,6 +350,9 @@ class SwapInkswapSINKtoETHModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ETH """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -356,6 +365,9 @@ class SwapInkswapKRAKENtoETHModule(SwapModuleInfo):
 
 class SwapInkswapISWAPtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to SINK """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -368,6 +380,9 @@ class SwapInkswapISWAPtoSINKModule(SwapModuleInfo):
 
 class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to ISWAP """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -378,6 +393,9 @@ class SwapInkswapSINKtoISWAPModule(SwapModuleInfo):
 
 class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from SINK to KRAKEN """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -388,6 +406,9 @@ class SwapInkswapSINKtoKRAKENModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to SINK """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -398,6 +419,9 @@ class SwapInkswapKRAKENtoSINKModule(SwapModuleInfo):
 
 class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
     """ Swap Inkswap module from KRAKEN to ISWAP """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -407,6 +431,9 @@ class SwapInkswapKRAKENtoISWAPModule(SwapModuleInfo):
     
 class SwapInkswapISWAPtoKRAKENModule(SwapModuleInfo):
     """ Swap Inkswap module from ISWAP to KRAKEN """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -482,6 +509,9 @@ class SwapDyorWETHtoETHModule(SwapModuleInfo):
 
 class SwapDyorUSDCtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDC.e to ETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -492,6 +522,9 @@ class SwapDyorUSDCtoETHModule(SwapModuleInfo):
 
 class SwapDyorUSDTtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to ETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -502,6 +535,9 @@ class SwapDyorUSDTtoETHModule(SwapModuleInfo):
 
 class SwapDyorWORMtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to ETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -512,6 +548,9 @@ class SwapDyorWORMtoETHModule(SwapModuleInfo):
 
 class SwapDyorKRAKENtoETHModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to ETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -522,6 +561,9 @@ class SwapDyorKRAKENtoETHModule(SwapModuleInfo):
 
 class SwapDyorKRAKENtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to WORM  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -532,6 +574,9 @@ class SwapDyorKRAKENtoWORMModule(SwapModuleInfo):
 
 class SwapDyorWORMtoKRAKENModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to KRAKEN  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -542,6 +587,9 @@ class SwapDyorWORMtoKRAKENModule(SwapModuleInfo):
 
 class SwapDyorWORMtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to USDT  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -552,6 +600,9 @@ class SwapDyorWORMtoUSDTModule(SwapModuleInfo):
 
 class SwapDyorWORMtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to USDC  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -562,6 +613,9 @@ class SwapDyorWORMtoUSDCModule(SwapModuleInfo):
 
 class SwapDyorWORMtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from WORM to WETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -572,6 +626,9 @@ class SwapDyorWORMtoWETHModule(SwapModuleInfo):
 
 class SwapDyorKRAKENtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to WETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -582,6 +639,9 @@ class SwapDyorKRAKENtoWETHModule(SwapModuleInfo):
 
 class SwapDyorKRAKENtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to USDC  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -592,6 +652,9 @@ class SwapDyorKRAKENtoUSDCModule(SwapModuleInfo):
 
 class SwapDyorUSDCtoKRAKENModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to KRAKEN  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -602,6 +665,9 @@ class SwapDyorUSDCtoKRAKENModule(SwapModuleInfo):
 
 class SwapDyorUSDCtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to WORM  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -612,6 +678,9 @@ class SwapDyorUSDCtoWORMModule(SwapModuleInfo):
 
 class SwapDyorUSDCtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to USDT  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -622,6 +691,9 @@ class SwapDyorUSDCtoUSDTModule(SwapModuleInfo):
 
 class SwapDyorUSDCtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDC to WETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -662,6 +734,9 @@ class SwapDyorWETHtoWORMModule(SwapModuleInfo):
 
 class SwapDyorUSDTtoWETHModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to WETH  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -682,6 +757,9 @@ class SwapDyorWETHtoKRAKENModule(SwapModuleInfo):
 
 class SwapDyorUSDTtoUSDCModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to USDC  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -692,6 +770,9 @@ class SwapDyorUSDTtoUSDCModule(SwapModuleInfo):
 
 class SwapDyorUSDTtoWORMModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to WORM  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -702,6 +783,9 @@ class SwapDyorUSDTtoWORMModule(SwapModuleInfo):
 
 class SwapDyorUSDTtoKRAKENModule(SwapModuleInfo):
     """ Swap Dyor module from USDT to KRAKEN  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
@@ -712,6 +796,9 @@ class SwapDyorUSDTtoKRAKENModule(SwapModuleInfo):
 
 class SwapDyorKRAKENtoUSDTModule(SwapModuleInfo):
     """ Swap Dyor module from KRAKEN to USDT  """
+    min_available_balance: float = 0.0005
+    min_amount_out: float = 0.0001
+    max_amount_out: float = 0.0004
     source_network: str = Ink.name
     source_network_chain_id: int = Ink.chain_id
     module_priority: int = 2
