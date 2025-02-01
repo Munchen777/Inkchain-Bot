@@ -1,8 +1,10 @@
 import os
 
 '--------------------------------------------------- AMOUNT CONTROL ---------------------------------------------------'
-AMOUNT_PERCENT = (0.001, 0.01) # Минимальная / максимальная сумма для выполнения всех действий
-MIN_BALANCE = 0.0001           # Сумма, которую должны оставить в сети отправления
+MIN_AVAILABLE_BALANCE_ETHEREUM = 0.01                # Minimum network Ethereum balance in native coin (ETH)
+MIN_AVAILABLE_BALANCE_OP = 0.002                     # Minimum network OP balance in native coin (ETH)
+MIN_AVAILABLE_BALANCE_BASE = 0.002                   # Minimum network Base balance in native coin (ETH)
+MIN_AVAILABLE_BALANCE_INK = 0.002                    # Minimum network Ink balance in native coin (ETH)
 
 
 GLOBAL_NETWORK = 1
@@ -30,7 +32,7 @@ WALLETS_TO_WORK: int | tuple | list = 0              # 0 - all accounts
 '------------------------------------------------SLEEP CONTROL---------------------------------------------------------'
 SLEEP_MODE = True               # True or False | Enables sleep after each account is used up
 SLEEP_TIME_MODULES = (60, 80)    # (minimum, maximum) seconds | Sleep time between modules
-SLEEP_TIME_ACCOUNTS = (40, 60)   # (minimum, maximum) seconds | Sleep time between accounts
+SLEEP_TIME_ACCOUNTS = (500, 700)   # (minimum, maximum) seconds | Sleep time between accounts
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 # Settings for Web3 activities (advanced users only)
