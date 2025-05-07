@@ -295,8 +295,8 @@ class Runner(Logger):
             )
 
     async def run_parallel(self, smart_route: bool, route_generator: RouteGenerator | None):
-        selected_wallets = list(self.get_wallets())
-        num_accounts = len(selected_wallets)
+        selected_wallets: List[Tuple[str, str]] = list(self.get_wallets())
+        num_accounts: int = len(selected_wallets)
         accounts_per_stream = ACCOUNTS_IN_STREAM
         num_streams, remainder = divmod(num_accounts, accounts_per_stream)
 

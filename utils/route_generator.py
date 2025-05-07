@@ -17,7 +17,7 @@ from utils.networks import Network
 from settings import *
 from utils.networks import NETWORKS
 from utils.client import SoftwareException
-from utils.tools import clean_progress_file, topological_sort
+from utils.tools import clean_progress_file, topological_sort, build_route_modules
 
 
 def get_func_by_name(module_name, help_message: bool = False) -> BaseModuleInfo | None:
@@ -191,24 +191,25 @@ class RouteGenerator(Logger):
                             f"Error while creating all available modules.\nError: {error}", "error")
             raise error
 
-        if CLASSIC_ROUTES_MODULES_USING:
-            modules_to_execute: list[str] = CLASSIC_ROUTES_MODULES_USING
-            # Пробуем строить зависимости между модулями
-            dependency_graph: Dict[str, list[str]] = await self.build_dependency_graph(CLASSIC_ROUTES_MODULES_USING)
-            if dependency_graph:
-                # Выполняем топологическую сортировку
-                ordered_modules: list[str] | None = topological_sort(dependency_graph)
-                if ordered_modules:
-                    modules_to_execute = ordered_modules
-        
+        if not CLASSIC_ROUTES_MODULES_USING:
+            modules_to_execute: List[str] = list(all_available_modules.keys())
         else:
-            modules_to_execute = list(all_available_modules.keys())
-            # modules_to_execute: list[str] = list(all_available_modules.keys())
-            # dependency_graph: Dict[str, list[str]] = await self.build_dependency_graph(modules_to_execute)
-            # if dependency_graph:
-            #     ordered_modules: list[str] | None = topological_sort(dependency_graph)
-            #     if ordered_modules:
-            #         modules_to_execute = ordered_modules
+            modules_to_execute: List[str] = CLASSIC_ROUTES_MODULES_USING
+
+        if not modules_to_execute:
+            self.logger_msg(None, None,
+                            f"Modules are absent to execute!", "error")
+            raise SoftwareException
+
+        try:
+            modules_to_execute: Dict[str, BaseModuleInfo] = {
+                module_name: MODULES_CLASSES.get(module_name)()
+                for module_name in modules_to_execute
+            }
+        except ValidationError as error:
+            self.logger_msg(None, None,
+                            f"Error while creating modules")
+            raise error
 
         try:
             runner: Runner = Runner()
@@ -225,20 +226,18 @@ class RouteGenerator(Logger):
                     self.logger_msg(client.name, client.address,
                                     f"We can't get token balances on {client.name} account.", "warning")
                     raise SoftwareException(f"The software can't find balances on {client.name} account!")
-       
+
                 classic_route: Deque[list] | None = deque([])
                 
-                graph = await self.build_dependency_graph(modules_to_execute, all_available_wallet_balances)
-                # Если не получилось сформировать зависимости
-                if not graph:
-                    # соберем классический маршрут
-                    route = CLASSIC_ROUTES_MODULES_USING
-                
-                # TODO: остановился на этапе формирования пути
-                # нужно выполнить топологическую сортировку
-                # но она невозможна, если в графе есть циклы
-                # я пробую удалить циклы, но все равно какая-то связанность присутствует
-                ordered_route = topological_sort(graph)
+                route_modules = await build_route_modules(modules_to_execute, all_available_wallet_balances)
+
+                # graph = await self.build_dependency_graph(modules_to_execute, all_available_wallet_balances)
+                # # Если не получилось сформировать зависимости
+                # if not graph:
+                #     # соберем классический маршрут
+                #     route = CLASSIC_ROUTES_MODULES_USING
+
+                # ordered_route = topological_sort(graph)
                 
                 
 
@@ -697,6 +696,29 @@ class RouteGenerator(Logger):
             return
         
         return available_modules
+    
+    # async def generate_route_modules(
+    #     all_available_modules: Dict[str, BaseModuleInfo],
+    #     all_available_wallet_balances: Dict[str, Dict[str, float]],
+    #     required_modules_to_execute: Set[str],
+    #     executed_modules: Set[str],
+    #     client: Client,
+    #     is_first_run: bool = False,
+    # ) -> List[BaseModuleInfo] | None:
+
+    #     execute_modules_go = True
+
+    #     available_modules: Deque[BaseModuleInfo] | None = deque([])
+
+    #     if not required_modules_to_execute:  
+    #         execute_modules_go = False
+    #         required_modules_to_execute: Set[str] = set(all_available_modules.keys())
+
+    #     required_modules_to_execute: Set[str] = set(all_available_modules.keys()) - set(executed_modules)
+        
+        
+        
+        
 
     async def smart_generate_route(
             self,
@@ -710,19 +732,20 @@ class RouteGenerator(Logger):
 
         try:
             try:
+                # Тут мы получили абсолютно все доступные модули которые имеются
                 all_available_modules: Dict[str, BaseModuleInfo] | None = {
                     module_name: module_class()
                     for module_name, module_class in MODULES_CLASSES.items()
-                }   # Тут мы получили абсолютно все доступные модули которые имеются
+                }
 
             except ValidationError as error:
                 self.logger_msg(account_name, None,
                                 f"Error while creating all available modules.\nError: {error}", "error")
-                return
+                raise error
 
             if not all_available_modules:
                 self.logger_msg(account_name, None,
-                                f"There is no any module for account {account_name}", "warning")
+                                f"Modules are absent in software!", "error")
                 raise SoftwareException
 
             client: Client = Client(account_name, private_key, proxy, name_znc_domen=name_znc_domen)   # Создаём клиента
@@ -736,8 +759,8 @@ class RouteGenerator(Logger):
             # 1. Проверяем, запускаем ли мы софт впервые
             is_first_run: bool = await self.check_first_run_modules(account_name)
 
-            suitable_modules: list[BaseModuleInfo] = []
-            executed_modules: set[str] = self.history.get(account_name, set())
+            suitable_modules: List[BaseModuleInfo] = []
+            executed_modules: Set[str] = self.history.get(account_name, set())
 
             try:  # Получаем список обязательных модулей для выполнения:
                 required_modules_to_execute: set[str] = set(RequiredModulesToExecute().required_modules)
@@ -749,6 +772,15 @@ class RouteGenerator(Logger):
 
             required_modules_to_execute -= executed_modules
             executed_available_modules = required_modules_to_execute
+            
+            # route_modules: List[BaseModuleInfo] | None = await self.generate_route_modules(
+            #     all_available_modules,
+            #     all_available_wallet_balances,
+            #     required_modules_to_execute,
+            #     executed_modules,
+            #     client,
+            #     is_first_run,
+            # )
 
             available_modules: list[BaseModuleInfo] | None = await self.get_available_modules(
                 all_available_modules,

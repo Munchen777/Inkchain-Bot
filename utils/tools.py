@@ -1,14 +1,16 @@
 import openpyxl
 import os
 import sys
+import networkx as nx
 
-from collections import defaultdict, deque
+from collections import Counter, defaultdict, deque
 from better_proxy import Proxy
+from openpyxl.utils.exceptions import InvalidFileException
 from typing import DefaultDict, Dict, Deque, List, Set
 
 from generall_settings import EXCEL_FILE_PATH
 from modules import Logger
-from openpyxl.utils.exceptions import InvalidFileException
+from modules.interfaces import BaseModuleInfo
 
 
 logger: Logger = Logger().get_logger()
@@ -106,34 +108,46 @@ def check_progress_file() -> bool:
 #         for neighbour in graph.get(key, []):
 #             remove_edge()
 
+def find_least_significant_edge(cycle_edges: List[str], graph: DefaultDict[str, List[str]]):
+    """ Определяет, какое ребро удалить """
+    # Считаем входящие связи
+    in_degree = Counter()
+    for u in graph:
+        for v in graph.get(u, []):
+            in_degree[v] += 1
+
+    # Выбираем ребро, ведущее в вершину с минимальной входящей степенью
+    min_edge = min(cycle_edges, key=lambda edge: in_degree[edge[1]])
+    return min_edge
+
 
 def find_cycle(graph: DefaultDict[str, List[str]]) -> List[str] | None:
-    visited: Set[str] = set()
-    stack: Set[str] = set()
+    """ Находит любое ребро в цикле """
+    visited: Dict[str, bool] = {node: False for node in graph}
+    rec_stack: Dict[str, bool] = {node: False for node in graph}
 
-    def dfs(node: str, path: List) -> List[str] | None:
-        if node in stack:
-            return path[path.index(node):]
-
-        if node in visited:
-            return None
-
-        visited.add(node)
-        stack.add(node)
+    def dfs_cycle_detect(node: str, visited: Dict[str, bool], rec_stack: Dict[str, bool]):
+        """ Обнаружение цикла с помощью DFS """
+        visited[node] = True
+        rec_stack[node] = True
 
         for neighbour in graph.get(node, []):
-            cycle: List[str] | None = dfs(neighbour, path + [node])
-            if cycle:
-                return cycle
+            if not visited.get(neighbour):
+                cycle_edge = dfs_cycle_detect(neighbour, visited, rec_stack)
+                if cycle_edge:
+                    return cycle_edge
 
-        stack.remove(node)
+            elif rec_stack.get(neighbour):  # Цикл найден
+                return (node, neighbour)
+
+        rec_stack[node] = False
         return None
 
     for node in graph:
-        cycle: List[str] | None = dfs(node, [])
-        if cycle:
-            return cycle
-
+        if not visited.get(node):
+            cycle_edge = dfs_cycle_detect(node, visited, rec_stack)
+            if cycle_edge:
+                return cycle_edge
     return None
 
 
@@ -151,6 +165,20 @@ def topological_sort(graph: DefaultDict[str, List[str]]) -> List[str]:
         node: list(set(deps))
         for node, deps in graph.items()
     }
+    cycle_edges: List = []
+
+    while True:
+        cycle_edge = find_cycle(graph)
+        if not cycle_edge:
+            break
+
+        cycle_edges.append(cycle_edge)
+        edge_to_remove = find_least_significant_edge(cycle_edges, graph)
+        print(f"Удаляем ребро {edge_to_remove}")
+        graph[edge_to_remove[0]].remove(edge_to_remove[1])
+        cycle_edges.remove(edge_to_remove)
+
+
     # Подсчёт входящих рёбер для каждой вершины
     in_degree: DefaultDict[str, int] = defaultdict(int)
     for node, dependencies in graph.items():
@@ -173,15 +201,102 @@ def topological_sort(graph: DefaultDict[str, List[str]]) -> List[str]:
 
     # Проверка на наличие цикла
     if len(sorted_order) != len(graph):
-        while True:#find_cycle(graph):
-            cycle: List[str] | None = find_cycle(graph)
-            if cycle:
-                graph: DefaultDict[str, list[str]] = remove_cycle(graph, cycle)
-                continue
-            break
+        problematic_nodes = [node for node in graph if in_degree[node] > 0]
+        for u in graph:
+            for v in graph.get(u, []):
+                if v in problematic_nodes:
+                    print(f"Удаляем ребро ({u} -> {v})")
+                    graph[u].remove(v)
+        # while True:#find_cycle(graph):
+        #     cycle: List[str] | None = find_cycle(graph)
+        #     if cycle:
+        #         graph: DefaultDict[str, list[str]] = remove_cycle(graph, cycle)
+        #         continue
+        #     break
 
-        return topological_sort(graph)
+        # return topological_sort(graph)
         
         # raise ValueError("Graph contains a cycle. Topological sort is not possible.")
 
     return sorted_order
+
+
+async def build_route_modules(
+    modules_to_execute: Dict[str, BaseModuleInfo],
+    all_available_wallet_balances: Dict[str, Dict[str, float]]
+):
+    graph: nx.Graph = nx.Graph()
+    
+    for module_name, module in modules_to_execute.items():
+        graph.add_node(module_name,
+                       source_tokens=module.source_token, 
+                       dest_tokens=module.dest_token,
+                       source_network=module.source_network,
+                       dest_network=module.destination_network,
+                       )
+    """
+    1. Сверяем сети отправления текущего модуля с сетью назначения
+    2. Можем ли мы получить токен отправления в токенах назначения, иначе False
+    3. Проверяю, что токенов в сети 
+    
+    
+    """
+    for node1 in graph.nodes:
+        for node2 in graph.nodes:
+            if node1 != node2:
+                # Берем два модуля
+                module_1: BaseModuleInfo = modules_to_execute.get(node1)
+                module_2: BaseModuleInfo = modules_to_execute.get(node2)
+
+                source_tokens: List[str] | None = module_1.source_token if isinstance(module_1.source_token, list) else [module_1.source_token]
+                source_network: str | None = module_1.source_network
+                
+                dest_tokens: List[str] | None = module_2.dest_token if isinstance(module_2.dest_token, list) else [module_2.dest_token]
+                dest_network: str | None = module_2.destination_network
+                
+                # Если сеть отправления 1-го модуля равна сети назначения и
+                # не хватает баланса какого-нибудь токена в сети отправления на выполнение действия 
+                # (оставляем в сети отправления мин.баланс + сумма для действия)
+                if source_network == dest_network and any(
+                    all_available_wallet_balances.get(source_network, {}).get(token_name, 0) <= (module_1.min_available_balance + module_1.min_amount_out) \
+                        for token_name in source_tokens
+                    ) and all(token in dest_tokens for token in source_tokens):
+                    # Если в сети назначения хватает баланса для сети отправления (мин. баланс + мин.сумма на выходе)
+                    
+                    # Если в сети отправления другого модуля хватает баланса токенов, то создаем связь
+                    dep_source_network: str = module_2.source_network
+                    dep_source_tokens: List[str] | None = module_2.source_token if isinstance(module_2.source_token, list) else [module_2.source_token]
+                    
+                    if all(
+                        all_available_wallet_balances.get(dep_source_network, {}).get(token_name, 0) > (module_2.min_available_balance + module_2.min_amount_out)
+                        for token_name in dep_source_tokens
+                    ) and module_1.module_type != module_2.module_type:
+                        graph.add_edge(node2, node1)
+                        
+                        for token_name in dep_source_tokens:
+                            all_available_wallet_balances.get(dep_source_network)[token_name] -= module_2.min_amount_out
+                        
+                        for token_name in source_tokens:
+                            all_available_wallet_balances.get(source_network)[token_name] += module_2.min_amount_out
+                
+    
+    return graph
+    print()
+                # if all_available_wallet_balances.get(source_network, {}).get(token_name, 0) > (module_1.min_available_balance + module_1.min_amount_out) \
+                #     for token_name in source_tokens
+                    
+                
+                
+                    
+                    
+                    # if all(
+                    #     all_available_wallet_balances.get(dest_network, {}).get(token_name, 0) > (module_1.min_available_balance)
+                    #     for token_name in dest_tokens
+                    # ):
+                    #     graph.add_edge(node2, node1)
+                    
+                
+                        
+
+    
+    

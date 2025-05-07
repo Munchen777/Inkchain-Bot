@@ -97,5 +97,5 @@ if __name__ == "__main__":
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    install_requirements()
+    # install_requirements()
     main()

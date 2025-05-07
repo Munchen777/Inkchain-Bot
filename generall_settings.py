@@ -1,5 +1,6 @@
 import os
-
+AMOUNT_PERCENT = (0.001, 0.01) # Минимальная / максимальная сумма для выполнения всех действий
+MIN_BALANCE = 0.0001           # Сумма, которую должны оставить в сети отправления
 '--------------------------------------------------- AMOUNT CONTROL ---------------------------------------------------'
 MIN_AVAILABLE_BALANCE_ETHEREUM = 0.01                # Minimum network Ethereum balance in native coin (ETH)
 MIN_AVAILABLE_BALANCE_OP = 0.002                     # Minimum network OP balance in native coin (ETH)
@@ -24,7 +25,7 @@ SHUFFLE_WALLETS = True                               # To mix accounts or not
 
 SHUFFLE_ROUTE = False                                # Shuffle the assignments or not
 
-WALLETS_TO_WORK: int | tuple | list = 0              # 0 - all accounts
+WALLETS_TO_WORK: int | tuple | list = 1              # 0 - all accounts
                                                      # 1 - account No. 1
                                                      # 1, 7 - accounts 1 and 7
                                                      # [5, 25] - accounts 5 through 25 inclusive
