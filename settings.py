@@ -1,125 +1,91 @@
-from typing import Dict, List, Set
+from dataclasses import dataclass
+from typing import Dict
 
-"""
-Handle installation of classic route.
-You can specify modules that will be used in the classic route.
+from interfaces import *
+from models import ERC20Contract
 
-CLASSIC_ROUTES_MODULES_USING = [
-    *** Bridges from L2 to L2 ***                                             Brief description of the modules
 
-    ["bridge_owlto_op_to_ink"]                          Bridge on the website Owlto from the Optimism Network to the Ink network
-    ["bridge_owlto_base_to_ink"]                        Bridge on the website Owlto from the Base Network to the Ink network
-    ["bridge_owlto_ink_to_op"]                          Bridge on the website Owlto from the Ink Network to the Optimism network
-    ["bridge_owlto_ink_to_base"]                        Bridge on the website Owlto from the Ink Network to the Base network
-    ["bridge_relay_op_to_ink"]                          Bridge on the website Relay from the Optimism Network to the Ink network
-    ["bridge_relay_base_to_ink"]                        Bridge on the website Relay from the Base Network to the Ink network
-    ["bridge_relay_ink_to_op"]                          Bridge on the website Relay from the Ink Network to the Optimism network
-    ["bridge_relay_ink_to_base"]                        Bridge on the website Relay from the Ink Network to the Base network
-    
-    *** Bridges from L1 to L2 ***
-
-    ["bridge_gg_ethereum_to_ink"]                       Bridge on the website BridGG from the Ethereum Network to the Ink network
-
-    ***Swaps InkSwap https://dex.inkswap.io/#/swap ***
-
-    ["swap_inkswap_eth_to_iswap"]                       Swap on the website InkSwap from the ETH token to ISWAP token on the Ink network
-    ["swap_inkswap_eth_to_sink"]                        Swap on the website InkSwap from the ETH token to SINK token on the Ink network
-    ["swap_inkswap_eth_to_kraken"]                      Swap on the website InkSwap from the ETH token to KRAKEN token on the Ink network
-    ["swap_inkswap_iswap_to_eth"]                       Swap on the website InkSwap from the ISWAP token to ETH token on the Ink network
-    ["swap_inkswap_sink_to_eth"]                        Swap on the website InkSwap from the SINK token to ETH token on the Ink network
-    ["swap_inkswap_kraken_to_eth"]                      Swap on the website InkSwap from the KRAKEN token to ETH token on the Ink network
-    ["swap_inkswap_iswap_to_sink"]                      Swap on the website InkSwap from the ISWAP token to SINK token on the Ink network
-    ["swap_inkswap_sink_to_iswap"]                      Swap on the website InkSwap from the SINK token to ISWAP token on the Ink network
-    ["swap_inkswap_sink_to_kraken"]                     Swap on the website InkSwap from the SINK token to KRAKEN token on the Ink network
-    ["swap_inkswap_kraken_to_sink"]                     Swap on the website InkSwap from the KRAKEN token to SINK token on the Ink network
-    ["swap_inkswap_kraken_to_iswap"]                    Swap on the website InkSwap from the KRAKEN token to ISWAP token on the Ink network
-    ["swap_inkswap_iswap_to_kraken"]                    Swap on the website InkSwap from the ISWAP token to KRAKEN token on the Ink network
-
-    ***Swaps DyorSwap https://dyorswap.finance/swap ***
-
-    ["swap_dyor_eth_to_usdc"]                           Swap on the website Dyor from the ETH token to USDC token on the Ink network
-    ["swap_dyor_eth_to_kraken"]                         Swap on the website Dyor from the ETH token to KRAKEN token on the Ink network
-    ["swap_dyor_eth_to_usdt"]                           Swap on the website Dyor from the ETH token to USDT token on the Ink network
-    ["swap_dyor_eth_to_weth"]                           Swap on the website Dyor from the ETH token to WETH token on the Ink network
-    ["swap_dyor_eth_to_worm"]                           Swap on the website Dyor from the ETH token to WORM token on the Ink network
-    ["swap_dyor_weth_to_eth"]                           Swap on the website Dyor from the WETH token to ETH token on the Ink network
-    ["swap_dyor_usdc_to_eth"]                           Swap on the website Dyor from the USDC token to ETH token on the Ink network
-    ["swap_dyor_usdt_to_eth"]                           Swap on the website Dyor from the USDT token to ETH token on the Ink network
-    ["swap_dyor_worm_to_eth"]                           Swap on the website Dyor from the WORM token to ETH token on the Ink network
-    ["swap_dyor_kraken_to_eth"]                         Swap on the website Dyor from the KRAKEN token to ETH token on the Ink network
-    ["swap_dyor_kraken_to_worm"]                        Swap on the website Dyor from the KRAKEN token to WORM token on the Ink network
-    ["swap_dyor_worm_to_kraken"]                        Swap on the website Dyor from the WORM token to KRAKEN token on the Ink network
-    ["swap_dyor_worm_to_usdt"]                          Swap on the website Dyor from the WORM token to USDT token on the Ink network
-    ["swap_dyor_worm_to_usdc"]                          Swap on the website Dyor from the WORM token to USDC token on the Ink network
-    ["swap_dyor_worm_to_weth"]                          Swap on the website Dyor from the WORM token to WETH token on the Ink network
-    ["swap_dyor_kraken_to_weth"]                        Swap on the website Dyor from the KRAKEN token to WETH token on the Ink network
-    ["swap_dyor_kraken_to_usdc"]                        Swap on the website Dyor from the KRAKEN token to USDC token on the Ink network
-    ["swap_dyor_usdc_to_kraken"]                        Swap on the website Dyor from the USDC token to KRAKEN token on the Ink network
-    ["swap_dyor_usdc_to_worm"]                          Swap on the website Dyor from the USDC token to WORM token on the Ink network
-    ["swap_dyor_usdc_to_usdt"]                          Swap on the website Dyor from the USDC token to USDT token on the Ink network
-    ["swap_dyor_usdc_to_weth"]                          Swap on the website Dyor from the USDC token to WETH token on the Ink network
-    ["swap_dyor_weth_to_usdt"]                          Swap on the website Dyor from the WETH token to USDT token on the Ink network
-    ["swap_dyor_weth_to_usdc"]                          Swap on the website Dyor from the WETH token to USDC token on the Ink network
-    ["swap_dyor_weth_to_worm"]                          Swap on the website Dyor from the WETH token to WORM token on the Ink network
-    ["swap_dyor_usdt_to_weth"]                          Swap on the website Dyor from the USDT token to WETH token on the Ink network
-    ["swap_dyor_weth_to_kraken"]                        Swap on the website Dyor from the WETH token to KRAKEN token on the Ink network
-    ["swap_dyor_usdt_to_usdc"]                          Swap on the website Dyor from the USDT token to USDC token on the Ink network
-    ["swap_dyor_usdt_to_worm"]                          Swap on the website Dyor from the USDT token to WORM token on the Ink network
-    ["swap_dyor_usdt_to_kraken"]                        Swap on the website Dyor from the USDT token to KRAKEN token on the Ink network
-    ["swap_dyor_kraken_to_usdt"]                        Swap on the website Dyor from the KRAKEN token to USDT token on the Ink network
-
-    *** Add Liquidity DyorSwap https://dyorswap.finance/liquidity ***
-
-    ["add_liquidity_dyor_eth_and_usdc"]                 Add Liquidity on the website Dyor from the ETH token and USDC token on the Ink network
-    ["add_liquidity_dyor_eth_and_usdt"]                 Add Liquidity on the website Dyor from the ETH token and USDT token on the Ink network
-    ["add_liquidity_dyor_eth_and_kraken"]               Add Liquidity on the website Dyor from the ETH token and KRAKEN token on the Ink network
-    ["add_liquidity_dyor_eth_and_worm"]                 Add Liquidity on the website Dyor from the ETH token and WORM token on the Ink network
-
-    *** Mint NFTs ***
-
-    ["mint_paragraf_nft"]                               Mint nft "Paragraf" on the Ink network
-    ["mint_og_nft"]                                     Mint nft "OG" on the Ink network
-    ["mint_guild_nft"]                                  Mint nft "Guild Pin" on the Ink network    
-
-    *** Other tasks ***
-
-    ["deploy_contract_ink_network"]                     Deploy contract on the Ink network
-
-    ["buy_znc_domen_ink_network"]                       Buy ZNC domen on the Ink network
-    
-    ["claim_daily_gm"]                                  Claim Daily GM on the Ink network
-
-    ["add_liquidity_dinero_ieth_and_eth"]               Add Liquidity on the website Dinero iETH on the Ink network and ETH on the Ethereum network
-
-]
-
-"""
-
-CLASSIC_ROUTES_MODULES_USING: List[str] = [
-    # "swap_dyor_eth_to_usdc",
-    # "mint_paragraf_nft",
-    # "mint_og_nft",
-    # "mint_guild_nft",
-    # "add_liquidity_dinero_ieth_and_eth",
-    # "buy_znc_domen_ink_network",
-    # "claim_daily_gm",
-]
-
-""" Networks which we work with """
-PRIORITY_NETWORK_NAMES: Set[str] = {
-    "Ink Mainnet",
+MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
+    "bridge_owlto_op_to_ink": BridgeOwltoOPtoInkModule,
+    "bridge_owlto_base_to_ink": BridgeOwltoBasetoInkModule,
+    "bridge_owlto_ink_to_op": BridgeOwltoInktoOPModule,
+    "bridge_owlto_ink_to_base": BridgeOwltoInktoBaseModule,
+    "bridge_relay_op_to_ink": BridgeRelayOPtoInkModule,
+    "bridge_relay_base_to_ink": BridgeRelayBasetoInkModule,
+    "bridge_relay_ink_to_op": BridgeRelayInktoOPModule,
+    "bridge_relay_ink_to_base": BridgeRelayInktoBaseModule,
+    "bridge_gg_ethereum_to_ink": BridgGGEthereumtoInkModule,
+    "swap_inkswap_eth_to_iswap": SwapInkswapETHtoISWAPModule,
+    "swap_inkswap_eth_to_sink": SwapInkswapETHtoSINKModule,
+    "swap_inkswap_eth_to_kraken": SwapInkswapETHtoKRAKENModule,
+    "swap_inkswap_iswap_to_eth": SwapInkswapISWAPtoETHModule,
+    "swap_inkswap_sink_to_eth": SwapInkswapSINKtoETHModule,
+    "swap_inkswap_kraken_to_eth": SwapInkswapKRAKENtoETHModule,
+    "swap_inkswap_iswap_to_sink": SwapInkswapISWAPtoSINKModule,
+    "swap_inkswap_sink_to_iswap": SwapInkswapSINKtoISWAPModule,
+    "swap_inkswap_sink_to_kraken": SwapInkswapSINKtoKRAKENModule,
+    "swap_inkswap_kraken_to_sink": SwapInkswapKRAKENtoSINKModule,
+    "swap_inkswap_kraken_to_iswap": SwapInkswapKRAKENtoISWAPModule,
+    "swap_inkswap_iswap_to_kraken": SwapInkswapISWAPtoKRAKENModule,
+    "swap_dyor_eth_to_usdc": SwapDyorETHtoUSDCModule,
+    "swap_dyor_eth_to_kraken": SwapDyorETHtoKrakenModule,
+    "swap_dyor_eth_to_usdt": SwapDyorETHtoUSDTModule,
+    "swap_dyor_eth_to_weth": SwapDyorETHtoWETHModule,
+    "swap_dyor_eth_to_worm": SwapDyorETHtoWORMModule,
+    "swap_dyor_weth_to_eth": SwapDyorWETHtoETHModule,
+    "swap_dyor_usdc_to_eth": SwapDyorUSDCtoETHModule,   
+    "swap_dyor_usdt_to_eth": SwapDyorUSDTtoETHModule,
+    "swap_dyor_worm_to_eth": SwapDyorWORMtoETHModule,
+    "swap_dyor_kraken_to_eth": SwapDyorKRAKENtoETHModule,
+    "swap_dyor_kraken_to_worm": SwapDyorKRAKENtoWORMModule,
+    "swap_dyor_worm_to_kraken": SwapDyorWORMtoKRAKENModule,
+    "swap_dyor_worm_to_usdt": SwapDyorWORMtoUSDTModule,
+    "swap_dyor_worm_to_usdc": SwapDyorWORMtoUSDCModule,
+    "swap_dyor_worm_to_weth": SwapDyorWORMtoWETHModule,
+    "swap_dyor_kraken_to_weth": SwapDyorKRAKENtoWETHModule,
+    "swap_dyor_kraken_to_usdc": SwapDyorKRAKENtoUSDCModule,
+    "swap_dyor_usdc_to_kraken": SwapDyorUSDCtoKRAKENModule,
+    "swap_dyor_usdc_to_worm": SwapDyorUSDCtoWORMModule,
+    "swap_dyor_usdc_to_usdt": SwapDyorUSDCtoUSDTModule,
+    "swap_dyor_usdc_to_weth": SwapDyorUSDCtoWETHModule,
+    "swap_dyor_weth_to_usdc": SwapDyorWETHtoUSDCModule,
+    "swap_dyor_weth_to_usdt": SwapDyorWETHtoUSDTModule,
+    "swap_dyor_weth_to_worm": SwapDyorWETHtoWORMModule,
+    "swap_dyor_usdt_to_weth": SwapDyorUSDTtoWETHModule,
+    "swap_dyor_weth_to_kraken": SwapDyorWETHtoKRAKENModule,
+    "swap_dyor_usdt_to_usdc": SwapDyorUSDTtoUSDCModule,
+    "swap_dyor_usdt_to_worm": SwapDyorUSDTtoWORMModule,
+    "swap_dyor_usdt_to_kraken": SwapDyorUSDTtoKRAKENModule,
+    "swap_dyor_kraken_to_usdt": SwapDyorKRAKENtoUSDTModule,
+    "add_liquidity_dyor_eth_and_usdc": AddLiquidityDyorETHtoUSDCModule,
+    "add_liquidity_dyor_eth_and_usdt": AddLiquidityDyorETHtoUSDTModule,
+    "add_liquidity_dyor_eth_and_kraken": AddLiquidityDyorETHtoKRAKENModule,
+    "add_liquidity_dyor_eth_and_worm": AddLiquidityDyorETHtoWORMModule,
+    "mint_paragraf_nft": MintNFTParagrafModule,
+    "mint_og_nft": MintNFTOGModule,
+    "mint_guild_nft": MintNFTGuildModule,
+    "deploy_contract_ink_network": DeployContractInkModule,
+    "buy_znc_domen_ink_network": BuyZNCDomenInkModule,
+    "claim_daily_gm": ClaimDailyGMModule,
+    "add_liquidity_dinero_ieth_and_eth": AddLiquidityDineroiETHandETHModule
 }
 
-NETWORK_TOKEN_CONTRACTS: Dict[str, Dict[str, str]] = {
-    "Ink Mainnet": {
-        "WETH": "0x4200000000000000000000000000000000000006",
-        "ISWAP": "0x6814B9C5dae3DD05A8dBE9bF2b4E4FbB9Cef5302",
-        "SINK": "0xD43e76fF8f95035E220070BdDFD3C0C2bdD3051B",
-        "KRAKEN": "0xCa5f2cCBD9C40b32657dF57c716De44237f80F05",
-        "USDC": "0xf1815bd50389c46847f0bda824ec8da914045d14",
-        "USDT": "0x0200C29006150606B650577BBE7B6248F58470c1",
-        "WORM": "0x2dC2b752F4C6dFfe2dbcf60b848B8357a8879A01"
-    },
-}
+@dataclass(slots=True)
+class BridgeGGContract(ERC20Contract):
+    address: str = "0x88ff1e5b602916615391f55854588efcbb7663f0"
+    abi_file: str = "bridge_gg.json"
 
-UNISWAP_V2_ROUTER_CONTRACT_ADDRESS: str = "0xb5B494e63c3a52391E6C8E4a4D6aa1AEF369Fb6B"
+@dataclass(slots=True)
+class OwltoContract(ERC20Contract):
+    address: str = "0x0e83ded9f80e1c92549615d96842f5cb64a08762"
+    abi_file: str = "owlto.json"
+
+@dataclass(slots=True)
+class ParagraphContract(ERC20Contract):
+    address: str = "0x69086dDd87cb58709540f784c32740a6f9a49CFF"
+    abi_file: str = "paragraph.json"
+
+@dataclass(slots=True)
+class DailyGMContract(ERC20Contract):
+    address: str = "0x9F500d075118272B3564ac6Ef2c70a9067Fd2d3F"
+    abi_file: str = "daily_gm.json"
