@@ -1,0 +1,76 @@
+#------------------------------------------------------------------------------
+# en: Threading Configuration | ru: Конфигурация потоков
+#------------------------------------------------------------------------------
+# en: Controls parallel execution capacity (min: 1) | ru: Управление количеством параллельных выполнений (минимум: 1)
+threads: 10
+
+#------------------------------------------------------------------------------
+# en: Timing Settings | ru: Настройки времени
+#------------------------------------------------------------------------------
+# en: Initial delay range before starting operations (seconds) | ru: Диапазон начальной задержки перед началом выполнения (секунды)
+delay_before_start:
+    min: 1
+    max: 10
+
+# en: Delay between tasks (seconds) | ru: Задержка между задачами (секунды)
+delay_between_tasks:
+    min: 60
+    max: 300
+
+
+#------------------------------------------------------------------------------
+# en: Accounts Settings | ru: Настройки аккаунтов
+#------------------------------------------------------------------------------
+# en: Shuffle accounts before execution | ru: Перемешать аккаунты перед запуском
+shuffle_flag: true
+
+# en: min / max percent range for swaps, bridging ... | ru: мин./макс. процент для свапов, бриджей ...
+percent_range:
+    min: 100
+    max: 100
+
+# en: min / max save amount in destination network | ru: мин./макс. кол-во, которое оставляем в сети отправления
+save_amount:
+    min: 0
+    max: 0
+
+
+#------------------------------------------------------------------------------
+# en: Individual Modules configuration | ru: Индивидуальная конфигурация модулей
+#------------------------------------------------------------------------------
+
+#  - bridge_owlto_op_to_ink
+#  - bridge_owlto_base_to_ink
+#  - bridge_owlto_ink_to_op
+#  - bridge_owlto_ink_to_base
+#  - bridge_relay_op_to_ink
+#  - bridge_relay_base_to_ink
+#  - bridge_relay_ink_to_op
+#  - bridge_relay_ink_to_base
+#  - bridge_gg_ethereum_to_ink
+#  - mint_paragraf_nft
+#  - buy_znc_domen_ink_network
+#  - claim_daily_gm
+
+
+# en: Example | ru: Пример
+
+# modules_settings:
+#   bridge_owlto_op_to_ink:
+#     # en: Range amount for define module (swap, bridge, add / remove liquidity ...) | ru: Процентный диапазон для модулей
+#     percent_range:
+#       min: 50
+#       max: 70
+#     # en: Range amount left | ru: Диапозон количество токенов, которое остается
+#     save_amount:
+#       min: 0.001
+#       max: 0.001
+
+  # bridge_relay_ink_to_op:
+  #   percent_range:
+  #     min: 50
+  #     max: 70
+
+  #   save_amount:
+  #     min: 0.01
+  #     max: 0.015
