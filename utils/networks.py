@@ -1,37 +1,32 @@
-from typing import Dict
+from typing import Dict, List
 
 
 class Network:
     def __init__(
             self,
             name: str,
-            rpc: list,
+            rpc: List[str],
             chain_id: int,
             eip1559_support: bool,
             token: str,
             explorer: str,
             decimals: int = 18
     ):
-        self.name = name
-        self.rpc = rpc
-        self.chain_id = chain_id
-        self.eip1559_support = eip1559_support
-        self.token = token
-        self.explorer = explorer
-        self.decimals = decimals
-
-    def __repr__(self):
-        return f'{self.name}'
+        self.name: str = name
+        self.rpc: List[str] = rpc
+        self.chain_id: int = chain_id
+        self.eip1559_support: bool = eip1559_support
+        self.token: str = token
+        self.explorer: str = explorer
+        self.decimals: int = decimals
 
 
 Ethereum = Network(
     name='Ethereum Mainnet',
     rpc=[
-        'wss://eth.drpc.org',
         'https://eth.llamarpc.com',
         'https://uk.rpc.blxrbdn.com',
         'https://virginia.rpc.blxrbdn.com',
-        'https://rpc.ankr.com/eth',
         'https://eth.meowrpc.com',
         'https://singapore.rpc.blxrbdn.com'
     ],
@@ -44,7 +39,6 @@ Ethereum = Network(
 Ink = Network(
     name='Ink Mainnet',
     rpc=[
-        'wss://rpc-qnd.inkonchain.com',
         'https://rpc-qnd.inkonchain.com'
     ],
     chain_id=57073,
@@ -56,11 +50,8 @@ Ink = Network(
 Base = Network(
     name='Base Mainnet',
     rpc=[
-        'https://base.llamarpc.com',
-        'wss://base.callstaticrpc.com',
-        'https://base-mainnet.public.blastapi.io',
-        'wss://base.gateway.tenderly.co',
-        'https://base.blockpi.network/v1/rpc/public'
+        "https://base.llamarpc.com",
+        "https://base.drpc.org",
     ],
     chain_id=8453,
     eip1559_support=True,
@@ -71,22 +62,10 @@ Base = Network(
 OP = Network(
     name='OP Mainnet',
     rpc=[
-        'https://optimism.llamarpc.com',
-        'wss://optimism.drpc.org',
-        'wss://optimism-rpc.publicnode.com',
-        'https://optimism-mainnet.public.blastapi.io',
-        'https://rpc.ankr.com/optimism'
+        "https://optimism.drpc.org",
     ],
     chain_id=10,
     eip1559_support=True,
     token='ETH',
     explorer='https://optimistic.etherscan.io/',
 )
-
-# Mapping of network names to network classes
-NETWORKS: Dict[str, Network] = {
-    "Ethereum Mainnet": Ethereum,
-    "Ink Mainnet": Ink,
-    "Base Mainnet": Base,
-    "OP Mainnet": OP,
-}
