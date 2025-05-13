@@ -1,0 +1,20 @@
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+    },
+      {
+        "internalType": "address",
+        "name": "mintReferrer",
+        "type": "address"
+    }
+    ],
+    "name": "mintWithReferrer",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+]
