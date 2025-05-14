@@ -1,79 +1,124 @@
-НЕАКТУАЛЕН!!!
-# 💻 Ink Soft
+# 💻 Inkochain Bot
 
 ## General information
 
-Software for practicing the Ink Sepolia testnet. All settings are simple and clear, nothing superfluous
+Software for processing main modules in Inkochain.
 
 ## Main Features
 
 * **Proxy support**
-* **Saving logs to files by day**
-* **Sending messages to Discord with requests**
-* **Saving and monitoring progress to avoid repeating tasks**
-* **Ability to choose the task to be performed**
-* **Parallel start**
+* **Ability to choose the module to be executed**
 * **Asynchronous OOP code**
 * **EIP-1559**
 
 ## 🧩 Modules
+### _Bridges_
+1. _Bridge Relay from Ink to Optimism_
+2. _Bridge Relay from Ink to Base_
+3. _Bridge Relay from Base to Ink_
+4. _Bridge Relay from Optimism to Ink_
+5. _Bridge Owlto from Ink to Optimism_
+6. _Bridge Owlto from Ink to Base_
+7. _Bridge Owlto from Base to Ink_
+8. _Bridge Owlto from Optimism to Ink_
+9. _Bridge BridgeGG from Ethereum Mainnet to Ink_
 
-    1.  Bridge                              (from Ink Sepolia to Sepolia (from Sepolia to Ink Sepolia the bridge is under development))
-    2.  Deploy contract ERC-721             (Deploy, verifying and changing the welcome message)
-    3.  Discord                             (sending feedback on contract creation and sending a message to the gm-gn thread)
-    4.  Guild, Mint NFt, Galxe, Intract     (Will be added if there's feedback from you)
+### _Others_
+10. _Claim Daily GM_
+11. _Claim ZNS Domen_
+12. _Mint Paragraph NFT (Optimism Network only)_
 
-## ♾️ Main Functions
-
-1.  **🚀 Complete all tasks**
-
-    This feature will run all jobs through your accounts 
-
-2.  **📝 Select tasks to be performed**
-
-    Here you can choose which assignment you want to work on.
 
 ## 📄Ввод своих данных
 
-### All necessary data should be specified in the `accounts_data` table in the `/data` folder. 
-   1. **Name** - your account names, each name must be unique
-   2. **Private Key** - private wallet keys
-   3. **Proxy** - proxy for each account
-   4. **DS Token** - auth_token your Discord account
+### All necessary data should be specified in the `config/data` folder.
+   1. **Private Key** - private keys
+   2. **Proxy** - proxy for each account
 
-## ⚙️ Software customization
+## ⚙️ Software customization `config/settings.yaml`
+```yaml
+# Controls asyncronious execution
+threads: 10
 
-All settings are placed in a file `general_settings.py`
+# Shuffle accounts before execution
+shuffle_flag: true
+
+# Initial delay range before starting operations (seconds)
+delay_before_start:
+    min: 1
+    max: 10
+
+# Delay between tasks (seconds)
+delay_between_tasks:
+    min: 60
+    max: 300
+
+percent_amount: # what percent of balance you want to bridge, swap and so on ...
+    - min: 50
+    - max: 75
+
+save_amount: # what amount in Ether you want to leave in source network
+    - min: 0.001
+    - max: 0.002
+
+# Optional
+# Individual Modules configuration
+
+#  - bridge_owlto_op_to_ink
+#  - bridge_owlto_base_to_ink
+#  - bridge_owlto_ink_to_op
+#  - bridge_owlto_ink_to_base
+#  - bridge_relay_op_to_ink
+#  - bridge_relay_base_to_ink
+#  - bridge_relay_ink_to_op
+#  - bridge_relay_ink_to_base
+#  - bridge_gg_ethereum_to_ink
+#  - mint_paragraf_nft
+#  - buy_znc_domen_ink_network
+#  - claim_daily_gm
+
+# Example:
+module_settings:
+    bridge_relay_ink_to_op:
+        percent_range:
+            min: 45
+            max: 80
+        save_amount:
+            # Fixed amount
+            min: 0.001
+            max: 0.001
+
+```
 
 ## 🛠️ Installing and launching the project
 
 > By installing the project, you accept the risks of using the software
 
-Once you download the project, **make sure** that you have Python 3.11.9
+Once you download the project, **make sure** that you have Python 3.12.7
 
-Installing a virtual environment (Windows)
+1. __Installing a virtual environment__
 
 ```bash
   python -m venv ./venv
 ```
 
-To install the necessary libraries, type in the console
+2. __To install the necessary libraries, type in the console__
 
 ```bash
   pip install -r requirements.txt
 ```
 
-## 🔗 Python and PyCharm installation links
-
- - [Installation VC Code](https://code.visualstudio.com/download)
- - [Installation Python](https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) (Windows)
+3. __Launch by command__
+```bash
+python main.py
+```
 
 ## ❔ Where do I write my question?
 
-- [@divinus_py](https://t.me/divinus_py) - my channel  
-- [@divinus_xyz_chat](https://t.me/divinus_xyz_chat) - answers to any question 
+- [@degensoftware](https://t.me/degensoftware) - my channel
+- [@degen_software](https://t.me/degen_software) - answers to any question
 
 ## ❤️‍🔥Donate (Any EVM)
 
-### `0x007F451532c978AC96e3B86beAE7923d691321Ea`
+### `0x5b7aa8714fa6784652518f6a08db986a0811c2b1`
 > Thank you for your support❤️
