@@ -29,11 +29,15 @@ Software for processing main modules in Inkochain.
 12. _Mint Paragraph NFT (Optimism Network only)_
 
 
-## 📄Ввод своих данных
+## 📄 Data
 
-### All necessary data should be specified in the `config/data` folder.
-   1. **Private Key** - private keys
-   2. **Proxy** - proxy for each account
+### All necessary data should be specified in the `config/data/client` folder.
+   1. Create `private_keys.txt` file and fill by private keys.
+   2. Create `proxies.txt` file and fill by proxies in format:
+        - **http://host:port:login:password**
+        - **http://host:port@login:password**
+        - **http://login:password@host:port**
+        - **http://login:password:host:port**
 
 ## ⚙️ Software customization `config/settings.yaml`
 ```yaml
