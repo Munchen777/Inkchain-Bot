@@ -124,8 +124,8 @@ class BridgeRelayWorker(Wallet):
             random_amount: float = random.uniform(min_amount, max_amount)
             random_save_amount: float = random.uniform(min_save_amount, max_save_amount)
 
-            if await self._has_sufficient_balance(balance, random_amount, min_save_amount):
-                value: float = float(balance - random_amount)
+            if await self._has_sufficient_balance(balance, random_amount, random_save_amount):
+                value: float = float(balance - (balance - random_amount))
                 if value == 0:
                     value: float = float(random_amount * 0.95)
 
