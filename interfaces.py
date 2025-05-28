@@ -548,8 +548,8 @@ class MintNFTModuleInfo(BaseModuleInfo):
         module_type: str = "mint_nft" - тип модуля (дефолтное значение)
     
     """
-    source_network: Network | None = Ink
-    destination_network: Network | None = Ink
+    source_network: Network = Ink
+    destination_network: Network = Ink
     source_network_name: str = Ink.name
     destination_network_name: str = Ink.name
     module_type: MODULE_TYPES = "mint_nft"
@@ -577,10 +577,16 @@ class MintNFTOGModule(MintNFTModuleInfo):
 
 class MintNFTGuildModule(MintNFTModuleInfo):
     """ Mint Guild NFT module  """
-    source_network: str = Ink.name
+    source_network: Network = Ink
     source_network_chain_id: int = Ink.chain_id
     module_name: str = "mint_guild_nft"
     module_display_name: str = "Mint Guild NFT"
+
+class RhinoNFTModule(MintNFTModuleInfo):
+    source_network: Network = Ink
+    source_network_chain_id: int = Ink.chain_id
+    module_name: str = "mint_rhino_nft"
+    module_display_name: str = "Mint RhinoFi NFT"
 
 
 class DeployContractModule(BaseModuleInfo):
