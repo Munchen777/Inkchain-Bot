@@ -1,7 +1,7 @@
 import random
 
 from abc import ABC, abstractmethod
-from typing import Tuple
+from typing import Tuple, Self
 from eth_typing import ChecksumAddress
 from web3.contract import AsyncContract
 
@@ -21,7 +21,7 @@ from settings import (
 )
 
 
-class BridgeOwltoWorker(ABC):
+class BridgeOwltoWorker(Wallet):
     def __init__(self,
                  account: Account,
                  module_model,
@@ -39,6 +39,13 @@ class BridgeOwltoWorker(ABC):
         self.contract_data: OwltoContract = OwltoContract()
         self.destination: int | None = None
 
+    async def __aenter__(self) -> Self:
+        await Wallet.__aenter__(self)
+        return self
+
+    async def __aexit__(self, exc_type, exc_value, exc_traceback) -> None:
+        await Wallet.__aexit__(self, exc_type, exc_value, exc_traceback)
+
     async def _has_sufficient_balance(self,
                                     balance: float,
                                     random_amount: float,
@@ -52,27 +59,16 @@ class BridgeOwltoWorker(ABC):
             error_msg: str = f"Insufficient Funds to execute {self.module_display_name} | Balance: {balance} | Save amount: {save_amount}"
             raise InsufficientFundsError(error_msg)
 
-    @property
-    def destination(self) -> int:
-        return self.destination
-
-    @destination.setter
-    @abstractmethod
-    def destionation(self, value) -> None:
-        if not isinstance(value, int):
-            raise TypeError("Destination parameter should be an integer type")
-        self.destination: int = value
-
-    @abstractmethod
     async def _get_data(self,
                         value: float,
+                        destination: int | None,
                         ) -> Tuple[ChecksumAddress | int | str]:
         return (
             self.wallet_address,
             self.to_checksum_address("0x0000000000000000000000000000000000000000"),
             self.to_checksum_address("0x1f49a3fa2b5B5b61df8dE486aBb6F3b9df066d86"),
             self.to_wei(value, "ether"),
-            self.destination,
+            destination or self.destination,
             98675412,
         )
 
@@ -108,8 +104,8 @@ class BridgeOwltoWorker(ABC):
             random_amount: float = random.uniform(min_amount, max_amount)
             random_save_amount: float = random.uniform(min_save_amount, max_save_amount)
 
-            if await self._has_sufficient_balance(balance, random_amount, min_save_amount):
-                value: float = float(balance - random_amount)
+            if await self._has_sufficient_balance(balance, random_amount, random_save_amount):
+                value: float = float(balance - (balance - random_amount))
                 if value == 0:
                     value: float = float(random_amount * 0.95)
 
@@ -146,16 +142,8 @@ class BridgeOwltoOPtoInkWorker(BridgeOwltoWorker):
                  account: Account,
                  module_model: BridgeOwltoOPtoInkModule,
                  ) -> None:
-        super().__init__(account, module_model)
-
-    @property
-    def destination(self) -> int:
-        return self.destination
-
-    @destination.setter
-    @abstractmethod
-    def destionation(self):
-        self.destination = 88
+        BridgeOwltoWorker.__init__(self, account=account, module_model=module_model)
+        self.destination = 3
 
 
 class BridgeOwltoInkToOPWorker(BridgeOwltoWorker):
@@ -163,15 +151,7 @@ class BridgeOwltoInkToOPWorker(BridgeOwltoWorker):
                  account: Account,
                  module_model: BridgeOwltoInktoOPModule,
                  ) -> None:
-        super().__init__(account, module_model)
-
-    @property
-    def destination(self) -> int:
-        return self.destination
-
-    @destination.setter
-    @abstractmethod
-    def destionation(self):
+        BridgeOwltoWorker.__init__(self, account=account, module_model=module_model)
         self.destination = 3
 
 
@@ -180,15 +160,7 @@ class BridgeOwltoBaseToInkWorker(BridgeOwltoWorker):
                  account: Account,
                  module_model: BridgeOwltoBasetoInkModule,
                  ) -> None:
-        super().__init__(account, module_model)
-
-    @property
-    def destination(self) -> int:
-        return self.destination
-
-    @destination.setter
-    @abstractmethod
-    def destionation(self):
+        BridgeOwltoWorker.__init__(self, account=account, module_model=module_model)
         self.destination = 88
 
 
@@ -197,13 +169,5 @@ class BridgeOwltoInkToBaseWorker(BridgeOwltoWorker):
                  account: Account,
                  module_model: BridgeOwltoInktoBaseModule,
                  ) -> None:
-        super().__init__(account, module_model)
-    
-    @property
-    def destination(self) -> int:
-        return self.destination
-
-    @destination.setter
-    @abstractmethod
-    def destionation(self):
+        BridgeOwltoWorker.__init__(self, account=account, module_model=module_model)
         self.destination = 3
