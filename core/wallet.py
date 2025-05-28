@@ -376,3 +376,9 @@ class Wallet(AsyncWeb3, Account):
             return status, result
         except Exception as error:
             return False, str(error)
+
+    async def get_available_balances(self) -> Dict[str, float]:
+        try:
+            pass
+        except Exception as error:
+            pass

@@ -17,6 +17,7 @@ class Console:
     MODULES: Tuple[str] = (
 
         "Exit",
+        "Smart Route Generate",
 
         "Owlto Bridge OP to Ink",
         "Owlto Bridge Ink to OP",
@@ -32,11 +33,13 @@ class Console:
         "Claim Daily GM",
         "Claim ZNS Domen",
         "Mint Paragraph NFT",
+        "Mint RhinoNFT",
     )
 
     MODULES_DATA: Dict[str, str] = {
 
         "Exit": "exit",
+        "Smart Route Generate": "smart_route_generate",
 
         "Owlto Bridge OP to Ink": "bridge_owlto_op_to_ink",
         "Owlto Bridge Ink to OP": "bridge_owlto_ink_to_op",
@@ -53,6 +56,7 @@ class Console:
         "Claim Daily GM": "claim_daily_gm",
         "Claim ZNS Domen": "buy_znc_domen_ink_network",
         "Mint Paragraph NFT": "mint_paragraf_nft",
+        "Mint RhinoNFT": "mint_rhino_nft",
     }
 
     def __init__(self) -> None:
