@@ -64,6 +64,7 @@ MODULES_CLASSES: Dict[str, BaseModuleInfo] = {
     "mint_paragraf_nft": MintNFTParagrafModule,
     "mint_og_nft": MintNFTOGModule,
     "mint_guild_nft": MintNFTGuildModule,
+    "mint_rhino_nft": RhinoNFTModule,
     "deploy_contract_ink_network": DeployContractInkModule,
     "buy_znc_domen_ink_network": BuyZNCDomenInkModule,
     "claim_daily_gm": ClaimDailyGMModule,
@@ -77,7 +78,7 @@ class BridgeGGContract(ERC20Contract):
 
 @dataclass(slots=True)
 class OwltoContract(ERC20Contract):
-    address: str = "0x0e83ded9f80e1c92549615d96842f5cb64a08762"
+    address: str = "0x7CFE8Aa0d8E92CCbBDfB12b95AEB7a54ec40f0F5"
     abi_file: str = "owlto.json"
 
 @dataclass(slots=True)
@@ -89,3 +90,8 @@ class ParagraphContract(ERC20Contract):
 class DailyGMContract(ERC20Contract):
     address: str = "0x9F500d075118272B3564ac6Ef2c70a9067Fd2d3F"
     abi_file: str = "daily_gm.json"
+
+@dataclass(slots=True)
+class RhinoFiNFTContract(ERC20Contract):
+    address: str = "0x1Df2De291F909baA50C1456C87C71Edf9Fb199D5"
+    abi_file: str = "rhinofi_nft.json"
