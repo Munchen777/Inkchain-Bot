@@ -14,3 +14,4 @@ from .others import ClaimDailyGMWorker
 from .others import ZNSDomenWorker
 
 from .mint_nfts import MintParagraphNFTWorker
+from .mint_nfts import RhinoFiNFTWorker

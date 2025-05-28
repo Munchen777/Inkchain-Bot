@@ -18,6 +18,7 @@ from .modules import (
     ZNSDomenWorker,
 
     MintParagraphNFTWorker,
+    RhinoFiNFTWorker,
 )
 
 
@@ -80,4 +81,9 @@ class InkBot:
     @staticmethod
     async def process_mint_paragraf_nft(account: Account, module_settings) -> Tuple[bool, str]:
         async with MintParagraphNFTWorker(account, module_settings) as module:
+            return await module.run()
+
+    @staticmethod
+    async def process_mint_rhino_nft(account: Account, module_settings) -> Tuple[bool, str]:
+        async with RhinoFiNFTWorker(account, module_settings) as module:
             return await module.run()
